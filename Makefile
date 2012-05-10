@@ -47,7 +47,7 @@ samples: all
 # Phony Targets
 #
 
-.PHONY: all-before clean doc install uninstall
+.PHONY: all-before clean doc install install-headers uninstall uninstall-headers
 
 all-before:
 	@mkdir -p build lib
@@ -61,18 +61,21 @@ doc:
 	$(MAKE) -C doc all
 
 install: all
-	@mkdir -v -p $(DESTDIR)/$(LIBDIR) $(DESTDIR)/$(INCLUDEDIR)
+	@mkdir -v -p $(DESTDIR)/$(LIBDIR)
 	cp lib/$(LIBNAME) $(DESTDIR)/$(LIBDIR)/$(LIBNAME).$(VERSION)
 	$(STRIP) $(DESTDIR)/$(LIBDIR)/$(LIBNAME).$(VERSION)
 	ldconfig -n $(DESTDIR)/$(LIBDIR)
+
+install-headers: all
+	@mkdir -v -p $(DESTDIR)/$(INCLUDEDIR)
 	@rm -fr $(DESTDIR)/$(INCLUDEDIR)/nmea
 	cp -r include/nmea $(DESTDIR)/$(INCLUDEDIR)
 
 uninstall:
-	rm -fr $(DESTDIR)/$(INCLUDEDIR)/nmea
 	rm -f $(DESTDIR)/$(LIBDIR)/$(LIBNAME) $(DESTDIR)/$(LIBDIR)/$(LIBNAME).$(VERSION)
 	ldconfig -n $(DESTDIR)/$(LIBDIR)
-	@rmdir -v -p --ignore-fail-on-non-empty $(DESTDIR)/$(LIBDIR) $(DESTDIR)/$(INCLUDEDIR)
-ifneq ($(DESTDIR),)
-	@mkdir -v -p $(DESTDIR)
-endif
+	@rmdir -v -p --ignore-fail-on-non-empty $(DESTDIR)/$(LIBDIR)
+
+uninstall-headers:
+	rm -fr $(DESTDIR)/$(INCLUDEDIR)/nmea
+	@rmdir -v -p --ignore-fail-on-non-empty $(DESTDIR)/$(INCLUDEDIR)
