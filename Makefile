@@ -61,21 +61,21 @@ doc:
 	$(MAKE) -C doc all
 
 install: all
-	@mkdir -v -p $(DESTDIR)/$(LIBDIR)
-	cp lib/$(LIBNAME) $(DESTDIR)/$(LIBDIR)/$(LIBNAME).$(VERSION)
-	$(STRIP) $(DESTDIR)/$(LIBDIR)/$(LIBNAME).$(VERSION)
-	ldconfig -n $(DESTDIR)/$(LIBDIR)
+	@mkdir -v -p "$(DESTDIR)/$(LIBDIR)"
+	cp "lib/$(LIBNAME)" "$(DESTDIR)/$(LIBDIR)/$(LIBNAME).$(VERSION)"
+	$(STRIP) "$(DESTDIR)/$(LIBDIR)/$(LIBNAME).$(VERSION)"
+	ldconfig -n "$(DESTDIR)/$(LIBDIR)"
 
 install-headers: all
-	@mkdir -v -p $(DESTDIR)/$(INCLUDEDIR)
-	@rm -fr $(DESTDIR)/$(INCLUDEDIR)/nmea
-	cp -r include/nmea $(DESTDIR)/$(INCLUDEDIR)
+	@mkdir -v -p "$(DESTDIR)/$(INCLUDEDIR)"
+	@rm -fr "$(DESTDIR)/$(INCLUDEDIR)/nmea"
+	cp -r include/nmea "$(DESTDIR)/$(INCLUDEDIR)"
 
 uninstall:
-	rm -f $(DESTDIR)/$(LIBDIR)/$(LIBNAME) $(DESTDIR)/$(LIBDIR)/$(LIBNAME).$(VERSION)
-	ldconfig -n $(DESTDIR)/$(LIBDIR)
-	@rmdir -v -p --ignore-fail-on-non-empty $(DESTDIR)/$(LIBDIR)
+	rm -f "$(DESTDIR)/$(LIBDIR)/$(LIBNAME)" "$(DESTDIR)/$(LIBDIR)/$(LIBNAME).$(VERSION)"
+	ldconfig -n "$(DESTDIR)/$(LIBDIR)"
+	@rmdir -v -p --ignore-fail-on-non-empty "$(DESTDIR)/$(LIBDIR)"
 
 uninstall-headers:
-	rm -fr $(DESTDIR)/$(INCLUDEDIR)/nmea
-	@rmdir -v -p --ignore-fail-on-non-empty $(DESTDIR)/$(INCLUDEDIR)
+	rm -fr "$(DESTDIR)/$(INCLUDEDIR)/nmea"
+	@rmdir -v -p --ignore-fail-on-non-empty "$(DESTDIR)/$(INCLUDEDIR)"
