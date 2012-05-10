@@ -10,9 +10,9 @@ DESTDIR ?=
 
 MACHINE=$(shell uname -m)
 ifeq ($(strip $(MACHINE)),x86_64)
-LIBDIR = usr/lib64
+LIBDIR_INSTALL = usr/lib64
 else
-LIBDIR = usr/lib
+LIBDIR_INSTALL = usr/lib
 endif
 INCLUDEDIR = usr/include
 
@@ -61,10 +61,10 @@ doc:
 	$(MAKE) -C doc all
 
 install: all
-	@mkdir -v -p "$(DESTDIR)/$(LIBDIR)"
-	cp "lib/$(LIBNAME)" "$(DESTDIR)/$(LIBDIR)/$(LIBNAME).$(VERSION)"
-	$(STRIP) "$(DESTDIR)/$(LIBDIR)/$(LIBNAME).$(VERSION)"
-	ldconfig -n "$(DESTDIR)/$(LIBDIR)"
+	@mkdir -v -p "$(DESTDIR)/$(LIBDIR_INSTALL)"
+	cp "lib/$(LIBNAME)" "$(DESTDIR)/$(LIBDIR_INSTALL)/$(LIBNAME).$(VERSION)"
+	$(STRIP) "$(DESTDIR)/$(LIBDIR_INSTALL)/$(LIBNAME).$(VERSION)"
+	ldconfig -n "$(DESTDIR)/$(LIBDIR_INSTALL)"
 
 install-headers: all
 	@mkdir -v -p "$(DESTDIR)/$(INCLUDEDIR)"
@@ -72,9 +72,9 @@ install-headers: all
 	cp -r include/nmea "$(DESTDIR)/$(INCLUDEDIR)"
 
 uninstall:
-	rm -f "$(DESTDIR)/$(LIBDIR)/$(LIBNAME)" "$(DESTDIR)/$(LIBDIR)/$(LIBNAME).$(VERSION)"
-	ldconfig -n "$(DESTDIR)/$(LIBDIR)"
-	@rmdir -v -p --ignore-fail-on-non-empty "$(DESTDIR)/$(LIBDIR)"
+	rm -f "$(DESTDIR)/$(LIBDIR_INSTALL)/$(LIBNAME)" "$(DESTDIR)/$(LIBDIR_INSTALL)/$(LIBNAME).$(VERSION)"
+	ldconfig -n "$(DESTDIR)/$(LIBDIR_INSTALL)"
+	@rmdir -v -p --ignore-fail-on-non-empty "$(DESTDIR)/$(LIBDIR_INSTALL)"
 
 uninstall-headers:
 	rm -fr "$(DESTDIR)/$(INCLUDEDIR)/nmea"
