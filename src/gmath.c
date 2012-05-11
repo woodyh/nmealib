@@ -162,8 +162,9 @@ double nmea_distance_ellipsoid(
     lambda = L;
     sin_lambda = sin(lambda);                            
     cos_lambda = cos(lambda);  
-    lambda_prev = 2*NMEA_PI;
-    delta_lambda = fabs(lambda - lambda_prev);//fixed bug when to_pos->lon equal from_pos->lon
+    lambda_prev = (double)2.0 * (double)NMEA_PI;
+    delta_lambda = lambda_prev - lambda;
+    if ( delta_lambda < 0 ) delta_lambda = -delta_lambda;
     remaining_steps = 20; 
 
     while ((delta_lambda > 1e-12) && (remaining_steps > 0)) 
