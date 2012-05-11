@@ -26,6 +26,9 @@
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1292019615" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.229256679" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
+								<option id="gnu.c.compiler.option.include.paths.1478081983" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/nmealib/include}&quot;"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1479620048" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.1591167374" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
@@ -86,6 +89,9 @@
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 		<project id="nmealib.null.131427440" name="nmealib"/>
 	</storageModule>
+	<storageModule moduleId="refreshScope" versionNumber="1">
+		<resource resourceType="PROJECT" workspacePath="/nmealib"/>
+	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.250310071;cdt.managedbuild.toolchain.gnu.base.250310071.384026117;cdt.managedbuild.tool.gnu.cpp.compiler.base.1836438998;cdt.managedbuild.tool.gnu.cpp.compiler.input.1292019615">
@@ -94,8 +100,5 @@
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.250310071;cdt.managedbuild.toolchain.gnu.base.250310071.384026117;cdt.managedbuild.tool.gnu.c.compiler.base.229256679;cdt.managedbuild.tool.gnu.c.compiler.input.1479620048">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
 		</scannerConfigBuildInfo>
-	</storageModule>
-	<storageModule moduleId="refreshScope" versionNumber="1">
-		<resource resourceType="PROJECT" workspacePath="/nmealib"/>
 	</storageModule>
 </cproject>
