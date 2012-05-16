@@ -25,13 +25,13 @@
 #include <unistd.h>
 
 
-void trace(const char *str, int str_size)
+static void trace(const char *str, int str_size)
 {
     printf("Trace: ");
     write(1, str, str_size);
     printf("\n");
 }
-void error(const char *str, int str_size)
+static void error(const char *str, int str_size)
 {
     printf("Error: ");
     write(1, str, str_size);
