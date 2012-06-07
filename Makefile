@@ -7,16 +7,17 @@ include Makefile.inc
 LIBNAME = libnmea.so
 
 DESTDIR ?=
+USRDIR ?= $(DESTDIR)/usr
+INCLUDEDIR ?= $(DESTDIR)/usr/include
+LIBDIR ?= $(USRDIR)/lib
 
 MACHINE=$(shell uname -m)
-LIBDIR_INSTALL = usr/lib
 ifeq ($(strip $(MACHINE)),x86_64)
   LIB64DIR := $(shell test -d "/usr/lib64" && echo "YES")
   ifeq ($(strip $(LIB64DIR)),YES)
-    LIBDIR_INSTALL = usr/lib64
+    LIBDIR = $(USRDIR)/lib64
   endif
 endif
-INCLUDEDIR = usr/include
 
 MODULES = context generate generator gmath info parse parser sentence time tok util
 OBJ = $(MODULES:%=build/%.o)
@@ -64,22 +65,25 @@ clean:
 doc:
 	$(MAKE) -C doc all
 
+doc-clean:
+	@$(MAKE) -C doc clean
+
 install: all
-	@mkdir -v -p "$(DESTDIR)/$(LIBDIR_INSTALL)"
-	cp "lib/$(LIBNAME)" "$(DESTDIR)/$(LIBDIR_INSTALL)/$(LIBNAME).$(VERSION)"
-	$(STRIP) "$(DESTDIR)/$(LIBDIR_INSTALL)/$(LIBNAME).$(VERSION)"
-	ldconfig -n "$(DESTDIR)/$(LIBDIR_INSTALL)"
+	@mkdir -v -p "$(LIBDIR)"
+	cp "lib/$(LIBNAME)" "$(LIBDIR)/$(LIBNAME).$(VERSION)"
+	$(STRIP) "$(LIBDIR)/$(LIBNAME).$(VERSION)"
+	ldconfig -n "$(LIBDIR)"
 
 install-headers: all
-	@mkdir -v -p "$(DESTDIR)/$(INCLUDEDIR)"
-	@rm -fr "$(DESTDIR)/$(INCLUDEDIR)/nmea"
-	cp -r include/nmea "$(DESTDIR)/$(INCLUDEDIR)"
+	@mkdir -v -p "$(INCLUDEDIR)"
+	@rm -fr "$(INCLUDEDIR)/nmea"
+	cp -r include/nmea "$(INCLUDEDIR)"
 
 uninstall:
-	rm -f "$(DESTDIR)/$(LIBDIR_INSTALL)/$(LIBNAME)" "$(DESTDIR)/$(LIBDIR_INSTALL)/$(LIBNAME).$(VERSION)"
-	ldconfig -n "$(DESTDIR)/$(LIBDIR_INSTALL)"
-	@rmdir -v -p --ignore-fail-on-non-empty "$(DESTDIR)/$(LIBDIR_INSTALL)"
+	rm -f "$(LIBDIR)/$(LIBNAME)" "$(LIBDIR)/$(LIBNAME).$(VERSION)"
+	ldconfig -n "$(LIBDIR)"
+	@rmdir -v -p --ignore-fail-on-non-empty "$(LIBDIR)"
 
 uninstall-headers:
-	rm -fr "$(DESTDIR)/$(INCLUDEDIR)/nmea"
-	@rmdir -v -p --ignore-fail-on-non-empty "$(DESTDIR)/$(INCLUDEDIR)"
+	rm -fr "$(INCLUDEDIR)/nmea"
+	@rmdir -v -p --ignore-fail-on-non-empty "$(INCLUDEDIR)"
