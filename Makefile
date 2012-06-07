@@ -11,13 +11,6 @@ USRDIR ?= $(DESTDIR)/usr
 INCLUDEDIR ?= $(DESTDIR)/usr/include
 LIBDIR ?= $(USRDIR)/lib
 
-MACHINE=$(shell uname -m)
-ifeq ($(strip $(MACHINE)),x86_64)
-  LIB64DIR := $(shell test -d "/usr/lib64" && echo "YES")
-  ifeq ($(strip $(LIB64DIR)),YES)
-    LIBDIR = $(USRDIR)/lib64
-  endif
-endif
 
 MODULES = context generate generator gmath info parse parser sentence time tok util
 OBJ = $(MODULES:%=build/%.o)
