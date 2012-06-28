@@ -37,17 +37,38 @@ int main(int argc __attribute__((unused)), char *argv[] __attribute__((unused)))
 	info.lon = 3600.0;
 	info.speed = 2.14 * NMEA_TUS_MS;
 	info.elv = 10.86;
+	info.track = 45;
+	info.magvar = 55;
+	info.HDOP = 2.3;
+	info.VDOP = 1.2;
+	info.PDOP = 2.594224354;
 
-	info.satinfo.inuse = 1;
+	nmea_INFO_set_present(&info, SIG);
+	nmea_INFO_set_present(&info, FIX);
+	nmea_INFO_set_present(&info, LAT);
+	nmea_INFO_set_present(&info, LON);
+	nmea_INFO_set_present(&info, SPEED);
+	nmea_INFO_set_present(&info, ELV);
+	nmea_INFO_set_present(&info, TRACK);
+	nmea_INFO_set_present(&info, MAGVAR);
+	nmea_INFO_set_present(&info, HDOP);
+	nmea_INFO_set_present(&info, VDOP);
+	nmea_INFO_set_present(&info, PDOP);
+
+	info.satinfo.inuse = NMEA_MAXSAT;
+	for (it = 0; it < NMEA_MAXSAT; it++) {
+		info.satinfo.in_use[it] = it + 1;
+	}
+	nmea_INFO_set_present(&info, SATINUSE);
+
 	info.satinfo.inview = 1;
-
-	/*
-	 info.satinfo.sat[0].id = 1;
-	 info.satinfo.sat[0].in_use = 1;
-	 info.satinfo.sat[0].elv = 50;
-	 info.satinfo.sat[0].azimuth = 0;
-	 info.satinfo.sat[0].sig = 99;
-	 */
+	for (it = 0; it < NMEA_MAXSAT; it++) {
+		info.satinfo.sat[0].id = it + 1;
+		info.satinfo.sat[0].elv = (it * 10);
+		info.satinfo.sat[0].azimuth = it + 1;
+		info.satinfo.sat[0].sig = 99 - it;
+	}
+	nmea_INFO_set_present(&info, SATINVIEW);
 
 	for (it = 0; it < 10; ++it) {
 		gen_sz = nmea_generate(&buff[0], 2048, &info, GPGGA | GPGSA | GPGSV | GPRMC | GPVTG);
