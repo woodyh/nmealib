@@ -27,16 +27,15 @@
 #include <string.h>
 #include <math.h>
 
-void nmea_zero_INFO(nmeaINFO *info)
-{
+void nmea_zero_INFO(nmeaINFO *info) {
 	if (!info) {
 		return;
 	}
 
-    memset(info, 0, sizeof(nmeaINFO));
-    nmea_time_now(&info->utc);
-    info->sig = NMEA_SIG_BAD;
-    info->fix = NMEA_FIX_BAD;
+	memset(info, 0, sizeof(nmeaINFO));
+	nmea_time_now(&info->utc);
+	info->sig = NMEA_SIG_BAD;
+	info->fix = NMEA_FIX_BAD;
 }
 
 /**
@@ -69,43 +68,42 @@ void nmea_zero_INFO(nmeaINFO *info)
  * @return
  * - true when the nmeaINFO structure has the field
  * - false otherwise
- */
-bool nmea_INFO_has_field(int smask, nmeaINFO_FIELD fieldName) {
+ */bool nmea_INFO_has_field(int smask, nmeaINFO_FIELD fieldName) {
 	switch (fieldName) {
-		case SMASK:
-			return true;
+	case SMASK:
+		return true;
 
-		case UTC:
-		case SIG:
-		case LAT:
-		case LON:
-			return ((smask & (GPGGA | GPRMC)) != 0);
+	case UTC:
+	case SIG:
+	case LAT:
+	case LON:
+		return ((smask & (GPGGA | GPRMC)) != 0);
 
-		case FIX:
-			return ((smask & (GPGSA | GPRMC)) != 0);
+	case FIX:
+		return ((smask & (GPGSA | GPRMC)) != 0);
 
-		case PDOP:
-		case VDOP:
-			return ((smask & GPGSA) != 0);
+	case PDOP:
+	case VDOP:
+		return ((smask & GPGSA) != 0);
 
-		case HDOP:
-			return ((smask & (GPGGA | GPGSA)) != 0);
+	case HDOP:
+		return ((smask & (GPGGA | GPGSA)) != 0);
 
-		case ELV:
-			return ((smask & GPGGA) != 0);
+	case ELV:
+		return ((smask & GPGGA) != 0);
 
-		case SPEED:
-		case DIRECTION:
-			return ((smask & (GPRMC | GPVTG)) != 0);
+	case SPEED:
+	case DIRECTION:
+		return ((smask & (GPRMC | GPVTG)) != 0);
 
-		case DECLINATION:
-			return ((smask & GPVTG) != 0);
+	case DECLINATION:
+		return ((smask & GPVTG) != 0);
 
-		case SATINFO:
-			return ((smask & (GPGSA | GPGSV)) != 0);
+	case SATINFO:
+		return ((smask & (GPGSA | GPGSV)) != 0);
 
-		default:
-			return false;
+	default:
+		return false;
 	}
 }
 

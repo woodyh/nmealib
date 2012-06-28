@@ -28,8 +28,7 @@
 extern "C" {
 #endif
 
-int nmea_generate(char *buff, int buff_sz, const nmeaINFO *info,
-		int generate_mask);
+int nmea_generate(char *buff, int buff_sz, const nmeaINFO *info, int generate_mask);
 
 int nmea_gen_GPGGA(char *buff, int buff_sz, nmeaGPGGA *pack);
 int nmea_gen_GPGSA(char *buff, int buff_sz, nmeaGPGSA *pack);

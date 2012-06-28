@@ -24,52 +24,45 @@
 #include <stdio.h>
 
 nmeaPROPERTY * nmea_property(void) {
-    static nmeaPROPERTY prop = {
-        0, 0, NMEA_DEF_PARSEBUFF
-        };
+	static nmeaPROPERTY prop = { 0, 0, NMEA_DEF_PARSEBUFF };
 
-    return &prop;
+	return &prop;
 }
 
-void nmea_trace(const char *str, ...)
-{
-    int size;
-    va_list arg_list;
-    char buff[NMEA_DEF_PARSEBUFF];
-    nmeaTraceFunc func = nmea_property()->trace_func;
+void nmea_trace(const char *str, ...) {
+	int size;
+	va_list arg_list;
+	char buff[NMEA_DEF_PARSEBUFF];
+	nmeaTraceFunc func = nmea_property()->trace_func;
 
-    if(func)
-    {
-        va_start(arg_list, str);
-        size = vsnprintf(&buff[0], NMEA_DEF_PARSEBUFF - 1, str, arg_list);
-        va_end(arg_list);
+	if (func) {
+		va_start(arg_list, str);
+		size = vsnprintf(&buff[0], NMEA_DEF_PARSEBUFF - 1, str, arg_list);
+		va_end(arg_list);
 
-        if(size > 0)
-            (*func)(&buff[0], size);
-    }
+		if (size > 0)
+			(*func)(&buff[0], size);
+	}
 }
 
-void nmea_trace_buff(const char *buff, int buff_size)
-{
-    nmeaTraceFunc func = nmea_property()->trace_func;
-    if(func && buff_size)
-        (*func)(buff, buff_size);
+void nmea_trace_buff(const char *buff, int buff_size) {
+	nmeaTraceFunc func = nmea_property()->trace_func;
+	if (func && buff_size)
+		(*func)(buff, buff_size);
 }
 
-void nmea_error(const char *str, ...)
-{
-    int size;
-    va_list arg_list;
-    char buff[NMEA_DEF_PARSEBUFF];
-    nmeaErrorFunc func = nmea_property()->error_func;
+void nmea_error(const char *str, ...) {
+	int size;
+	va_list arg_list;
+	char buff[NMEA_DEF_PARSEBUFF];
+	nmeaErrorFunc func = nmea_property()->error_func;
 
-    if(func)
-    {
-        va_start(arg_list, str);
-        size = vsnprintf(&buff[0], NMEA_DEF_PARSEBUFF - 1, str, arg_list);
-        va_end(arg_list);
+	if (func) {
+		va_start(arg_list, str);
+		size = vsnprintf(&buff[0], NMEA_DEF_PARSEBUFF - 1, str, arg_list);
+		va_end(arg_list);
 
-        if(size > 0)
-            (*func)(&buff[0], size);
-    }
+		if (size > 0)
+			(*func)(&buff[0], size);
+	}
 }

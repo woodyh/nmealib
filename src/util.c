@@ -39,13 +39,10 @@
  * @return
  * - true when the string has invalid characters
  * - false otherwise
- */
-bool nmea_string_has_invalid_chars(const char * str, const char * strName,
-		char * report, size_t reportSize) {
+ */bool nmea_string_has_invalid_chars(const char * str, const char * strName, char * report, size_t reportSize) {
 	static const char invalidChars[] = { '$', '*', ',', '!', '\\', '^', '~' };
-	static const char * invalidCharsNames[] = { "sentence delimiter ($)",
-			"checksum field delimiter (*)", "comma (,)", "exclamation mark (!)",
-			"backslash (\\)", "^ (^)", "tilde (~)" };
+	static const char * invalidCharsNames[] = { "sentence delimiter ($)", "checksum field delimiter (*)", "comma (,)",
+			"exclamation mark (!)", "backslash (\\)", "^ (^)", "tilde (~)" };
 
 	size_t i;
 	size_t j;
@@ -61,8 +58,7 @@ bool nmea_string_has_invalid_chars(const char * str, const char * strName,
 			if (report) {
 				snprintf((char*) report, reportSize, "Configured %s (%s),"
 						" character %lu, can not contain non-printable"
-						" characters (codes outside the range [32, 126])",
-						strName, str, (unsigned long)i + 1);
+						" characters (codes outside the range [32, 126])", strName, str, (unsigned long) i + 1);
 				report[reportSize - 1] = '\0';
 			}
 			return true;
@@ -72,8 +68,8 @@ bool nmea_string_has_invalid_chars(const char * str, const char * strName,
 			if (c == invalidChars[j]) {
 				if (report) {
 					snprintf((char *) report, reportSize, "Configured %s (%s),"
-							" character %lu, can not contain %s characters",
-							strName, str, (unsigned long)i + 1, invalidCharsNames[j]);
+							" character %lu, can not contain %s characters", strName, str, (unsigned long) i + 1,
+							invalidCharsNames[j]);
 					report[reportSize - 1] = '\0';
 				}
 				return true;

@@ -28,7 +28,7 @@ void nmea_time_now(nmeaTIME *stm) {
 	struct timeval tp;
 	struct tm tt;
 
-	gettimeofday(&tp, NULL);
+	gettimeofday(&tp, NULL );
 	gmtime_r(&tp.tv_sec, &tt);
 
 	stm->year = tt.tm_year;
