@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-int nmea_pack_type(const char *buff, int buff_sz);
+int nmea_pack_type(const char *s, int len);
 int nmea_find_tail(const char *buff, int buff_sz, int *res_crc);
 
 int nmea_parse_GPGGA(const char *buff, int buff_sz, nmeaGPGGA *pack);

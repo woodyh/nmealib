@@ -75,28 +75,29 @@ static int _nmea_parse_time(const char *s, int len, nmeaTIME *t) {
 }
 
 /**
- * \brief Define packet type by header (nmeaPACKTYPE).
- * @param buff a constant character pointer of packet buffer.
- * @param buff_sz buffer size.
- * @return The defined packet type
- * @see nmeaPACKTYPE
+ * Determine packet type (see nmeaPACKTYPE) by the header of a string.
+ * The header is the start of an NMEA sentence, right after the $.
+ *
+ * @param s the string
+ * @param len the length of the string
+ * @return The packet type (or GPNON when it could not be determined)
  */
-int nmea_pack_type(const char *buff, int buff_sz) {
-	static const char *pheads[] = { "GPGGA", "GPGSA", "GPGSV", "GPRMC", "GPVTG", };
+int nmea_pack_type(const char *s, int len) {
+	static const char *pheads[] = { "GPGGA", "GPGSA", "GPGSV", "GPRMC", "GPVTG" };
 
-	assert(buff);
+	assert(s);
 
-	if (buff_sz < 5)
+	if (len < 5)
 		return GPNON;
-	else if (0 == memcmp(buff, pheads[0], 5))
+	if (!memcmp(s, pheads[0], 5))
 		return GPGGA;
-	else if (0 == memcmp(buff, pheads[1], 5))
+	if (!memcmp(s, pheads[1], 5))
 		return GPGSA;
-	else if (0 == memcmp(buff, pheads[2], 5))
+	if (!memcmp(s, pheads[2], 5))
 		return GPGSV;
-	else if (0 == memcmp(buff, pheads[3], 5))
+	if (!memcmp(s, pheads[3], 5))
 		return GPRMC;
-	else if (0 == memcmp(buff, pheads[4], 5))
+	if (!memcmp(s, pheads[4], 5))
 		return GPVTG;
 
 	return GPNON;
