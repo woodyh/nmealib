@@ -20,12 +20,14 @@
 
 #include <nmea/parse.h>
 
+#include <nmea/time.h>
+#include <nmea/tok.h>
+#include <nmea/context.h>
+#include <nmea/units.h>
+
 #include <string.h>
 #include <assert.h>
-
-#include <nmea/context.h>
-#include <nmea/tok.h>
-#include <nmea/units.h>
+#include <ctype.h>
 
 #define NMEA_TIMEPARSE_BUF  (256)
 
