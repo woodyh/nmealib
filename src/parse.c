@@ -31,21 +31,42 @@
 
 #define NMEA_TIMEPARSE_BUF  (256)
 
-static int _nmea_parse_time(const char *buff, int buff_sz, nmeaTIME *res) {
+/**
+ * Parse nmeaTIME from a string.
+ * The format that is used is determined by the length of the string.
+ *
+ * @param s the string
+ * @param len the length of the string
+ * @param t a pointer to the nmeaTIME structure in which to store the parsed time
+ * @return 0 on success (false), -1 otherwise (true)
+ */
+static int _nmea_parse_time(const char *s, int len, nmeaTIME *t) {
 	int success = 0;
 
-	switch (buff_sz) {
+	assert(s);
+	assert(t);
+
+	switch (len) {
 	case sizeof("hhmmss") - 1:
-		success = (3 == nmea_scanf(buff, buff_sz, "%2d%2d%2d", &(res->hour), &(res->min), &(res->sec)));
+		success = (3 == nmea_scanf(s, len, "%2d%2d%2d", &t->hour, &t->min, &t->sec));
 		break;
 	case sizeof("hhmmss.s") - 1:
+		success = (4 == nmea_scanf(s, len, "%2d%2d%2d.%d", &t->hour, &t->min, &t->sec, &t->hsec));
+		if (success) {
+			t->hsec *= 10;
+		}
+		break;
 	case sizeof("hhmmss.ss") - 1:
+		success = (4 == nmea_scanf(s, len, "%2d%2d%2d.%d", &t->hour, &t->min, &t->sec, &t->hsec));
+		break;
 	case sizeof("hhmmss.sss") - 1:
-		success =
-				(4 == nmea_scanf(buff, buff_sz, "%2d%2d%2d.%d", &(res->hour), &(res->min), &(res->sec), &(res->hsec)));
+		success = (4 == nmea_scanf(s, len, "%2d%2d%2d.%d", &t->hour, &t->min, &t->sec, &t->hsec));
+		if (success) {
+			t->hsec /= 10;
+		}
 		break;
 	default:
-		nmea_error("Parse of time error (format error)!");
+		nmea_error("Time parse error: invalid format");
 		success = 0;
 		break;
 	}
