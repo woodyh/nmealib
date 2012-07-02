@@ -104,43 +104,49 @@ int nmea_pack_type(const char *s, int len) {
 }
 
 /**
- * \brief Find tail of packet ("\r\n") in buffer and check control sum (CRC).
- * @param buff a constant character pointer of packets buffer.
- * @param buff_sz buffer size.
- * @param res_crc a integer pointer for return CRC of packet (must be defined).
- * @return Number of bytes to packet tail.
+ * Find the tail ("\r\n") of a sentence in a string and check the checksum of the sentence.
+ *
+ * @param s the string
+ * @param len the length of the string
+ * @param checksum a pointer to the location where the checksum (as specified in the sentence) should be stored
+ * (will be -1 if the checksum did not match the calculated checksum)
+ * @return Number of bytes from the start of the string until the tail or 0 when the checksum did not match
+ * the calculated checksum
  */
-int nmea_find_tail(const char *buff, int buff_sz, int *res_crc) {
-	static const int tail_sz = 3 /* *[CRC] */+ 2 /* \r\n */;
+int nmea_find_tail(const char *s, int len, int *checksum) {
+	static const int tail_sz = 1 + 2 + 2 /* *xx\r\n */;
 
-	const char *end_buff = buff + buff_sz;
+	const char *s_end = s + len;
 	int nread = 0;
-	int crc = 0;
+	int cksum = 0;
 
-	assert(buff && res_crc);
+	assert(s);
+	assert(checksum);
 
-	*res_crc = -1;
+	*checksum = -1;
 
-	for (; buff < end_buff; ++buff, ++nread) {
-		if (('$' == *buff) && nread) {
-			buff = 0;
+	for (; s < s_end; ++s, ++nread) {
+		if (('$' == *s) && nread) {
+			s = NULL;
 			break;
-		} else if ('*' == *buff) {
-			if (buff + tail_sz <= end_buff && '\r' == buff[3] && '\n' == buff[4]) {
-				*res_crc = nmea_atoi(buff + 1, 2, 16);
-				nread = buff_sz - (int) (end_buff - (buff + tail_sz));
-				if (*res_crc != crc) {
-					*res_crc = -1;
-					buff = 0;
+		}
+		if ('*' == *s) {
+			if (((s + tail_sz) <= s_end) && ('\r' == s[3]) && ('\n' == s[4])) {
+				*checksum = nmea_atoi(s + 1, 2, 16);
+				nread = len - (int) (s_end - (s + tail_sz));
+				if (*checksum != cksum) {
+					*checksum = -1;
+					s = NULL;
 				}
 			}
-
 			break;
-		} else if (nread)
-			crc ^= (int) *buff;
+		}
+		if (nread) {
+			cksum ^= (int) *s;
+		}
 	}
 
-	if (*res_crc < 0 && buff)
+	if (s && (*checksum < 0))
 		nread = 0;
 
 	return nread;
