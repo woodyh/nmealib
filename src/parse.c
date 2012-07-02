@@ -18,52 +18,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \file parse.h
- * \brief Functions of a low level for analysis of
- * packages of NMEA stream.
- *
- * \code
- * ...
- * ptype = nmea_pack_type(
- *     (const char *)parser->buffer + nparsed + 1,
- *     parser->buff_use - nparsed - 1);
- * 
- * if(0 == (node = malloc(sizeof(nmeaParserNODE))))
- *     goto mem_fail;
- * 
- * node->pack = 0;
- * 
- * switch(ptype)
- * {
- * case GPGGA:
- *     if(0 == (node->pack = malloc(sizeof(nmeaGPGGA))))
- *         goto mem_fail;
- *     node->packType = GPGGA;
- *     if(!nmea_parse_GPGGA(
- *         (const char *)parser->buffer + nparsed,
- *         sen_sz, (nmeaGPGGA *)node->pack))
- *     {
- *         free(node);
- *         node = 0;
- *     }
- *     break;
- * case GPGSA:
- *     if(0 == (node->pack = malloc(sizeof(nmeaGPGSA))))
- *         goto mem_fail;
- *     node->packType = GPGSA;
- *     if(!nmea_parse_GPGSA(
- *         (const char *)parser->buffer + nparsed,
- *         sen_sz, (nmeaGPGSA *)node->pack))
- *     {
- *         free(node);
- *         node = 0;
- *     }
- *     break;
- * ...
- * \endcode
- */
-
 #include <nmea/parse.h>
 
 #include <string.h>
