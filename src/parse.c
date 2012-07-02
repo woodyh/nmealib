@@ -28,50 +28,49 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 #define NMEA_TIMEPARSE_BUF  (256)
 
 /**
- * Parse nmeaTIME from a string.
- * The format that is used is determined by the length of the string.
+ * Parse nmeaTIME (time only, no date) from a string.
+ * The format that is used (hhmmss, hhmmss.s, hhmmss.ss or hhmmss.sss) is determined by the length of the string.
  *
  * @param s the string
  * @param len the length of the string
  * @param t a pointer to the nmeaTIME structure in which to store the parsed time
- * @return 0 on success (false), -1 otherwise (true)
+ * @return true on success, false otherwise
  */
-static int _nmea_parse_time(const char *s, int len, nmeaTIME *t) {
-	int success = 0;
-
+static bool _nmea_parse_time(const char *s, int len, nmeaTIME *t) {
 	assert(s);
 	assert(t);
 
-	switch (len) {
-	case sizeof("hhmmss") - 1:
-		success = (3 == nmea_scanf(s, len, "%2d%2d%2d", &t->hour, &t->min, &t->sec));
-		break;
-	case sizeof("hhmmss.s") - 1:
-		success = (4 == nmea_scanf(s, len, "%2d%2d%2d.%d", &t->hour, &t->min, &t->sec, &t->hsec));
-		if (success) {
-			t->hsec *= 10;
-		}
-		break;
-	case sizeof("hhmmss.ss") - 1:
-		success = (4 == nmea_scanf(s, len, "%2d%2d%2d.%d", &t->hour, &t->min, &t->sec, &t->hsec));
-		break;
-	case sizeof("hhmmss.sss") - 1:
-		success = (4 == nmea_scanf(s, len, "%2d%2d%2d.%d", &t->hour, &t->min, &t->sec, &t->hsec));
-		if (success) {
-			t->hsec /= 10;
-		}
-		break;
-	default:
-		nmea_error("Time parse error: invalid format");
-		success = 0;
-		break;
+	if (len == (sizeof("hhmmss") - 1)) {
+		return (3 == nmea_scanf(s, len, "%2d%2d%2d", &t->hour, &t->min, &t->sec));
 	}
 
-	return (success ? 0 : -1);
+	if (len == (sizeof("hhmmss.s") - 1)) {
+		if (4 == nmea_scanf(s, len, "%2d%2d%2d.%d", &t->hour, &t->min, &t->sec, &t->hsec)) {
+			t->hsec *= 10;
+			return true;
+		}
+		return false;
+	}
+
+	if (len == (sizeof("hhmmss.ss") - 1)) {
+		return (4 == nmea_scanf(s, len, "%2d%2d%2d.%d", &t->hour, &t->min, &t->sec, &t->hsec));
+	}
+
+	if (len == (sizeof("hhmmss.sss") - 1)) {
+		if ((4 == nmea_scanf(s, len, "%2d%2d%2d.%d", &t->hour, &t->min, &t->sec, &t->hsec))) {
+			t->hsec /= 10;
+			return true;
+		}
+		return false;
+	}
+
+	nmea_error("Time parse error: invalid format in %s", s);
+	return false;
 }
 
 /**
@@ -177,7 +176,7 @@ int nmea_parse_GPGGA(const char *buff, int buff_sz, nmeaGPGGA *pack) {
 		return 0;
 	}
 
-	if (0 != _nmea_parse_time(&time_buff[0], (int) strlen(&time_buff[0]), &(pack->utc))) {
+	if (!_nmea_parse_time(&time_buff[0], (int) strlen(&time_buff[0]), &(pack->utc))) {
 		nmea_error("GPGGA time parse error!");
 		return 0;
 	}
@@ -277,7 +276,7 @@ int nmea_parse_GPRMC(const char *buff, int buff_sz, nmeaGPRMC *pack) {
 		return 0;
 	}
 
-	if (0 != _nmea_parse_time(&time_buff[0], (int) strlen(&time_buff[0]), &(pack->utc))) {
+	if (!_nmea_parse_time(&time_buff[0], (int) strlen(&time_buff[0]), &(pack->utc))) {
 		nmea_error("GPRMC time parse error!");
 		return 0;
 	}
