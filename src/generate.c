@@ -135,7 +135,7 @@ void nmea_info2GPRMC(const nmeaINFO *info, nmeaGPRMC *pack) {
 	pack->ew = ((info->lon > 0) ? 'E' : 'W');
 	pack->speed = info->speed / NMEA_TUD_KNOTS;
 	pack->direction = info->track;
-	pack->declination = info->declination;
+	pack->declination = info->magvar;
 	pack->declin_ew = 'E';
 	pack->mode = ((info->sig > 0) ? 'A' : 'N');
 }
@@ -144,7 +144,7 @@ void nmea_info2GPVTG(const nmeaINFO *info, nmeaGPVTG *pack) {
 	nmea_zero_GPVTG(pack);
 
 	pack->dir = info->track;
-	pack->dec = info->declination;
+	pack->dec = info->magvar;
 	pack->spn = info->speed / NMEA_TUD_KNOTS;
 	pack->spk = info->speed;
 }

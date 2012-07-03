@@ -129,7 +129,7 @@ static int nmea_igen_noise_loop(nmeaGENERATOR *gen __attribute__ ((unused)), nme
 	info->lon = nmea_random(0, 100);
 	info->speed = nmea_random(0, 100);
 	info->track = nmea_random(0, 360);
-	info->declination = nmea_random(0, 360);
+	info->magvar = nmea_random(0, 360);
 	info->elv = lrint(nmea_random(-100, 100));
 
 	info->satinfo.inuse = 0;
@@ -262,7 +262,8 @@ static int nmea_igen_rotate_init(nmeaGENERATOR *gen, nmeaINFO *info) {
 static int nmea_igen_pos_rmove_init(nmeaGENERATOR *gen __attribute__ ((unused)), nmeaINFO *info) {
 	info->sig = 3;
 	info->fix = 3;
-	info->track = info->declination = 0;
+	info->track = 0;
+	info->magvar = 0;
 	info->speed = 20;
 	return 1;
 }
@@ -287,7 +288,7 @@ static int nmea_igen_pos_rmove_loop(nmeaGENERATOR *gen __attribute__ ((unused)),
 	nmea_move_horz(&crd, &crd, info->track, info->speed / 3600);
 	nmea_pos2info(&crd, info);
 
-	info->declination = info->track;
+	info->magvar = info->track;
 
 	return 1;
 }

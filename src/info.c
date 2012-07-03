@@ -120,8 +120,8 @@ void nmea_INFO_sanitise(nmeaINFO *nmeaInfo) {
 		nmeaInfo->track = 0;
 	}
 
-	if (!nmea_INFO_is_present(nmeaInfo, DECLINATION)) {
-		nmeaInfo->declination = 0;
+	if (!nmea_INFO_is_present(nmeaInfo, MAGVAR)) {
+		nmeaInfo->magvar = 0;
 	}
 
 	/* satinfo is not used */

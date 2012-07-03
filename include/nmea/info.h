@@ -41,7 +41,7 @@
  elv:           x
  speed:                                 x       x
  track:                                 x       x
- declination:                                   x
+ magvar:                                        x
  satinfo:               x       x
  </pre>
  */
@@ -123,7 +123,7 @@ typedef struct _nmeaINFO {
 	double elv;						/**< Antenna altitude above/below mean sea level (geoid) in meters */
 	double speed;					/**< Speed over the ground in kilometers/hour */
 	double track;					/**< Track angle in degrees True */
-	double declination;				/**< Magnetic variation degrees (Easterly var. subtracts from true course) */
+	double magvar;					/**< Magnetic variation degrees (Easterly var. subtracts from true course) */
 
 	nmeaSATINFO satinfo;			/**< Satellites information */
 } nmeaINFO;
@@ -145,7 +145,7 @@ typedef enum _nmeaINFO_FIELD {
 	ELV			= (1 << 9),
 	SPEED		= (1 << 10),
 	TRACK		= (1 << 11),
-	DECLINATION	= (1 << 12),
+	MAGVAR		= (1 << 12),
 	SATINFO		= (1 << 13)
 } nmeaINFO_FIELD;
 
