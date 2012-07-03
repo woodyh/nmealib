@@ -39,75 +39,6 @@ void nmea_zero_INFO(nmeaINFO *info) {
 }
 
 /**
- * Determine whether a given nmeaINFO structure has a certain field.
- *
- * nmeaINFO dependencies:
- <pre>
- field/sentence GPGGA   GPGSA   GPGSV   GPRMC   GPVTG
- smask:         x       x       x       x       x
- utc:           x                       x
- sig:           x                       x
- fix:                   x               x
- PDOP:                  x
- HDOP:          x       x
- VDOP:                  x
- lat:           x                       x
- lon:           x                       x
- elv:           x
- speed:                                 x       x
- direction:                             x       x
- declination:                                   x
- satinfo:               x       x
- </pre>
- *
- * @param smask
- * the smask of a nmeaINFO structure
- * @param fieldName
- * the field name
- *
- * @return
- * - true when the nmeaINFO structure has the field
- * - false otherwise
- */bool nmea_INFO_has_field(int smask, nmeaINFO_FIELD fieldName) {
-	switch (fieldName) {
-	case SMASK:
-		return true;
-
-	case UTC:
-	case SIG:
-	case LAT:
-	case LON:
-		return ((smask & (GPGGA | GPRMC)) != 0);
-
-	case FIX:
-		return ((smask & (GPGSA | GPRMC)) != 0);
-
-	case PDOP:
-	case VDOP:
-		return ((smask & GPGSA) != 0);
-
-	case HDOP:
-		return ((smask & (GPGGA | GPGSA)) != 0);
-
-	case ELV:
-		return ((smask & GPGGA) != 0);
-
-	case SPEED:
-	case DIRECTION:
-		return ((smask & (GPRMC | GPVTG)) != 0);
-
-	case DECLINATION:
-		return ((smask & GPVTG) != 0);
-
-	case SATINFO:
-		return ((smask & (GPGSA | GPGSV)) != 0);
-
-	default:
-		return false;
-	}
-}
-
-/**
  * Sanitise the NMEA info, make sure that:
  * - latitude is in the range [-9000, 9000],
  * - longitude is in the range [-18000, 18000],
@@ -139,57 +70,57 @@ void nmea_INFO_sanitise(nmeaINFO *nmeaInfo) {
 		return;
 	}
 
-	if (!nmea_INFO_has_field(nmeaInfo->smask, UTC)) {
+	if (!nmea_INFO_is_present(nmeaInfo, UTC)) {
 		nmea_time_now(&nmeaInfo->utc);
 	}
 
-	if (!nmea_INFO_has_field(nmeaInfo->smask, SIG)) {
+	if (!nmea_INFO_is_present(nmeaInfo, SIG)) {
 		nmeaInfo->sig = NMEA_SIG_BAD;
 	}
 
-	if (!nmea_INFO_has_field(nmeaInfo->smask, FIX)) {
+	if (!nmea_INFO_is_present(nmeaInfo, FIX)) {
 		nmeaInfo->fix = NMEA_FIX_BAD;
 	}
 
-	if (!nmea_INFO_has_field(nmeaInfo->smask, PDOP)) {
+	if (!nmea_INFO_is_present(nmeaInfo, PDOP)) {
 		nmeaInfo->PDOP = 0;
 	} else {
 		nmeaInfo->PDOP = fabs(nmeaInfo->PDOP);
 	}
 
-	if (!nmea_INFO_has_field(nmeaInfo->smask, HDOP)) {
+	if (!nmea_INFO_is_present(nmeaInfo, HDOP)) {
 		nmeaInfo->HDOP = 0;
 	} else {
 		nmeaInfo->HDOP = fabs(nmeaInfo->HDOP);
 	}
 
-	if (!nmea_INFO_has_field(nmeaInfo->smask, VDOP)) {
+	if (!nmea_INFO_is_present(nmeaInfo, VDOP)) {
 		nmeaInfo->VDOP = 0;
 	} else {
 		nmeaInfo->VDOP = fabs(nmeaInfo->VDOP);
 	}
 
-	if (!nmea_INFO_has_field(nmeaInfo->smask, LAT)) {
+	if (!nmea_INFO_is_present(nmeaInfo, LAT)) {
 		nmeaInfo->lat = 0;
 	}
 
-	if (!nmea_INFO_has_field(nmeaInfo->smask, LON)) {
+	if (!nmea_INFO_is_present(nmeaInfo, LON)) {
 		nmeaInfo->lon = 0;
 	}
 
-	if (!nmea_INFO_has_field(nmeaInfo->smask, ELV)) {
+	if (!nmea_INFO_is_present(nmeaInfo, ELV)) {
 		nmeaInfo->elv = 0;
 	}
 
-	if (!nmea_INFO_has_field(nmeaInfo->smask, SPEED)) {
+	if (!nmea_INFO_is_present(nmeaInfo, SPEED)) {
 		nmeaInfo->speed = 0;
 	}
 
-	if (!nmea_INFO_has_field(nmeaInfo->smask, DIRECTION)) {
+	if (!nmea_INFO_is_present(nmeaInfo, DIRECTION)) {
 		nmeaInfo->direction = 0;
 	}
 
-	if (!nmea_INFO_has_field(nmeaInfo->smask, DECLINATION)) {
+	if (!nmea_INFO_is_present(nmeaInfo, DECLINATION)) {
 		nmeaInfo->declination = 0;
 	}
 
@@ -316,23 +247,23 @@ void nmea_INFO_unit_conversion(nmeaINFO * nmeaInfo) {
 	/* sig (already in correct format) */
 	/* fix (already in correct format) */
 
-	if (nmea_INFO_has_field(nmeaInfo->smask, PDOP)) {
+	if (nmea_INFO_is_present(nmeaInfo, PDOP)) {
 		nmeaInfo->PDOP = nmea_dop2meters(nmeaInfo->PDOP);
 	}
 
-	if (nmea_INFO_has_field(nmeaInfo->smask, HDOP)) {
+	if (nmea_INFO_is_present(nmeaInfo, HDOP)) {
 		nmeaInfo->HDOP = nmea_dop2meters(nmeaInfo->HDOP);
 	}
 
-	if (nmea_INFO_has_field(nmeaInfo->smask, VDOP)) {
+	if (nmea_INFO_is_present(nmeaInfo, VDOP)) {
 		nmeaInfo->VDOP = nmea_dop2meters(nmeaInfo->VDOP);
 	}
 
-	if (nmea_INFO_has_field(nmeaInfo->smask, LAT)) {
+	if (nmea_INFO_is_present(nmeaInfo, LAT)) {
 		nmeaInfo->lat = nmea_ndeg2degree(nmeaInfo->lat);
 	}
 
-	if (nmea_INFO_has_field(nmeaInfo->smask, LON)) {
+	if (nmea_INFO_is_present(nmeaInfo, LON)) {
 		nmeaInfo->lon = nmea_ndeg2degree(nmeaInfo->lon);
 	}
 

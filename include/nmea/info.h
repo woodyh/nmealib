@@ -26,6 +26,26 @@
 #include <nmea/time.h>
 #include <stdbool.h>
 
+/*
+ <pre>
+ field/sentence GPGGA   GPGSA   GPGSV   GPRMC   GPVTG
+ smask:         x       x       x       x       x
+ utc:           x                       x
+ sig:           x                       x
+ fix:                   x               x
+ PDOP:                  x
+ HDOP:          x       x
+ VDOP:                  x
+ lat:           x                       x
+ lon:           x                       x
+ elv:           x
+ speed:                                 x       x
+ direction:                             x       x
+ declination:                                   x
+ satinfo:               x       x
+ </pre>
+ */
+
 #define NMEA_SIG_BAD   (0)
 #define NMEA_SIG_LOW   (1)
 #define NMEA_SIG_MID   (2)
@@ -85,6 +105,8 @@ typedef struct _nmeaSATINFO {
  * @see nmea_GPGGA2info,  nmea_...2info
  */
 typedef struct _nmeaINFO {
+	int present;					/**< Mask specifying which fields are present */
+
 	int smask;						/**< Mask specifying from which sentences data has been obtained */
 
 	nmeaTIME utc;					/**< UTC of position */
@@ -107,15 +129,52 @@ typedef struct _nmeaINFO {
 } nmeaINFO;
 
 /**
- * Enumeration for the fields names of a nmeaINFO structure
+ * Enumeration for the fields names of a nmeaINFO structure.
+ * The values are used in the 'present' mask.
  */
 typedef enum _nmeaINFO_FIELD {
-	SMASK, UTC, SIG, FIX, PDOP, HDOP, VDOP, LAT, LON, ELV, SPEED, DIRECTION, DECLINATION, SATINFO
+	SMASK		= (1 << 0),
+	UTC			= (1 << 1),
+	SIG			= (1 << 2),
+	FIX			= (1 << 3),
+	PDOP		= (1 << 4),
+	HDOP		= (1 << 5),
+	VDOP		= (1 << 6),
+	LAT			= (1 << 7),
+	LON			= (1 << 8),
+	ELV			= (1 << 9),
+	SPEED		= (1 << 10),
+	DIRECTION	= (1 << 11),
+	DECLINATION	= (1 << 12),
+	SATINFO		= (1 << 13)
 } nmeaINFO_FIELD;
 
 void nmea_zero_INFO(nmeaINFO *info);
 
-bool nmea_INFO_has_field(int smask, nmeaINFO_FIELD fieldName);
+/**
+ * Determine if a nmeaINFO structure has a certain field
+ *
+ * @param nmeaInfo use a pointer to nmeaINFO
+ * @param fieldName use a name from nmeaINFO_FIELD
+ * @return a boolean, true when the structure has the requested field
+ */
+#define nmea_INFO_is_present(nmeaInfo, fieldName) (((nmeaInfo)->present & fieldName) != 0)
+
+/**
+ * Flag a nmeaINFO structure to contain a certain field
+ *
+ * @param nmeaInfo use a pointer to nmeaINFO
+ * @param fieldName use a name from nmeaINFO_FIELD
+ */
+#define nmea_INFO_set_present(nmeaInfo, fieldName) ((nmeaInfo)->present |= fieldName)
+
+/**
+ * Flag a nmeaINFO structure to NOT contain a certain field
+ *
+ * @param nmeaInfo use a pointer to nmeaINFO
+ * @param fieldName use a name from nmeaINFO_FIELD
+ */
+#define nmea_INFO_unset_present(nmeaInfo, fieldName) ((nmeaInfo)->present &= ~fieldName)
 
 void nmea_INFO_sanitise(nmeaINFO *nmeaInfo);
 
