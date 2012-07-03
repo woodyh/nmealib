@@ -135,8 +135,8 @@ void nmea_info2GPRMC(const nmeaINFO *info, nmeaGPRMC *pack) {
 	pack->ew = ((info->lon > 0) ? 'E' : 'W');
 	pack->speed = info->speed / NMEA_TUD_KNOTS;
 	pack->track = info->track;
-	pack->magvar = info->magvar;
-	pack->magvar_ew = 'E';
+	pack->magvar = fabs(info->magvar);
+	pack->magvar_ew = ((info->magvar > 0) ? 'E' : 'W');
 	pack->mode = ((info->sig > 0) ? 'A' : 'N');
 }
 
