@@ -534,6 +534,7 @@ void nmea_GPRMC2info(nmeaGPRMC *pack, nmeaINFO *info) {
 	info->lon = ((pack->ew == 'E') ? pack->lon : -pack->lon);
 	info->speed = pack->speed * NMEA_TUD_KNOTS;
 	info->track = pack->track;
+	info->magvar = ((pack->magvar_ew == 'E') ? pack->magvar : -pack->magvar);
 }
 
 /**
