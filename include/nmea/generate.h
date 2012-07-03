@@ -30,11 +30,11 @@ extern "C" {
 
 int nmea_generate(char *buff, int buff_sz, const nmeaINFO *info, int generate_mask);
 
-int nmea_gen_GPGGA(char *buff, int buff_sz, nmeaGPGGA *pack);
-int nmea_gen_GPGSA(char *buff, int buff_sz, nmeaGPGSA *pack);
-int nmea_gen_GPGSV(char *buff, int buff_sz, nmeaGPGSV *pack);
-int nmea_gen_GPRMC(char *buff, int buff_sz, nmeaGPRMC *pack);
-int nmea_gen_GPVTG(char *buff, int buff_sz, nmeaGPVTG *pack);
+int nmea_gen_GPGGA(char *s, int len, nmeaGPGGA *pack);
+int nmea_gen_GPGSA(char *s, int len, nmeaGPGSA *pack);
+int nmea_gen_GPGSV(char *s, int len, nmeaGPGSV *pack);
+int nmea_gen_GPRMC(char *s, int len, nmeaGPRMC *pack);
+int nmea_gen_GPVTG(char *s, int len, nmeaGPVTG *pack);
 
 void nmea_info2GPGGA(const nmeaINFO *info, nmeaGPGGA *pack);
 void nmea_info2GPGSA(const nmeaINFO *info, nmeaGPGSA *pack);

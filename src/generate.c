@@ -25,24 +25,24 @@
 #include <nmea/tok.h>
 #include <nmea/units.h>
 
-int nmea_gen_GPGGA(char *buff, int buff_sz, nmeaGPGGA *pack) {
-	return nmea_printf(buff, buff_sz,
+int nmea_gen_GPGGA(char *s, int len, nmeaGPGGA *pack) {
+	return nmea_printf(s, len,
 			"$GPGGA,%02d%02d%02d.%02d,%09.4f,%C,%010.4f,%C,%1d,%02d,%03.1f,%03.1f,%C,%03.1f,%C,%03.1f,%04d",
 			pack->utc.hour, pack->utc.min, pack->utc.sec, pack->utc.hsec, pack->lat, pack->ns, pack->lon, pack->ew,
 			pack->sig, pack->satinuse, pack->HDOP, pack->elv, pack->elv_units, pack->diff, pack->diff_units,
 			pack->dgps_age, pack->dgps_sid);
 }
 
-int nmea_gen_GPGSA(char *buff, int buff_sz, nmeaGPGSA *pack) {
-	return nmea_printf(buff, buff_sz,
+int nmea_gen_GPGSA(char *s, int len, nmeaGPGSA *pack) {
+	return nmea_printf(s, len,
 			"$GPGSA,%C,%1d,%02d,%02d,%02d,%02d,%02d,%02d,%02d,%02d,%02d,%02d,%02d,%02d,%03.1f,%03.1f,%03.1f",
 			pack->fix_mode, pack->fix_type, pack->sat_prn[0], pack->sat_prn[1], pack->sat_prn[2], pack->sat_prn[3],
 			pack->sat_prn[4], pack->sat_prn[5], pack->sat_prn[6], pack->sat_prn[7], pack->sat_prn[8], pack->sat_prn[9],
 			pack->sat_prn[10], pack->sat_prn[11], pack->PDOP, pack->HDOP, pack->VDOP);
 }
 
-int nmea_gen_GPGSV(char *buff, int buff_sz, nmeaGPGSV *pack) {
-	return nmea_printf(buff, buff_sz, "$GPGSV,%1d,%1d,%02d,"
+int nmea_gen_GPGSV(char *s, int len, nmeaGPGSV *pack) {
+	return nmea_printf(s, len, "$GPGSV,%1d,%1d,%02d,"
 			"%02d,%02d,%03d,%02d,"
 			"%02d,%02d,%03d,%02d,"
 			"%02d,%02d,%03d,%02d,"
@@ -53,16 +53,16 @@ int nmea_gen_GPGSV(char *buff, int buff_sz, nmeaGPGSV *pack) {
 			pack->sat_data[3].elv, pack->sat_data[3].azimuth, pack->sat_data[3].sig);
 }
 
-int nmea_gen_GPRMC(char *buff, int buff_sz, nmeaGPRMC *pack) {
-	return nmea_printf(buff, buff_sz,
+int nmea_gen_GPRMC(char *s, int len, nmeaGPRMC *pack) {
+	return nmea_printf(s, len,
 			"$GPRMC,%02d%02d%02d.%02d,%C,%09.4f,%C,%010.4f,%C,%03.1f,%03.1f,%02d%02d%02d,%03.1f,%C,%C", pack->utc.hour,
 			pack->utc.min, pack->utc.sec, pack->utc.hsec, pack->status, pack->lat, pack->ns, pack->lon, pack->ew,
 			pack->speed, pack->track, pack->utc.day, pack->utc.mon + 1, pack->utc.year - 100, pack->magvar,
 			pack->magvar_ew, pack->mode);
 }
 
-int nmea_gen_GPVTG(char *buff, int buff_sz, nmeaGPVTG *pack) {
-	return nmea_printf(buff, buff_sz, "$GPVTG,%.1f,%C,%.1f,%C,%.1f,%C,%.1f,%C", pack->dir, pack->dir_t, pack->dec,
+int nmea_gen_GPVTG(char *s, int len, nmeaGPVTG *pack) {
+	return nmea_printf(s, len, "$GPVTG,%.1f,%C,%.1f,%C,%.1f,%C,%.1f,%C", pack->dir, pack->dir_t, pack->dec,
 			pack->dec_m, pack->spn, pack->spn_n, pack->spk, pack->spk_k);
 }
 
