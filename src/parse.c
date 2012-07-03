@@ -516,24 +516,24 @@ void nmea_GPGSV2info(nmeaGPGSV *pack, nmeaINFO *info) {
  * @param info a pointer to the nmeaINFO structure
  */
 void nmea_GPRMC2info(nmeaGPRMC *pack, nmeaINFO *info) {
-	assert(pack && info);
+	assert(pack);
+	assert(info);
 
+	info->smask |= GPRMC;
+	info->utc = pack->utc;
 	if ('A' == pack->status) {
-		if (NMEA_SIG_BAD == info->sig)
+		if (info->sig == NMEA_SIG_BAD)
 			info->sig = NMEA_SIG_MID;
-		if (NMEA_FIX_BAD == info->fix)
+		if (info->fix == NMEA_FIX_BAD)
 			info->fix = NMEA_FIX_2D;
-	} else if ('V' == pack->status) {
+	} else {
 		info->sig = NMEA_SIG_BAD;
 		info->fix = NMEA_FIX_BAD;
 	}
-
-	info->utc = pack->utc;
-	info->lat = ((pack->ns == 'N') ? pack->lat : -(pack->lat));
-	info->lon = ((pack->ew == 'E') ? pack->lon : -(pack->lon));
+	info->lat = ((pack->ns == 'N') ? pack->lat : -pack->lat);
+	info->lon = ((pack->ew == 'E') ? pack->lon : -pack->lon);
 	info->speed = pack->speed * NMEA_TUD_KNOTS;
 	info->track = pack->track;
-	info->smask |= GPRMC;
 }
 
 /**
