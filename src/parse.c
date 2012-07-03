@@ -267,7 +267,7 @@ int nmea_parse_GPRMC(const char *buff, int buff_sz, nmeaGPRMC *pack) {
 	nmea_trace_buff(buff, buff_sz);
 
 	nsen = nmea_scanf(buff, buff_sz, "$GPRMC,%s,%C,%f,%C,%f,%C,%f,%f,%2d%2d%2d,%f,%C,%C*", &(time_buff[0]),
-			&(pack->status), &(pack->lat), &(pack->ns), &(pack->lon), &(pack->ew), &(pack->speed), &(pack->direction),
+			&(pack->status), &(pack->lat), &(pack->ns), &(pack->lon), &(pack->ew), &(pack->speed), &(pack->track),
 			&(pack->utc.day), &(pack->utc.mon), &(pack->utc.year), &(pack->declination), &(pack->declin_ew),
 			&(pack->mode));
 
@@ -419,7 +419,7 @@ void nmea_GPRMC2info(nmeaGPRMC *pack, nmeaINFO *info) {
 	info->lat = ((pack->ns == 'N') ? pack->lat : -(pack->lat));
 	info->lon = ((pack->ew == 'E') ? pack->lon : -(pack->lon));
 	info->speed = pack->speed * NMEA_TUD_KNOTS;
-	info->track = pack->direction;
+	info->track = pack->track;
 	info->smask |= GPRMC;
 }
 

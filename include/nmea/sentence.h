@@ -236,7 +236,7 @@ typedef struct _nmeaGPRMC {
 	double lon;					/**< Longitude in NDEG - [degree][min].[sec/60] */
 	char ew;					/**< [E]ast or [W]est */
 	double speed;				/**< Speed over the ground in knots */
-	double direction;			/**< Track angle in degrees True */
+	double track;				/**< Track angle in degrees True */
 	double declination;			/**< Magnetic variation degrees (Easterly var. subtracts from true course) */
 	char declin_ew;				/**< [E]ast or [W]est */
 	char mode;					/**< Mode indicator of fix type (A=autonomous, D=differential, E=Estimated, N=not valid, S=Simulator) */
