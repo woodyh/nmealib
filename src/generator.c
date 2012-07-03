@@ -128,7 +128,7 @@ static int nmea_igen_noise_loop(nmeaGENERATOR *gen __attribute__ ((unused)), nme
 	info->lat = nmea_random(0, 100);
 	info->lon = nmea_random(0, 100);
 	info->speed = nmea_random(0, 100);
-	info->direction = nmea_random(0, 360);
+	info->track = nmea_random(0, 360);
 	info->declination = nmea_random(0, 360);
 	info->elv = lrint(nmea_random(-100, 100));
 
@@ -262,7 +262,7 @@ static int nmea_igen_rotate_init(nmeaGENERATOR *gen, nmeaINFO *info) {
 static int nmea_igen_pos_rmove_init(nmeaGENERATOR *gen __attribute__ ((unused)), nmeaINFO *info) {
 	info->sig = 3;
 	info->fix = 3;
-	info->direction = info->declination = 0;
+	info->track = info->declination = 0;
 	info->speed = 20;
 	return 1;
 }
@@ -270,13 +270,13 @@ static int nmea_igen_pos_rmove_init(nmeaGENERATOR *gen __attribute__ ((unused)),
 static int nmea_igen_pos_rmove_loop(nmeaGENERATOR *gen __attribute__ ((unused)), nmeaINFO *info) {
 	nmeaPOS crd;
 
-	info->direction += nmea_random(-10, 10);
+	info->track += nmea_random(-10, 10);
 	info->speed += nmea_random(-2, 3);
 
-	if (info->direction < 0)
-		info->direction = 359 + info->direction;
-	if (info->direction > 359)
-		info->direction -= 359;
+	if (info->track < 0)
+		info->track = 359 + info->track;
+	if (info->track > 359)
+		info->track -= 359;
 
 	if (info->speed > 40)
 		info->speed = 40;
@@ -284,10 +284,10 @@ static int nmea_igen_pos_rmove_loop(nmeaGENERATOR *gen __attribute__ ((unused)),
 		info->speed = 1;
 
 	nmea_info2pos(info, &crd);
-	nmea_move_horz(&crd, &crd, info->direction, info->speed / 3600);
+	nmea_move_horz(&crd, &crd, info->track, info->speed / 3600);
 	nmea_pos2info(&crd, info);
 
-	info->declination = info->direction;
+	info->declination = info->track;
 
 	return 1;
 }

@@ -419,7 +419,7 @@ void nmea_GPRMC2info(nmeaGPRMC *pack, nmeaINFO *info) {
 	info->lat = ((pack->ns == 'N') ? pack->lat : -(pack->lat));
 	info->lon = ((pack->ew == 'E') ? pack->lon : -(pack->lon));
 	info->speed = pack->speed * NMEA_TUD_KNOTS;
-	info->direction = pack->direction;
+	info->track = pack->direction;
 	info->smask |= GPRMC;
 }
 
@@ -431,7 +431,7 @@ void nmea_GPRMC2info(nmeaGPRMC *pack, nmeaINFO *info) {
 void nmea_GPVTG2info(nmeaGPVTG *pack, nmeaINFO *info) {
 	assert(pack && info);
 
-	info->direction = pack->dir;
+	info->track = pack->dir;
 	info->declination = pack->dec;
 	info->speed = pack->spk;
 	info->smask |= GPVTG;

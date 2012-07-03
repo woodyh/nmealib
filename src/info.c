@@ -44,7 +44,7 @@ void nmea_zero_INFO(nmeaINFO *info) {
  * - longitude is in the range [-18000, 18000],
  * - DOPs are positive,
  * - speed is positive,
- * - direction is in the range [0, 360>.
+ * - track is in the range [0, 360>.
  *
  * Time is set to the current time when not present.
  *
@@ -60,11 +60,11 @@ void nmea_INFO_sanitise(nmeaINFO *nmeaInfo) {
 	double lat = 0;
 	double lon = 0;
 	double speed = 0;
-	double direction = 0;
+	double track = 0;
 	bool latAdjusted = false;
 	bool lonAdjusted = false;
 	bool speedAdjusted = false;
-	bool directionAdjusted = false;
+	bool trackAdjusted = false;
 
 	if (!nmeaInfo) {
 		return;
@@ -116,8 +116,8 @@ void nmea_INFO_sanitise(nmeaINFO *nmeaInfo) {
 		nmeaInfo->speed = 0;
 	}
 
-	if (!nmea_INFO_is_present(nmeaInfo, DIRECTION)) {
-		nmeaInfo->direction = 0;
+	if (!nmea_INFO_is_present(nmeaInfo, TRACK)) {
+		nmeaInfo->track = 0;
 	}
 
 	if (!nmea_INFO_is_present(nmeaInfo, DECLINATION)) {
@@ -192,13 +192,13 @@ void nmea_INFO_sanitise(nmeaINFO *nmeaInfo) {
 	 */
 
 	speed = nmeaInfo->speed;
-	direction = nmeaInfo->direction;
+	track = nmeaInfo->track;
 
 	if (speed < 0.0) {
 		speed = -speed;
-		direction += 180.0;
+		track += 180.0;
 		speedAdjusted = true;
-		directionAdjusted = true;
+		trackAdjusted = true;
 	}
 
 	/* speed is now in [0, max> */
@@ -208,23 +208,23 @@ void nmea_INFO_sanitise(nmeaINFO *nmeaInfo) {
 	}
 
 	/*
-	 * direction
+	 * track
 	 */
 
-	/* force direction in [0, 360> */
-	while (direction < 0.0) {
-		direction += 360.0;
-		directionAdjusted = true;
+	/* force track in [0, 360> */
+	while (track < 0.0) {
+		track += 360.0;
+		trackAdjusted = true;
 	}
-	while (direction >= 360.0) {
-		direction -= 360.0;
-		directionAdjusted = true;
+	while (track >= 360.0) {
+		track -= 360.0;
+		trackAdjusted = true;
 	}
 
-	/* direction is now in [0, 360> */
+	/* track is now in [0, 360> */
 
-	if (directionAdjusted) {
-		nmeaInfo->direction = direction;
+	if (trackAdjusted) {
+		nmeaInfo->track = track;
 	}
 }
 
@@ -269,7 +269,7 @@ void nmea_INFO_unit_conversion(nmeaINFO * nmeaInfo) {
 
 	/* elv (already in correct format) */
 	/* speed (already in correct format) */
-	/* direction (already in correct format) */
+	/* track (already in correct format) */
 	/* declination (already in correct format) */
 
 	/* satinfo (not used) */
