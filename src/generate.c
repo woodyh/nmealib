@@ -57,8 +57,8 @@ int nmea_gen_GPRMC(char *buff, int buff_sz, nmeaGPRMC *pack) {
 	return nmea_printf(buff, buff_sz,
 			"$GPRMC,%02d%02d%02d.%02d,%C,%09.4f,%C,%010.4f,%C,%03.1f,%03.1f,%02d%02d%02d,%03.1f,%C,%C", pack->utc.hour,
 			pack->utc.min, pack->utc.sec, pack->utc.hsec, pack->status, pack->lat, pack->ns, pack->lon, pack->ew,
-			pack->speed, pack->track, pack->utc.day, pack->utc.mon + 1, pack->utc.year - 100, pack->declination,
-			pack->declin_ew, pack->mode);
+			pack->speed, pack->track, pack->utc.day, pack->utc.mon + 1, pack->utc.year - 100, pack->magvar,
+			pack->magvar_ew, pack->mode);
 }
 
 int nmea_gen_GPVTG(char *buff, int buff_sz, nmeaGPVTG *pack) {
@@ -135,8 +135,8 @@ void nmea_info2GPRMC(const nmeaINFO *info, nmeaGPRMC *pack) {
 	pack->ew = ((info->lon > 0) ? 'E' : 'W');
 	pack->speed = info->speed / NMEA_TUD_KNOTS;
 	pack->track = info->track;
-	pack->declination = info->magvar;
-	pack->declin_ew = 'E';
+	pack->magvar = info->magvar;
+	pack->magvar_ew = 'E';
 	pack->mode = ((info->sig > 0) ? 'A' : 'N');
 }
 

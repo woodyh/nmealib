@@ -47,7 +47,7 @@ void nmea_zero_GPRMC(nmeaGPRMC *pack) {
 	pack->status = 'V';
 	pack->ns = 'N';
 	pack->ew = 'E';
-	pack->declin_ew = 'E';
+	pack->magvar_ew = 'E';
 }
 
 void nmea_zero_GPVTG(nmeaGPVTG *pack) {

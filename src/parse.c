@@ -268,7 +268,7 @@ int nmea_parse_GPRMC(const char *buff, int buff_sz, nmeaGPRMC *pack) {
 
 	nsen = nmea_scanf(buff, buff_sz, "$GPRMC,%s,%C,%f,%C,%f,%C,%f,%f,%2d%2d%2d,%f,%C,%C*", &(time_buff[0]),
 			&(pack->status), &(pack->lat), &(pack->ns), &(pack->lon), &(pack->ew), &(pack->speed), &(pack->track),
-			&(pack->utc.day), &(pack->utc.mon), &(pack->utc.year), &(pack->declination), &(pack->declin_ew),
+			&(pack->utc.day), &(pack->utc.mon), &(pack->utc.year), &(pack->magvar), &(pack->magvar_ew),
 			&(pack->mode));
 
 	if (nsen != 13 && nsen != 14) {
