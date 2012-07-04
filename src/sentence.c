@@ -52,7 +52,7 @@ void nmea_zero_GPRMC(nmeaGPRMC *pack) {
 
 void nmea_zero_GPVTG(nmeaGPVTG *pack) {
 	memset(pack, 0, sizeof(nmeaGPVTG));
-	pack->dir_t = 'T';
+	pack->track_t = 'T';
 	pack->dec_m = 'M';
 	pack->spn_n = 'N';
 	pack->spk_k = 'K';

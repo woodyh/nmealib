@@ -264,8 +264,8 @@ typedef struct _nmeaGPRMC {
  * </pre>
  */
 typedef struct _nmeaGPVTG {
-	double dir;					/**< True track made good (degrees) */
-	char dir_t;					/**< Fixed text 'T' indicates that track made good is relative to true north */
+	double track;				/**< True track made good (degrees) */
+	char track_t;				/**< Fixed text 'T' indicates that track made good is relative to true north */
 	double dec;					/**< Magnetic track made good */
 	char dec_m;					/**< Fixed text 'M' */
 	double spn;					/**< Ground speed, knots */
