@@ -123,6 +123,7 @@ typedef struct _nmeaINFO {
 	double elv;						/**< Antenna altitude above/below mean sea level (geoid) in meters */
 	double speed;					/**< Speed over the ground in kilometers/hour */
 	double track;					/**< Track angle in degrees True */
+	double mtrack;					/**< Magnetic Track angle in degrees True */
 	double magvar;					/**< Magnetic variation degrees (Easterly var. subtracts from true course) */
 
 	nmeaSATINFO satinfo;			/**< Satellites information */
@@ -145,8 +146,9 @@ typedef enum _nmeaINFO_FIELD {
 	ELV			= (1 << 9),
 	SPEED		= (1 << 10),
 	TRACK		= (1 << 11),
-	MAGVAR		= (1 << 12),
-	SATINFO		= (1 << 13)
+	MTRACK		= (1 << 12),
+	MAGVAR		= (1 << 13),
+	SATINFO		= (1 << 14)
 } nmeaINFO_FIELD;
 
 void nmea_zero_INFO(nmeaINFO *info);

@@ -61,10 +61,12 @@ void nmea_INFO_sanitise(nmeaINFO *nmeaInfo) {
 	double lon = 0;
 	double speed = 0;
 	double track = 0;
+	double mtrack = 0;
 	bool latAdjusted = false;
 	bool lonAdjusted = false;
 	bool speedAdjusted = false;
 	bool trackAdjusted = false;
+	bool mtrackAdjusted = false;
 
 	if (!nmeaInfo) {
 		return;
@@ -118,6 +120,10 @@ void nmea_INFO_sanitise(nmeaINFO *nmeaInfo) {
 
 	if (!nmea_INFO_is_present(nmeaInfo, TRACK)) {
 		nmeaInfo->track = 0;
+	}
+
+	if (!nmea_INFO_is_present(nmeaInfo, MTRACK)) {
+		nmeaInfo->mtrack = 0;
 	}
 
 	if (!nmea_INFO_is_present(nmeaInfo, MAGVAR)) {
@@ -193,10 +199,12 @@ void nmea_INFO_sanitise(nmeaINFO *nmeaInfo) {
 
 	speed = nmeaInfo->speed;
 	track = nmeaInfo->track;
+	mtrack = nmeaInfo->mtrack;
 
 	if (speed < 0.0) {
 		speed = -speed;
 		track += 180.0;
+		mtrack += 180.0;
 		speedAdjusted = true;
 		trackAdjusted = true;
 	}
@@ -225,6 +233,26 @@ void nmea_INFO_sanitise(nmeaINFO *nmeaInfo) {
 
 	if (trackAdjusted) {
 		nmeaInfo->track = track;
+	}
+
+	/*
+	 * mtrack
+	 */
+
+	/* force mtrack in [0, 360> */
+	while (mtrack < 0.0) {
+		mtrack += 360.0;
+		mtrackAdjusted = true;
+	}
+	while (mtrack >= 360.0) {
+		mtrack -= 360.0;
+		mtrackAdjusted = true;
+	}
+
+	/* mtrack is now in [0, 360> */
+
+	if (mtrackAdjusted) {
+		nmeaInfo->mtrack = mtrack;
 	}
 }
 

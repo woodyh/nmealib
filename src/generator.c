@@ -129,6 +129,7 @@ static int nmea_igen_noise_loop(nmeaGENERATOR *gen __attribute__ ((unused)), nme
 	info->lon = nmea_random(0, 100);
 	info->speed = nmea_random(0, 100);
 	info->track = nmea_random(0, 360);
+	info->mtrack = nmea_random(0, 360);
 	info->magvar = nmea_random(0, 360);
 	info->elv = lrint(nmea_random(-100, 100));
 
@@ -263,6 +264,7 @@ static int nmea_igen_pos_rmove_init(nmeaGENERATOR *gen __attribute__ ((unused)),
 	info->sig = 3;
 	info->fix = 3;
 	info->track = 0;
+	info->mtrack = 0;
 	info->magvar = 0;
 	info->speed = 20;
 	return 1;
@@ -272,12 +274,21 @@ static int nmea_igen_pos_rmove_loop(nmeaGENERATOR *gen __attribute__ ((unused)),
 	nmeaPOS crd;
 
 	info->track += nmea_random(-10, 10);
+	info->mtrack += nmea_random(-10, 10);
 	info->speed += nmea_random(-2, 3);
 
-	if (info->track < 0)
+	if (info->track < 0) {
 		info->track = 359 + info->track;
-	if (info->track > 359)
+	}
+	if (info->track > 359) {
 		info->track -= 359;
+	}
+	if (info->mtrack < 0) {
+		info->mtrack = 359 + info->mtrack;
+	}
+	if (info->mtrack > 359) {
+		info->mtrack -= 359;
+	}
 
 	if (info->speed > 40)
 		info->speed = 40;
