@@ -519,20 +519,29 @@ int nmea_parse_GPRMC(const char *s, int len, nmeaGPRMC *pack) {
  * @return 1 (true) - if parsed successfully or 0 (false) otherwise.
  */
 int nmea_parse_GPVTG(const char *s, int len, nmeaGPVTG *pack) {
-	assert(s && pack);
+	int token_count;
 
-	memset(pack, 0, sizeof(nmeaGPVTG));
+	assert(s);
+	assert(pack);
 
 	nmea_trace_buff(s, len);
 
-	if (8
-			!= nmea_scanf(s, len, "$GPVTG,%f,%C,%f,%C,%f,%C,%f,%C*", &(pack->track), &(pack->track_t), &(pack->mtrack),
-					&(pack->mtrack_m), &(pack->spn), &(pack->spn_n), &(pack->spk), &(pack->spk_k))) {
-		nmea_error("GPVTG parse error!");
+	/*
+	 * Clear before parsing, to be able to detect absent fields
+	 */
+	memset(pack, 0, sizeof(nmeaGPVTG));
+
+	/* parse */
+	token_count = nmea_scanf(s, len, "$GPVTG,%f,%C,%f,%C,%f,%C,%f,%C*", &pack->track, &pack->track_t, &pack->mtrack,
+			&pack->mtrack_m, &pack->spn, &pack->spn_n, &pack->spk, &pack->spk_k);
+
+	/* see that we have enough tokens */
+	if (token_count != 8) {
+		nmea_error("GPVTG parse error, need 8 tokens, got %d in %s", token_count, s);
 		return 0;
 	}
 
-	if (pack->track_t != 'T' || pack->mtrack_m != 'M' || pack->spn_n != 'N' || pack->spk_k != 'K') {
+	if (!((pack->track_t == 'T') && (pack->mtrack_m == 'M') && (pack->spn_n == 'N') && (pack->spk_k == 'K'))) {
 		nmea_error("GPVTG parse error (format error)!");
 		return 0;
 	}
@@ -671,10 +680,11 @@ void nmea_GPRMC2info(nmeaGPRMC *pack, nmeaINFO *info) {
  * @param info a pointer to the nmeaINFO structure
  */
 void nmea_GPVTG2info(nmeaGPVTG *pack, nmeaINFO *info) {
-	assert(pack && info);
+	assert(pack);
+	assert(info);
 
+	info->smask |= GPVTG;
+	info->speed = pack->spk;
 	info->track = pack->track;
 	info->mtrack = pack->mtrack;
-	info->speed = pack->spk;
-	info->smask |= GPVTG;
 }
