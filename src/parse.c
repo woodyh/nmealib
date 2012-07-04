@@ -74,6 +74,117 @@ static bool _nmea_parse_time(const char *s, int len, nmeaTIME *t) {
 }
 
 /**
+ * Validate the time fields in an nmeaTIME structure.
+ * Expects:
+ * <pre>
+ *   0 <= hour <   24
+ *   0 <= min  <   60
+ *   0 <= sec  <=  60
+ *   0 <= hsec <  100
+ * </pre>
+ *
+ * @param t a pointer to the structure
+ * @return true when valid, false otherwise
+ */
+static bool validateTime(nmeaTIME * t) {
+	if (!t) {
+		return false;
+	}
+
+	if (!((t->hour >= 0) && (t->hour < 24) && (t->min >= 0) && (t->min < 60) && (t->sec >= 0) && (t->sec <= 60)
+			&& (t->hsec >= 0) && (t->hsec < 100))) {
+		nmea_error("Parse error: invalid time (%02d%02d%02d.%02d)", t->hour, t->min, t->sec, t->hsec);
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Validate the date fields in an nmeaTIME structure.
+ * Expects:
+ * <pre>
+ *   90 <= year  < 190
+ *    0 <= month <  12
+ *    0 <= day   <  31
+ * </pre>
+ *
+ * @param t a pointer to the structure
+ * @return true when valid, false otherwise
+ */
+static bool validateDate(nmeaTIME * t) {
+	if (!t) {
+		return false;
+	}
+
+	if (!((t->year >= 90) && (t->year < 190) && (t->mon >= 0) && (t->mon < 12) && (t->day >= 0) && (t->day < 31))) {
+		nmea_error("Parse error: invalid date (%02d%02d%02d)", t->day, t->mon, t->year);
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Validate north/south or east/west and uppercase it.
+ * Expects:
+ * <pre>
+ *   c in { n, N, s, S } (for north/south)
+ *   c in { e, E, w, W } (for east/west)
+ * </pre>
+ *
+ * @param c a pointer to the character. The character will be converted to uppercase.
+ * @param ns true: evaluate north/south, false: evaluate east/west
+ * @return true when valid, false otherwise
+ */
+static bool validateNSEW(char * c, bool ns) {
+	if (!c) {
+		return false;
+	}
+
+	*c = toupper(*c);
+
+	if (ns) {
+		if (!((*c == 'N') || (*c == 'S'))) {
+			nmea_error("Parse error: invalid north/south (%c)", *c);
+			return false;
+		}
+	} else {
+		if (!((*c == 'E') || (*c == 'W'))) {
+			nmea_error("Parse error: invalid east/west (%c)", *c);
+			return false;
+		}
+	}
+
+	return true;
+}
+
+/**
+ * Validate mode and uppercase it.
+ * Expects:
+ * <pre>
+ *   c in { a, A, d, D, e, E, n, N, s, S }
+ * </pre>
+ *
+ * @param c a pointer to the character. The character will be converted to uppercase.
+ * @return true when valid, false otherwise
+ */
+static bool validateMode(char * c) {
+	if (!c) {
+		return false;
+	}
+
+	*c = toupper(*c);
+
+	if (!((*c == 'A') || (*c == 'D') || (*c == 'E') || (*c == 'N') || (*c == 'S'))) {
+		nmea_error("Parse error: invalid mode (%c)", *c);
+		return false;
+	}
+
+	return true;
+}
+
+/**
  * Determine packet type (see nmeaPACKTYPE) by the header of a string.
  * The header is the start of an NMEA sentence, right after the $.
  *
