@@ -20,6 +20,8 @@
 
 #include <nmea/generate.h>
 
+#include <stdio.h>
+#include <string.h>
 #include <math.h>
 
 #include <nmea/tok.h>
@@ -53,12 +55,68 @@ int nmea_gen_GPGSV(char *s, int len, nmeaGPGSV *pack) {
 			pack->sat_data[3].elv, pack->sat_data[3].azimuth, pack->sat_data[3].sig);
 }
 
+/**
+ * Generate a GPRMC sentence from an nmeaGPRMC structure
+ *
+ * @param s a pointer to the buffer to generate the string in
+ * @param len the size of the buffer
+ * @param pack the structure
+ * @return the length of the generated sentence
+ */
 int nmea_gen_GPRMC(char *s, int len, nmeaGPRMC *pack) {
-	return nmea_printf(s, len,
-			"$GPRMC,%02d%02d%02d.%02d,%C,%09.4f,%C,%010.4f,%C,%03.1f,%03.1f,%02d%02d%02d,%03.1f,%C,%C", pack->utc.hour,
-			pack->utc.min, pack->utc.sec, pack->utc.hsec, pack->status, pack->lat, pack->ns, pack->lon, pack->ew,
-			pack->speed, pack->track, pack->utc.day, pack->utc.mon + 1, pack->utc.year - 100, pack->magvar,
-			pack->magvar_ew, pack->mode);
+	char sTime[16];
+	char sDate[16];
+	char sLat[16];
+	char sNs[2];
+	char sLon[16];
+	char sEw[2];
+	char sSpeed[16];
+	char sTrack[16];
+	char sMagvar[16];
+	char sMagvar_ew[2];
+	char sMode[2];
+
+	sTime[0] = 0;
+	sDate[0] = 0;
+	sLat[0] = 0;
+	sNs[0] = sNs[1] = 0;
+	sLon[0] = 0;
+	sEw[0] = sEw[1] = 0;
+	sSpeed[0] = 0;
+	sTrack[0] = 0;
+	sMagvar[0] = 0;
+	sMagvar_ew[0] = sMagvar_ew[1] = 0;
+	sMode[0] = sMode[1] = 0;
+
+	if (nmea_INFO_is_present(pack, UTC)) {
+		snprintf(&sTime[0], sizeof(sTime), "%02d%02d%02d.%02d", pack->utc.hour, pack->utc.min, pack->utc.sec,
+				pack->utc.hsec);
+		snprintf(&sDate[0], sizeof(sDate), "%02d%02d%02d", pack->utc.day, pack->utc.mon + 1, pack->utc.year - 100);
+	}
+	if (nmea_INFO_is_present(pack, LAT)) {
+		snprintf(&sLat[0], sizeof(sLat), "%09.4f", pack->lat);
+		sNs[0] = pack->ns;
+	}
+	if (nmea_INFO_is_present(pack, LON)) {
+		snprintf(&sLon[0], sizeof(sLon), "%010.4f", pack->lon);
+		sEw[0] = pack->ew;
+	}
+	if (nmea_INFO_is_present(pack, SPEED)) {
+		snprintf(&sSpeed[0], sizeof(sSpeed), "%03.1f", pack->speed);
+	}
+	if (nmea_INFO_is_present(pack, TRACK)) {
+		snprintf(&sTrack[0], sizeof(sTrack), "%03.1f", pack->track);
+	}
+	if (nmea_INFO_is_present(pack, MAGVAR)) {
+		snprintf(&sMagvar[0], sizeof(sMagvar), "%03.1f", pack->magvar);
+		sMagvar_ew[0] = pack->magvar_ew;
+	}
+	if (nmea_INFO_is_present(pack, SIG)) {
+		sMode[0] = pack->mode;
+	}
+
+	return nmea_printf(s, len, "$GPRMC,%s,%C,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s", &sTime[0], pack->status, &sLat[0], &sNs[0],
+			&sLon[0], &sEw[0], &sSpeed[0], &sTrack[0], &sDate[0], &sMagvar[0], &sMagvar_ew[0], &sMode[0]);
 }
 
 int nmea_gen_GPVTG(char *s, int len, nmeaGPVTG *pack) {
@@ -124,9 +182,17 @@ void nmea_info2GPGSV(const nmeaINFO *info, nmeaGPGSV *pack, int pack_idx) {
 		pack->sat_data[pit] = info->satinfo.sat[sit];
 }
 
+/**
+ * Convert an nmeaINFO structure into an nmeaGPRMC structure
+ *
+ * @param info a pointer to the nmeaINFO structure
+ * @param pack a pointer to the nmeaGPRMC structure
+ */
 void nmea_info2GPRMC(const nmeaINFO *info, nmeaGPRMC *pack) {
 	nmea_zero_GPRMC(pack);
 
+	pack->present = info->present;
+	nmea_INFO_unset_present(pack, SMASK);
 	pack->utc = info->utc;
 	pack->status = ((info->sig > 0) ? 'A' : 'V');
 	pack->lat = fabs(info->lat);

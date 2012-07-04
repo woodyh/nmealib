@@ -27,6 +27,7 @@
 
 #include <string.h>
 #include <assert.h>
+#include <math.h>
 #include <ctype.h>
 #include <stdbool.h>
 
@@ -369,33 +370,142 @@ int nmea_parse_GPGSV(const char *s, int len, nmeaGPGSV *pack) {
  * @return 1 (true) - if parsed successfully or 0 (false) otherwise.
  */
 int nmea_parse_GPRMC(const char *s, int len, nmeaGPRMC *pack) {
-	int nsen;
+	int token_count;
 	char time_buff[NMEA_TIMEPARSE_BUF];
 
-	assert(s && pack);
-
-	memset(pack, 0, sizeof(nmeaGPRMC));
+	assert(s);
+	assert(pack);
 
 	nmea_trace_buff(s, len);
 
-	nsen = nmea_scanf(s, len, "$GPRMC,%s,%C,%f,%C,%f,%C,%f,%f,%2d%2d%2d,%f,%C,%C*", &(time_buff[0]),
-			&(pack->status), &(pack->lat), &(pack->ns), &(pack->lon), &(pack->ew), &(pack->speed), &(pack->track),
-			&(pack->utc.day), &(pack->utc.mon), &(pack->utc.year), &(pack->magvar), &(pack->magvar_ew),
-			&(pack->mode));
+	/*
+	 * Clear before parsing, to be able to detect absent fields
+	 */
+	time_buff[0] = '\0';
+	pack->present = 0;
+	pack->utc.year = -1;
+	pack->utc.mon = -1;
+	pack->utc.day = -1;
+	pack->utc.hour = -1;
+	pack->utc.min = -1;
+	pack->utc.sec = -1;
+	pack->utc.hsec = -1;
+	pack->status = 0;
+	pack->lat = NAN;
+	pack->ns = 0;
+	pack->lon = NAN;
+	pack->ew = 0;
+	pack->speed = NAN;
+	pack->track = NAN;
+	pack->magvar = NAN;
+	pack->magvar_ew = 0;
+	pack->mode = 0;
 
-	if (nsen != 13 && nsen != 14) {
-		nmea_error("GPRMC parse error!");
+	/* parse */
+	token_count = nmea_scanf(s, len, "$GPRMC,%s,%C,%f,%C,%f,%C,%f,%f,%2d%2d%2d,%f,%C,%C*", &time_buff[0], &pack->status,
+			&pack->lat, &pack->ns, &pack->lon, &pack->ew, &pack->speed, &pack->track, &pack->utc.day, &pack->utc.mon,
+			&pack->utc.year, &pack->magvar, &pack->magvar_ew, &pack->mode);
+
+	/* see that we have enough tokens */
+	if ((token_count != 13) && (token_count != 14)) {
+		nmea_error("GPRMC parse error, need 13 or 14 tokens, got %d in %s", token_count, s);
 		return 0;
 	}
 
-	if (!_nmea_parse_time(&time_buff[0], (int) strlen(&time_buff[0]), &(pack->utc))) {
-		nmea_error("GPRMC time parse error!");
-		return 0;
+	/* determine which fields are present and validate them */
+
+	nmea_INFO_set_present(pack, SIG);
+	nmea_INFO_set_present(pack, FIX);
+
+	if ((pack->utc.year != -1) && (pack->utc.mon != -1) && (pack->utc.day != -1)) {
+		size_t time_buff_len = 0;
+
+		if (pack->utc.year < 90) {
+			pack->utc.year += 100;
+		}
+		pack->utc.mon -= 1;
+
+		if (!validateDate(&pack->utc)) {
+			return 0;
+		}
+
+		time_buff_len = strlen(&time_buff[0]);
+		if (time_buff_len) {
+			if (!_nmea_parse_time(&time_buff[0], time_buff_len, &pack->utc)) {
+				return 0;
+			}
+
+			if (!validateTime(&pack->utc)) {
+				return 0;
+			}
+
+			/* only when both time and date are present and valid */
+			nmea_INFO_set_present(pack, UTC);
+		}
 	}
 
-	if (pack->utc.year < 90)
-		pack->utc.year += 100;
-	pack->utc.mon -= 1;
+	if (!pack->status) {
+		pack->status = 'V';
+	} else {
+		pack->status = toupper(pack->status);
+		if (!((pack->status == 'A') || (pack->status == 'V'))) {
+			nmea_error("GPRMC parse error: invalid status (%c)", pack->status);
+			return 0;
+		}
+	}
+	if (pack->lat != NAN) {
+		if (!pack->ns) {
+			pack->ns = 'N';
+		} else {
+			if (!validateNSEW(&pack->ns, true)) {
+				return 0;
+			}
+
+			/* only when lat and ns are present and valid */
+			nmea_INFO_set_present(pack, LAT);
+		}
+	}
+	if (pack->lon != NAN) {
+		if (!pack->ew) {
+			pack->ew = 'E';
+		} else {
+			if (!validateNSEW(&pack->ew, false)) {
+				return 0;
+			}
+
+			/* only when lon and ew are present and valid */
+			nmea_INFO_set_present(pack, LON);
+		}
+	}
+	if (pack->speed != NAN) {
+		nmea_INFO_set_present(pack, SPEED);
+	}
+	if (pack->track != NAN) {
+		nmea_INFO_set_present(pack, TRACK);
+	}
+	if (pack->magvar != NAN) {
+		if (!pack->magvar_ew) {
+			pack->magvar_ew = 'E';
+		} else {
+			if (!validateNSEW(&pack->magvar_ew, false)) {
+				return 0;
+			}
+
+			/* only when magvar and magvar_ew are present and valid */
+			nmea_INFO_set_present(pack, MAGVAR);
+		}
+	}
+	if (token_count == 13) {
+		pack->mode = 'A';
+	} else {
+		if (!pack->mode) {
+			pack->mode = 'N';
+		} else {
+			if (!validateMode(&pack->mode)) {
+				return 0;
+			}
+		}
+	}
 
 	return 1;
 }
@@ -519,22 +629,38 @@ void nmea_GPRMC2info(nmeaGPRMC *pack, nmeaINFO *info) {
 	assert(pack);
 	assert(info);
 
+	info->present |= pack->present;
+	nmea_INFO_set_present(info, SMASK);
 	info->smask |= GPRMC;
-	info->utc = pack->utc;
-	if ('A' == pack->status) {
-		if (info->sig == NMEA_SIG_BAD)
+	if (nmea_INFO_is_present(pack, UTC)) {
+		info->utc = pack->utc;
+	}
+	if (pack->status == 'A') {
+		if (info->sig == NMEA_SIG_BAD) {
 			info->sig = NMEA_SIG_MID;
-		if (info->fix == NMEA_FIX_BAD)
+		}
+		if (info->fix == NMEA_FIX_BAD) {
 			info->fix = NMEA_FIX_2D;
+		}
 	} else {
 		info->sig = NMEA_SIG_BAD;
 		info->fix = NMEA_FIX_BAD;
 	}
-	info->lat = ((pack->ns == 'N') ? pack->lat : -pack->lat);
-	info->lon = ((pack->ew == 'E') ? pack->lon : -pack->lon);
-	info->speed = pack->speed * NMEA_TUD_KNOTS;
-	info->track = pack->track;
-	info->magvar = ((pack->magvar_ew == 'E') ? pack->magvar : -pack->magvar);
+	if (nmea_INFO_is_present(pack, LAT)) {
+		info->lat = ((pack->ns == 'N') ? pack->lat : -pack->lat);
+	}
+	if (nmea_INFO_is_present(pack, LON)) {
+		info->lon = ((pack->ew == 'E') ? pack->lon : -pack->lon);
+	}
+	if (nmea_INFO_is_present(pack, SPEED)) {
+		info->speed = pack->speed * NMEA_TUD_KNOTS;
+	}
+	if (nmea_INFO_is_present(pack, TRACK)) {
+		info->track = pack->track;
+	}
+	if (nmea_INFO_is_present(pack, MAGVAR)) {
+		info->magvar = ((pack->magvar_ew == 'E') ? pack->magvar : -pack->magvar);
+	}
 }
 
 /**

@@ -229,6 +229,7 @@ typedef struct _nmeaGPGSV {
  * </pre>
  */
 typedef struct _nmeaGPRMC {
+	int present;				/**< Mask specifying which fields are present, same as in nmeaINFO */
 	nmeaTIME utc;				/**< UTC of position */
 	char status;				/**< Status (A = active or V = void) */
 	double lat;					/**< Latitude in NDEG - [degree][min].[sec/60] */
