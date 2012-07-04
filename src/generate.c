@@ -210,7 +210,7 @@ void nmea_info2GPVTG(const nmeaINFO *info, nmeaGPVTG *pack) {
 	nmea_zero_GPVTG(pack);
 
 	pack->track = info->track;
-	pack->mtrack = info->magvar;
+	pack->mtrack = info->mtrack;
 	pack->spn = info->speed / NMEA_TUD_KNOTS;
 	pack->spk = info->speed;
 }

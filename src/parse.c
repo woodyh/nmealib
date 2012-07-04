@@ -672,7 +672,7 @@ void nmea_GPVTG2info(nmeaGPVTG *pack, nmeaINFO *info) {
 	assert(pack && info);
 
 	info->track = pack->track;
-	info->magvar = pack->mtrack;
+	info->mtrack = pack->mtrack;
 	info->speed = pack->spk;
 	info->smask |= GPVTG;
 }
