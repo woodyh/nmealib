@@ -511,11 +511,12 @@ int nmea_parse_GPRMC(const char *s, int len, nmeaGPRMC *pack) {
 }
 
 /**
- * \brief Parse VTG packet from buffer.
- * @param s a constant character pointer of packet buffer.
- * @param len buffer size.
- * @param pack a pointer of packet which will filled by function.
- * @return 1 (true) - if parsed successfully or 0 (false) - if fail.
+ * Parse a GPVTG sentence from a string
+ *
+ * @param s the string
+ * @param len the length of the string
+ * @param pack a pointer to the result structure
+ * @return 1 (true) - if parsed successfully or 0 (false) otherwise.
  */
 int nmea_parse_GPVTG(const char *s, int len, nmeaGPVTG *pack) {
 	assert(s && pack);
@@ -664,9 +665,10 @@ void nmea_GPRMC2info(nmeaGPRMC *pack, nmeaINFO *info) {
 }
 
 /**
- * \brief Fill nmeaINFO structure by VTG packet data.
- * @param pack a pointer of packet structure.
- * @param info a pointer of summary information structure.
+ * Fill nmeaINFO structure from VTG packet structure
+ *
+ * @param pack a pointer to the packet structure
+ * @param info a pointer to the nmeaINFO structure
  */
 void nmea_GPVTG2info(nmeaGPVTG *pack, nmeaINFO *info) {
 	assert(pack && info);

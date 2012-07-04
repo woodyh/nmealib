@@ -119,6 +119,14 @@ int nmea_gen_GPRMC(char *s, int len, nmeaGPRMC *pack) {
 			&sLon[0], &sEw[0], &sSpeed[0], &sTrack[0], &sDate[0], &sMagvar[0], &sMagvar_ew[0], &sMode[0]);
 }
 
+/**
+ * Generate a GPVTG sentence from an nmeaGPVTG structure
+ *
+ * @param s a pointer to the buffer to generate the string in
+ * @param len the size of the buffer
+ * @param pack the structure
+ * @return the length of the generated sentence
+ */
 int nmea_gen_GPVTG(char *s, int len, nmeaGPVTG *pack) {
 	return nmea_printf(s, len, "$GPVTG,%.1f,%C,%.1f,%C,%.1f,%C,%.1f,%C", pack->track, pack->track_t, pack->mtrack,
 			pack->mtrack_m, pack->spn, pack->spn_n, pack->spk, pack->spk_k);
@@ -206,6 +214,12 @@ void nmea_info2GPRMC(const nmeaINFO *info, nmeaGPRMC *pack) {
 	pack->mode = ((info->sig > 0) ? 'A' : 'N');
 }
 
+/**
+ * Convert an nmeaINFO structure into an nmeaGPVTG structure
+ *
+ * @param info a pointer to the nmeaINFO structure
+ * @param pack a pointer to the nmeaGPRMC structure
+ */
 void nmea_info2GPVTG(const nmeaINFO *info, nmeaGPVTG *pack) {
 	nmea_zero_GPVTG(pack);
 
