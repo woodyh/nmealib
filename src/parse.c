@@ -264,22 +264,22 @@ int nmea_find_tail(const char *s, int len, int *checksum) {
 
 /**
  * \brief Parse GGA packet from buffer.
- * @param buff a constant character pointer of packet buffer.
- * @param buff_sz buffer size.
+ * @param s a constant character pointer of packet buffer.
+ * @param len buffer size.
  * @param pack a pointer of packet which will filled by function.
  * @return 1 (true) - if parsed successfully or 0 (false) - if fail.
  */
-int nmea_parse_GPGGA(const char *buff, int buff_sz, nmeaGPGGA *pack) {
+int nmea_parse_GPGGA(const char *s, int len, nmeaGPGGA *pack) {
 	char time_buff[NMEA_TIMEPARSE_BUF];
 
-	assert(buff && pack);
+	assert(s && pack);
 
 	memset(pack, 0, sizeof(nmeaGPGGA));
 
-	nmea_trace_buff(buff, buff_sz);
+	nmea_trace_buff(s, len);
 
 	if (14
-			!= nmea_scanf(buff, buff_sz, "$GPGGA,%s,%f,%C,%f,%C,%d,%d,%f,%f,%C,%f,%C,%f,%d*", &(time_buff[0]),
+			!= nmea_scanf(s, len, "$GPGGA,%s,%f,%C,%f,%C,%d,%d,%f,%f,%C,%f,%C,%f,%d*", &(time_buff[0]),
 					&(pack->lat), &(pack->ns), &(pack->lon), &(pack->ew), &(pack->sig), &(pack->satinuse),
 					&(pack->HDOP), &(pack->elv), &(pack->elv_units), &(pack->diff), &(pack->diff_units),
 					&(pack->dgps_age), &(pack->dgps_sid))) {
@@ -297,20 +297,20 @@ int nmea_parse_GPGGA(const char *buff, int buff_sz, nmeaGPGGA *pack) {
 
 /**
  * \brief Parse GSA packet from buffer.
- * @param buff a constant character pointer of packet buffer.
- * @param buff_sz buffer size.
+ * @param s a constant character pointer of packet buffer.
+ * @param len buffer size.
  * @param pack a pointer of packet which will filled by function.
  * @return 1 (true) - if parsed successfully or 0 (false) - if fail.
  */
-int nmea_parse_GPGSA(const char *buff, int buff_sz, nmeaGPGSA *pack) {
-	assert(buff && pack);
+int nmea_parse_GPGSA(const char *s, int len, nmeaGPGSA *pack) {
+	assert(s && pack);
 
 	memset(pack, 0, sizeof(nmeaGPGSA));
 
-	nmea_trace_buff(buff, buff_sz);
+	nmea_trace_buff(s, len);
 
 	if (17
-			!= nmea_scanf(buff, buff_sz, "$GPGSA,%C,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%f,%f,%f*",
+			!= nmea_scanf(s, len, "$GPGSA,%C,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%f,%f,%f*",
 					&(pack->fix_mode), &(pack->fix_type), &(pack->sat_prn[0]), &(pack->sat_prn[1]), &(pack->sat_prn[2]),
 					&(pack->sat_prn[3]), &(pack->sat_prn[4]), &(pack->sat_prn[5]), &(pack->sat_prn[6]),
 					&(pack->sat_prn[7]), &(pack->sat_prn[8]), &(pack->sat_prn[9]), &(pack->sat_prn[10]),
@@ -324,21 +324,21 @@ int nmea_parse_GPGSA(const char *buff, int buff_sz, nmeaGPGSA *pack) {
 
 /**
  * \brief Parse GSV packet from buffer.
- * @param buff a constant character pointer of packet buffer.
- * @param buff_sz buffer size.
+ * @param s a constant character pointer of packet buffer.
+ * @param len buffer size.
  * @param pack a pointer of packet which will filled by function.
  * @return 1 (true) - if parsed successfully or 0 (false) - if fail.
  */
-int nmea_parse_GPGSV(const char *buff, int buff_sz, nmeaGPGSV *pack) {
+int nmea_parse_GPGSV(const char *s, int len, nmeaGPGSV *pack) {
 	int nsen, nsat;
 
-	assert(buff && pack);
+	assert(s && pack);
 
 	memset(pack, 0, sizeof(nmeaGPGSV));
 
-	nmea_trace_buff(buff, buff_sz);
+	nmea_trace_buff(s, len);
 
-	nsen = nmea_scanf(buff, buff_sz, "$GPGSV,%d,%d,%d,"
+	nsen = nmea_scanf(s, len, "$GPGSV,%d,%d,%d,"
 			"%d,%d,%d,%d,"
 			"%d,%d,%d,%d,"
 			"%d,%d,%d,%d,"
@@ -362,22 +362,22 @@ int nmea_parse_GPGSV(const char *buff, int buff_sz, nmeaGPGSV *pack) {
 
 /**
  * \brief Parse RMC packet from buffer.
- * @param buff a constant character pointer of packet buffer.
- * @param buff_sz buffer size.
+ * @param s a constant character pointer of packet buffer.
+ * @param len buffer size.
  * @param pack a pointer of packet which will filled by function.
  * @return 1 (true) - if parsed successfully or 0 (false) - if fail.
  */
-int nmea_parse_GPRMC(const char *buff, int buff_sz, nmeaGPRMC *pack) {
+int nmea_parse_GPRMC(const char *s, int len, nmeaGPRMC *pack) {
 	int nsen;
 	char time_buff[NMEA_TIMEPARSE_BUF];
 
-	assert(buff && pack);
+	assert(s && pack);
 
 	memset(pack, 0, sizeof(nmeaGPRMC));
 
-	nmea_trace_buff(buff, buff_sz);
+	nmea_trace_buff(s, len);
 
-	nsen = nmea_scanf(buff, buff_sz, "$GPRMC,%s,%C,%f,%C,%f,%C,%f,%f,%2d%2d%2d,%f,%C,%C*", &(time_buff[0]),
+	nsen = nmea_scanf(s, len, "$GPRMC,%s,%C,%f,%C,%f,%C,%f,%f,%2d%2d%2d,%f,%C,%C*", &(time_buff[0]),
 			&(pack->status), &(pack->lat), &(pack->ns), &(pack->lon), &(pack->ew), &(pack->speed), &(pack->track),
 			&(pack->utc.day), &(pack->utc.mon), &(pack->utc.year), &(pack->magvar), &(pack->magvar_ew),
 			&(pack->mode));
@@ -401,20 +401,20 @@ int nmea_parse_GPRMC(const char *buff, int buff_sz, nmeaGPRMC *pack) {
 
 /**
  * \brief Parse VTG packet from buffer.
- * @param buff a constant character pointer of packet buffer.
- * @param buff_sz buffer size.
+ * @param s a constant character pointer of packet buffer.
+ * @param len buffer size.
  * @param pack a pointer of packet which will filled by function.
  * @return 1 (true) - if parsed successfully or 0 (false) - if fail.
  */
-int nmea_parse_GPVTG(const char *buff, int buff_sz, nmeaGPVTG *pack) {
-	assert(buff && pack);
+int nmea_parse_GPVTG(const char *s, int len, nmeaGPVTG *pack) {
+	assert(s && pack);
 
 	memset(pack, 0, sizeof(nmeaGPVTG));
 
-	nmea_trace_buff(buff, buff_sz);
+	nmea_trace_buff(s, len);
 
 	if (8
-			!= nmea_scanf(buff, buff_sz, "$GPVTG,%f,%C,%f,%C,%f,%C,%f,%C*", &(pack->dir), &(pack->dir_t), &(pack->dec),
+			!= nmea_scanf(s, len, "$GPVTG,%f,%C,%f,%C,%f,%C,%f,%C*", &(pack->dir), &(pack->dir_t), &(pack->dec),
 					&(pack->dec_m), &(pack->spn), &(pack->spn_n), &(pack->spk), &(pack->spk_k))) {
 		nmea_error("GPVTG parse error!");
 		return 0;
