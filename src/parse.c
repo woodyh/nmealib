@@ -525,13 +525,13 @@ int nmea_parse_GPVTG(const char *s, int len, nmeaGPVTG *pack) {
 	nmea_trace_buff(s, len);
 
 	if (8
-			!= nmea_scanf(s, len, "$GPVTG,%f,%C,%f,%C,%f,%C,%f,%C*", &(pack->track), &(pack->track_t), &(pack->dec),
-					&(pack->dec_m), &(pack->spn), &(pack->spn_n), &(pack->spk), &(pack->spk_k))) {
+			!= nmea_scanf(s, len, "$GPVTG,%f,%C,%f,%C,%f,%C,%f,%C*", &(pack->track), &(pack->track_t), &(pack->mtrack),
+					&(pack->mtrack_m), &(pack->spn), &(pack->spn_n), &(pack->spk), &(pack->spk_k))) {
 		nmea_error("GPVTG parse error!");
 		return 0;
 	}
 
-	if (pack->track_t != 'T' || pack->dec_m != 'M' || pack->spn_n != 'N' || pack->spk_k != 'K') {
+	if (pack->track_t != 'T' || pack->mtrack_m != 'M' || pack->spn_n != 'N' || pack->spk_k != 'K') {
 		nmea_error("GPVTG parse error (format error)!");
 		return 0;
 	}
@@ -672,7 +672,7 @@ void nmea_GPVTG2info(nmeaGPVTG *pack, nmeaINFO *info) {
 	assert(pack && info);
 
 	info->track = pack->track;
-	info->magvar = pack->dec;
+	info->magvar = pack->mtrack;
 	info->speed = pack->spk;
 	info->smask |= GPVTG;
 }

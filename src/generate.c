@@ -120,8 +120,8 @@ int nmea_gen_GPRMC(char *s, int len, nmeaGPRMC *pack) {
 }
 
 int nmea_gen_GPVTG(char *s, int len, nmeaGPVTG *pack) {
-	return nmea_printf(s, len, "$GPVTG,%.1f,%C,%.1f,%C,%.1f,%C,%.1f,%C", pack->track, pack->track_t, pack->dec,
-			pack->dec_m, pack->spn, pack->spn_n, pack->spk, pack->spk_k);
+	return nmea_printf(s, len, "$GPVTG,%.1f,%C,%.1f,%C,%.1f,%C,%.1f,%C", pack->track, pack->track_t, pack->mtrack,
+			pack->mtrack_m, pack->spn, pack->spn_n, pack->spk, pack->spk_k);
 }
 
 void nmea_info2GPGGA(const nmeaINFO *info, nmeaGPGGA *pack) {
@@ -210,7 +210,7 @@ void nmea_info2GPVTG(const nmeaINFO *info, nmeaGPVTG *pack) {
 	nmea_zero_GPVTG(pack);
 
 	pack->track = info->track;
-	pack->dec = info->magvar;
+	pack->mtrack = info->magvar;
 	pack->spn = info->speed / NMEA_TUD_KNOTS;
 	pack->spk = info->speed;
 }
