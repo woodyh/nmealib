@@ -128,8 +128,41 @@ int nmea_gen_GPRMC(char *s, int len, nmeaGPRMC *pack) {
  * @return the length of the generated sentence
  */
 int nmea_gen_GPVTG(char *s, int len, nmeaGPVTG *pack) {
-	return nmea_printf(s, len, "$GPVTG,%.1f,%C,%.1f,%C,%.1f,%C,%.1f,%C", pack->track, pack->track_t, pack->mtrack,
-			pack->mtrack_m, pack->spn, pack->spn_n, pack->spk, pack->spk_k);
+	char sTrackT[16];
+	char sTrackM[16];
+	char sSpeedN[16];
+	char sSpeedK[16];
+	char sUnitT[2];
+	char sUnitM[2];
+	char sUnitN[2];
+	char sUnitK[2];
+
+	sTrackT[0] = 0;
+	sTrackM[0] = 0;
+	sSpeedN[0] = 0;
+	sSpeedK[0] = 0;
+	sUnitT[0] = sUnitT[1] = 0;
+	sUnitM[0] = sUnitM[1] = 0;
+	sUnitN[0] = sUnitN[1] = 0;
+	sUnitK[0] = sUnitK[1] = 0;
+
+	if (nmea_INFO_is_present(pack, TRACK)) {
+		snprintf(&sTrackT[0], sizeof(sTrackT), "%03.1f", pack->track);
+		sUnitT[0] = 'T';
+	}
+	if (nmea_INFO_is_present(pack, MTRACK)) {
+		snprintf(&sTrackM[0], sizeof(sTrackM), "%03.1f", pack->mtrack);
+		sUnitM[0] = 'M';
+	}
+	if (nmea_INFO_is_present(pack, SPEED)) {
+		snprintf(&sSpeedN[0], sizeof(sSpeedN), "%03.1f", pack->spn);
+		sUnitN[0] = 'N';
+		snprintf(&sSpeedK[0], sizeof(sSpeedK), "%03.1f", pack->spk);
+		sUnitK[0] = 'K';
+	}
+
+	return nmea_printf(s, len, "$GPVTG,%s,%s,%s,%s,%s,%s,%s,%s", &sTrackT[0], &sUnitT[0], &sTrackM[0],
+			&sUnitM[0], &sSpeedN[0], &sUnitN[0], &sSpeedK[0], &sUnitK[0]);
 }
 
 void nmea_info2GPGGA(const nmeaINFO *info, nmeaGPGGA *pack) {
@@ -223,10 +256,16 @@ void nmea_info2GPRMC(const nmeaINFO *info, nmeaGPRMC *pack) {
 void nmea_info2GPVTG(const nmeaINFO *info, nmeaGPVTG *pack) {
 	nmea_zero_GPVTG(pack);
 
+	pack->present = info->present;
+	nmea_INFO_unset_present(pack, SMASK);
 	pack->track = info->track;
+	pack->track_t = 'T';
 	pack->mtrack = info->mtrack;
+	pack->mtrack_m = 'M';
 	pack->spn = info->speed / NMEA_TUD_KNOTS;
+	pack->spn_n = 'N';
 	pack->spk = info->speed;
+	pack->spk_k = 'K';
 }
 
 int nmea_generate(char *buff, int buff_sz, const nmeaINFO *info, int generate_mask) {

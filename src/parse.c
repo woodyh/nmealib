@@ -529,7 +529,15 @@ int nmea_parse_GPVTG(const char *s, int len, nmeaGPVTG *pack) {
 	/*
 	 * Clear before parsing, to be able to detect absent fields
 	 */
-	memset(pack, 0, sizeof(nmeaGPVTG));
+	pack->present = 0;
+	pack->track = NAN;
+	pack->track_t = 0;
+	pack->mtrack = NAN;
+	pack->mtrack_m = 0;
+	pack->spn = NAN;
+	pack->spn_n = 0;
+	pack->spk = NAN;
+	pack->spk_k = 0;
 
 	/* parse */
 	token_count = nmea_scanf(s, len, "$GPVTG,%f,%C,%f,%C,%f,%C,%f,%C*", &pack->track, &pack->track_t, &pack->mtrack,
@@ -541,9 +549,55 @@ int nmea_parse_GPVTG(const char *s, int len, nmeaGPVTG *pack) {
 		return 0;
 	}
 
-	if (!((pack->track_t == 'T') && (pack->mtrack_m == 'M') && (pack->spn_n == 'N') && (pack->spk_k == 'K'))) {
-		nmea_error("GPVTG parse error (format error)!");
-		return 0;
+	/* uppercase the units */
+	pack->track_t = toupper(pack->track_t);
+	pack->mtrack_m = toupper(pack->mtrack_m);
+	pack->spn_n = toupper(pack->spn_n);
+	pack->spk_k = toupper(pack->spk_k);
+
+	/* determine which fields are present and validate them */
+
+	if (pack->track != NAN) {
+		if (pack->track_t != 'T') {
+			nmea_error("GPVTG parse error: invalid track unit, got %C, expected %C", pack->track_t, 'T');
+			return 0;
+		}
+
+		nmea_INFO_set_present(pack, TRACK);
+	}
+	if (pack->mtrack != NAN) {
+		if (pack->mtrack_m != 'M') {
+			nmea_error("GPVTG parse error: invalid mtrack unit, got %C, expected %C", pack->mtrack_m, 'M');
+			return 0;
+		}
+
+		nmea_INFO_set_present(pack, MTRACK);
+	}
+	if (pack->spn != NAN) {
+		if (pack->spn_n != 'N') {
+			nmea_error("GPVTG parse error: invalid knots speed unit, got %C, expected %C", pack->spn_n, 'N');
+			return 0;
+		}
+
+		nmea_INFO_set_present(pack, SPEED);
+
+		if (pack->spk == NAN) {
+			pack->spk = pack->spn * NMEA_TUD_KNOTS;
+			pack->spk_k = 'K';
+		}
+	}
+	if (pack->spk != NAN) {
+		if (pack->spk_k != 'K') {
+			nmea_error("GPVTG parse error: invalid kph speed unit, got %C, expected %C", pack->spk_k, 'K');
+			return 0;
+		}
+
+		nmea_INFO_set_present(pack, SPEED);
+
+		if (pack->spn == NAN) {
+			pack->spn = pack->spk / NMEA_TUD_KNOTS;
+			pack->spn_n = 'N';
+		}
 	}
 
 	return 1;
@@ -683,8 +737,16 @@ void nmea_GPVTG2info(nmeaGPVTG *pack, nmeaINFO *info) {
 	assert(pack);
 	assert(info);
 
+	info->present |= pack->present;
+	nmea_INFO_set_present(info, SMASK);
 	info->smask |= GPVTG;
-	info->speed = pack->spk;
-	info->track = pack->track;
-	info->mtrack = pack->mtrack;
+	if (nmea_INFO_is_present(pack, SPEED)) {
+		info->speed = pack->spk;
+	}
+	if (nmea_INFO_is_present(pack, TRACK)) {
+		info->track = pack->track;
+	}
+	if (nmea_INFO_is_present(pack, MTRACK)) {
+		info->mtrack = pack->mtrack;
+	}
 }

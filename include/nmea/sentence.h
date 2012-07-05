@@ -264,6 +264,7 @@ typedef struct _nmeaGPRMC {
  * </pre>
  */
 typedef struct _nmeaGPVTG {
+	int present;				/**< Mask specifying which fields are present, same as in nmeaINFO */
 	double track;				/**< True track made good (degrees) */
 	char track_t;				/**< Fixed text 'T' indicates that track made good is relative to true north */
 	double mtrack;				/**< Magnetic track made good */
