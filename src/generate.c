@@ -88,10 +88,12 @@ int nmea_gen_GPRMC(char *s, int len, nmeaGPRMC *pack) {
 	sMagvar_ew[0] = sMagvar_ew[1] = 0;
 	sMode[0] = sMode[1] = 0;
 
-	if (nmea_INFO_is_present(pack, UTC)) {
+	if (nmea_INFO_is_present(pack, UTCDATE)) {
+		snprintf(&sDate[0], sizeof(sDate), "%02d%02d%02d", pack->utc.day, pack->utc.mon + 1, pack->utc.year - 100);
+	}
+	if (nmea_INFO_is_present(pack, UTCTIME)) {
 		snprintf(&sTime[0], sizeof(sTime), "%02d%02d%02d.%02d", pack->utc.hour, pack->utc.min, pack->utc.sec,
 				pack->utc.hsec);
-		snprintf(&sDate[0], sizeof(sDate), "%02d%02d%02d", pack->utc.day, pack->utc.mon + 1, pack->utc.year - 100);
 	}
 	if (nmea_INFO_is_present(pack, LAT)) {
 		snprintf(&sLat[0], sizeof(sLat), "%09.4f", pack->lat);

@@ -372,6 +372,7 @@ int nmea_parse_GPGSV(const char *s, int len, nmeaGPGSV *pack) {
 int nmea_parse_GPRMC(const char *s, int len, nmeaGPRMC *pack) {
 	int token_count;
 	char time_buff[NMEA_TIMEPARSE_BUF];
+	size_t time_buff_len = 0;
 
 	assert(s);
 	assert(pack);
@@ -418,8 +419,6 @@ int nmea_parse_GPRMC(const char *s, int len, nmeaGPRMC *pack) {
 	nmea_INFO_set_present(pack, FIX);
 
 	if ((pack->utc.year != -1) && (pack->utc.mon != -1) && (pack->utc.day != -1)) {
-		size_t time_buff_len = 0;
-
 		if (pack->utc.year < 90) {
 			pack->utc.year += 100;
 		}
@@ -429,19 +428,20 @@ int nmea_parse_GPRMC(const char *s, int len, nmeaGPRMC *pack) {
 			return 0;
 		}
 
-		time_buff_len = strlen(&time_buff[0]);
-		if (time_buff_len) {
-			if (!_nmea_parse_time(&time_buff[0], time_buff_len, &pack->utc)) {
-				return 0;
-			}
+		nmea_INFO_set_present(pack, UTCDATE);
+	}
 
-			if (!validateTime(&pack->utc)) {
-				return 0;
-			}
-
-			/* only when both time and date are present and valid */
-			nmea_INFO_set_present(pack, UTC);
+	time_buff_len = strlen(&time_buff[0]);
+	if (time_buff_len) {
+		if (!_nmea_parse_time(&time_buff[0], time_buff_len, &pack->utc)) {
+			return 0;
 		}
+
+		if (!validateTime(&pack->utc)) {
+			return 0;
+		}
+
+		nmea_INFO_set_present(pack, UTCTIME);
 	}
 
 	if (!pack->status) {
@@ -696,8 +696,16 @@ void nmea_GPRMC2info(nmeaGPRMC *pack, nmeaINFO *info) {
 	info->present |= pack->present;
 	nmea_INFO_set_present(info, SMASK);
 	info->smask |= GPRMC;
-	if (nmea_INFO_is_present(pack, UTC)) {
-		info->utc = pack->utc;
+	if (nmea_INFO_is_present(pack, UTCDATE)) {
+		info->utc.year = pack->utc.year;
+		info->utc.mon = pack->utc.mon;
+		info->utc.day = pack->utc.day;
+	}
+	if (nmea_INFO_is_present(pack, UTCTIME)) {
+		info->utc.hour = pack->utc.hour;
+		info->utc.min = pack->utc.min;
+		info->utc.sec = pack->utc.sec;
+		info->utc.hsec = pack->utc.hsec;
 	}
 	if (pack->status == 'A') {
 		if (info->sig == NMEA_SIG_BAD) {

@@ -135,20 +135,21 @@ typedef struct _nmeaINFO {
  */
 typedef enum _nmeaINFO_FIELD {
 	SMASK		= (1 << 0),
-	UTC			= (1 << 1),
-	SIG			= (1 << 2),
-	FIX			= (1 << 3),
-	PDOP		= (1 << 4),
-	HDOP		= (1 << 5),
-	VDOP		= (1 << 6),
-	LAT			= (1 << 7),
-	LON			= (1 << 8),
-	ELV			= (1 << 9),
-	SPEED		= (1 << 10),
-	TRACK		= (1 << 11),
-	MTRACK		= (1 << 12),
-	MAGVAR		= (1 << 13),
-	SATINFO		= (1 << 14)
+	UTCDATE		= (1 << 1),
+	UTCTIME		= (1 << 2),
+	SIG			= (1 << 3),
+	FIX			= (1 << 4),
+	PDOP		= (1 << 5),
+	HDOP		= (1 << 6),
+	VDOP		= (1 << 7),
+	LAT			= (1 << 8),
+	LON			= (1 << 9),
+	ELV			= (1 << 10),
+	SPEED		= (1 << 11),
+	TRACK		= (1 << 12),
+	MTRACK		= (1 << 13),
+	MAGVAR		= (1 << 14),
+	SATINFO		= (1 << 15)
 } nmeaINFO_FIELD;
 
 void nmea_zero_INFO(nmeaINFO *info);

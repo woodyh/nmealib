@@ -67,13 +67,27 @@ void nmea_INFO_sanitise(nmeaINFO *nmeaInfo) {
 	bool speedAdjusted = false;
 	bool trackAdjusted = false;
 	bool mtrackAdjusted = false;
+	nmeaTIME utc;
 
 	if (!nmeaInfo) {
 		return;
 	}
 
-	if (!nmea_INFO_is_present(nmeaInfo, UTC)) {
-		nmea_time_now(&nmeaInfo->utc);
+	if (!nmea_INFO_is_present(nmeaInfo, UTCDATE) || !nmea_INFO_is_present(nmeaInfo, UTCTIME)) {
+		nmea_time_now(&utc);
+	}
+
+	if (!nmea_INFO_is_present(nmeaInfo, UTCDATE)) {
+		nmeaInfo->utc.year = utc.year;
+		nmeaInfo->utc.mon = utc.mon;
+		nmeaInfo->utc.day = utc.day;
+	}
+
+	if (!nmea_INFO_is_present(nmeaInfo, UTCTIME)) {
+		nmeaInfo->utc.hour = utc.hour;
+		nmeaInfo->utc.min = utc.min;
+		nmeaInfo->utc.sec = utc.sec;
+		nmeaInfo->utc.hsec = utc.hsec;
 	}
 
 	if (!nmea_INFO_is_present(nmeaInfo, SIG)) {
