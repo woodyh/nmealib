@@ -273,6 +273,7 @@ void nmea_info2GPGSA(const nmeaINFO *info, nmeaGPGSA *pack) {
 
 	nmea_zero_GPGSA(pack);
 
+	/* fix_mode is ignored */
 	pack->fix_type = info->fix;
 	pack->PDOP = info->PDOP;
 	pack->HDOP = info->HDOP;

@@ -387,19 +387,27 @@ int nmea_parse_GPGGA(const char *s, int len, nmeaGPGGA *pack) {
  * @return 1 (true) - if parsed successfully or 0 (false) otherwise.
  */
 int nmea_parse_GPGSA(const char *s, int len, nmeaGPGSA *pack) {
-	assert(s && pack);
+	int token_count;
 
-	memset(pack, 0, sizeof(nmeaGPGSA));
+	assert(s);
+	assert(pack);
 
 	nmea_trace_buff(s, len);
 
-	if (17
-			!= nmea_scanf(s, len, "$GPGSA,%C,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%f,%f,%f*",
-					&(pack->fix_mode), &(pack->fix_type), &(pack->sat_prn[0]), &(pack->sat_prn[1]), &(pack->sat_prn[2]),
-					&(pack->sat_prn[3]), &(pack->sat_prn[4]), &(pack->sat_prn[5]), &(pack->sat_prn[6]),
-					&(pack->sat_prn[7]), &(pack->sat_prn[8]), &(pack->sat_prn[9]), &(pack->sat_prn[10]),
-					&(pack->sat_prn[11]), &(pack->PDOP), &(pack->HDOP), &(pack->VDOP))) {
-		nmea_error("GPGSA parse error!");
+	/*
+	 * Clear before parsing, to be able to detect absent fields
+	 */
+	memset(pack, 0, sizeof(nmeaGPGSA));
+
+	/* parse */
+	token_count = nmea_scanf(s, len, "$GPGSA,%C,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%f,%f,%f*", &pack->fix_mode,
+			&pack->fix_type, &pack->sat_prn[0], &pack->sat_prn[1], &pack->sat_prn[2], &pack->sat_prn[3],
+			&pack->sat_prn[4], &pack->sat_prn[5], &pack->sat_prn[6], &pack->sat_prn[7], &pack->sat_prn[8],
+			&pack->sat_prn[9], &pack->sat_prn[10], &pack->sat_prn[11], &pack->PDOP, &pack->HDOP, &pack->VDOP);
+
+	/* see that we have enough tokens */
+	if (token_count != 17) {
+		nmea_error("GPGSA parse error, need 17 tokens, got %d in %s", token_count, s);
 		return 0;
 	}
 
@@ -734,13 +742,12 @@ void nmea_GPGGA2info(nmeaGPGGA *pack, nmeaINFO *info) {
 void nmea_GPGSA2info(nmeaGPGSA *pack, nmeaINFO *info) {
 	int i, j, nuse = 0;
 
-	assert(pack && info);
+	assert(pack);
+	assert(info);
 
+	info->smask |= GPGSA;
+	/* fix_mode is ignored */
 	info->fix = pack->fix_type;
-	info->PDOP = pack->PDOP;
-	info->HDOP = pack->HDOP;
-	info->VDOP = pack->VDOP;
-
 	for (i = 0; i < NMEA_MAXSAT; ++i) {
 		for (j = 0; j < info->satinfo.inview; ++j) {
 			if (pack->sat_prn[i] && pack->sat_prn[i] == info->satinfo.sat[j].id) {
@@ -749,9 +756,10 @@ void nmea_GPGSA2info(nmeaGPGSA *pack, nmeaINFO *info) {
 			}
 		}
 	}
-
 	info->satinfo.inuse = nuse;
-	info->smask |= GPGSA;
+	info->PDOP = pack->PDOP;
+	info->HDOP = pack->HDOP;
+	info->VDOP = pack->VDOP;
 }
 
 /**
