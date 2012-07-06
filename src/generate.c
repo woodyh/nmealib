@@ -27,6 +27,14 @@
 #include <nmea/tok.h>
 #include <nmea/units.h>
 
+/**
+ * Generate a GPGGA sentence from an nmeaGPGGA structure
+ *
+ * @param s a pointer to the buffer to generate the string in
+ * @param len the size of the buffer
+ * @param pack the structure
+ * @return the length of the generated sentence
+ */
 int nmea_gen_GPGGA(char *s, int len, nmeaGPGGA *pack) {
 	return nmea_printf(s, len,
 			"$GPGGA,%02d%02d%02d.%02d,%09.4f,%C,%010.4f,%C,%1d,%02d,%03.1f,%03.1f,%C,%03.1f,%C,%03.1f,%04d",
@@ -35,6 +43,14 @@ int nmea_gen_GPGGA(char *s, int len, nmeaGPGGA *pack) {
 			pack->dgps_age, pack->dgps_sid);
 }
 
+/**
+ * Generate a GPGSA sentence from an nmeaGPGSA structure
+ *
+ * @param s a pointer to the buffer to generate the string in
+ * @param len the size of the buffer
+ * @param pack the structure
+ * @return the length of the generated sentence
+ */
 int nmea_gen_GPGSA(char *s, int len, nmeaGPGSA *pack) {
 	return nmea_printf(s, len,
 			"$GPGSA,%C,%1d,%02d,%02d,%02d,%02d,%02d,%02d,%02d,%02d,%02d,%02d,%02d,%02d,%03.1f,%03.1f,%03.1f",
@@ -43,6 +59,14 @@ int nmea_gen_GPGSA(char *s, int len, nmeaGPGSA *pack) {
 			pack->sat_prn[10], pack->sat_prn[11], pack->PDOP, pack->HDOP, pack->VDOP);
 }
 
+/**
+ * Generate a GPGSV sentence from an nmeaGPGSV structure
+ *
+ * @param s a pointer to the buffer to generate the string in
+ * @param len the size of the buffer
+ * @param pack the structure
+ * @return the length of the generated sentence
+ */
 int nmea_gen_GPGSV(char *s, int len, nmeaGPGSV *pack) {
 	return nmea_printf(s, len, "$GPGSV,%1d,%1d,%02d,"
 			"%02d,%02d,%03d,%02d,"
@@ -167,6 +191,12 @@ int nmea_gen_GPVTG(char *s, int len, nmeaGPVTG *pack) {
 			&sUnitM[0], &sSpeedN[0], &sUnitN[0], &sSpeedK[0], &sUnitK[0]);
 }
 
+/**
+ * Convert an nmeaINFO structure into an nmeaGPGGA structure
+ *
+ * @param info a pointer to the nmeaINFO structure
+ * @param pack a pointer to the nmeaGPGGA structure
+ */
 void nmea_info2GPGGA(const nmeaINFO *info, nmeaGPGGA *pack) {
 	nmea_zero_GPGGA(pack);
 
@@ -181,6 +211,12 @@ void nmea_info2GPGGA(const nmeaINFO *info, nmeaGPGGA *pack) {
 	pack->elv = info->elv;
 }
 
+/**
+ * Convert an nmeaINFO structure into an nmeaGPGSA structure
+ *
+ * @param info a pointer to the nmeaINFO structure
+ * @param pack a pointer to the nmeaGPGSA structure
+ */
 void nmea_info2GPGSA(const nmeaINFO *info, nmeaGPGSA *pack) {
 	int it;
 
@@ -205,6 +241,13 @@ int nmea_gsv_npack(int sat_count) {
 	return pack_count;
 }
 
+/**
+ * Convert an nmeaINFO structure into an nmeaGPGSV structure
+ *
+ * @param info a pointer to the nmeaINFO structure
+ * @param pack a pointer to the nmeaGPGSV structure
+ * @param pack_idx pack index
+ */
 void nmea_info2GPGSV(const nmeaINFO *info, nmeaGPGSV *pack, int pack_idx) {
 	int sit, pit;
 
