@@ -83,7 +83,7 @@ enum nmeaPACKTYPE {
  * </pre>
  */
 typedef struct _nmeaGPGGA {
-	int present;				/**< Mask specifying which fields are present, same as in nmeaINFO */
+	uint32_t present;			/**< Mask specifying which fields are present, same as in nmeaINFO */
 	nmeaTIME utc;				/**< UTC of position (just time) */
 	double lat;					/**< Latitude in NDEG - [degree][min].[sec/60] */
 	char ns;					/**< [N]orth or [S]outh */
@@ -230,7 +230,7 @@ typedef struct _nmeaGPGSV {
  * </pre>
  */
 typedef struct _nmeaGPRMC {
-	int present;				/**< Mask specifying which fields are present, same as in nmeaINFO */
+	uint32_t present;			/**< Mask specifying which fields are present, same as in nmeaINFO */
 	nmeaTIME utc;				/**< UTC of position */
 	char status;				/**< Status (A = active or V = void) */
 	double lat;					/**< Latitude in NDEG - [degree][min].[sec/60] */
@@ -265,7 +265,7 @@ typedef struct _nmeaGPRMC {
  * </pre>
  */
 typedef struct _nmeaGPVTG {
-	int present;				/**< Mask specifying which fields are present, same as in nmeaINFO */
+	uint32_t present;			/**< Mask specifying which fields are present, same as in nmeaINFO */
 	double track;				/**< True track made good (degrees) */
 	char track_t;				/**< Fixed text 'T' indicates that track made good is relative to true north */
 	double mtrack;				/**< Magnetic track made good */

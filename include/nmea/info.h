@@ -24,6 +24,7 @@
 #define __NMEA_INFO_H__
 
 #include <nmea/time.h>
+#include <stdint.h>
 #include <stdbool.h>
 
 /*
@@ -110,7 +111,7 @@ typedef struct _nmeaSATINFO {
  * @see nmea_GPGGA2info,  nmea_...2info
  */
 typedef struct _nmeaINFO {
-	int present;					/**< Mask specifying which fields are present */
+	uint32_t present;				/**< Mask specifying which fields are present */
 
 	int smask;						/**< Mask specifying from which sentences data has been obtained */
 
@@ -159,7 +160,8 @@ typedef enum _nmeaINFO_FIELD {
 	TRACK		= (1 << 12),
 	MTRACK		= (1 << 13),
 	MAGVAR		= (1 << 14),
-	SATINFO		= (1 << 15)
+	SATINUSE	= (1 << 15),
+	SATINVIEW	= (1 << 16)
 } nmeaINFO_FIELD;
 
 void nmea_zero_INFO(nmeaINFO *info);
