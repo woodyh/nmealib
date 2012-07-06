@@ -200,7 +200,10 @@ int nmea_gen_GPVTG(char *s, int len, nmeaGPVTG *pack) {
 void nmea_info2GPGGA(const nmeaINFO *info, nmeaGPGGA *pack) {
 	nmea_zero_GPGGA(pack);
 
-	pack->utc = info->utc;
+	pack->utc.hour = info->utc.hour;
+	pack->utc.min = info->utc.min;
+	pack->utc.sec = info->utc.sec;
+	pack->utc.hsec = info->utc.hsec;
 	pack->lat = fabs(info->lat);
 	pack->ns = ((info->lat > 0) ? 'N' : 'S');
 	pack->lon = fabs(info->lon);
@@ -209,6 +212,7 @@ void nmea_info2GPGGA(const nmeaINFO *info, nmeaGPGGA *pack) {
 	pack->satinuse = info->satinfo.inuse;
 	pack->HDOP = info->HDOP;
 	pack->elv = info->elv;
+	pack->elv_units = 'M';
 }
 
 /**

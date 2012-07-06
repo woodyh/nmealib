@@ -272,19 +272,26 @@ int nmea_find_tail(const char *s, int len, int *checksum) {
  * @return 1 (true) - if parsed successfully or 0 (false) otherwise.
  */
 int nmea_parse_GPGGA(const char *s, int len, nmeaGPGGA *pack) {
+	int token_count;
 	char time_buff[NMEA_TIMEPARSE_BUF];
 
-	assert(s && pack);
-
-	memset(pack, 0, sizeof(nmeaGPGGA));
+	assert(s);
+	assert(pack);
 
 	nmea_trace_buff(s, len);
 
-	if (14
-			!= nmea_scanf(s, len, "$GPGGA,%s,%f,%C,%f,%C,%d,%d,%f,%f,%C,%f,%C,%f,%d*", &(time_buff[0]),
-					&(pack->lat), &(pack->ns), &(pack->lon), &(pack->ew), &(pack->sig), &(pack->satinuse),
-					&(pack->HDOP), &(pack->elv), &(pack->elv_units), &(pack->diff), &(pack->diff_units),
-					&(pack->dgps_age), &(pack->dgps_sid))) {
+	/*
+	 * Clear before parsing, to be able to detect absent fields
+	 */
+	memset(pack, 0, sizeof(nmeaGPGGA));
+
+	/* parse */
+	token_count = nmea_scanf(s, len, "$GPGGA,%s,%f,%C,%f,%C,%d,%d,%f,%f,%C,%f,%C,%f,%d*", &time_buff[0], &pack->lat,
+			&pack->ns, &pack->lon, &pack->ew, &pack->sig, &pack->satinuse, &pack->HDOP, &pack->elv, &pack->elv_units,
+			&pack->diff, &pack->diff_units, &pack->dgps_age, &pack->dgps_sid);
+
+	/* see that we have enough tokens */
+	if (token_count != 14) {
 		nmea_error("GPGGA parse error!");
 		return 0;
 	}
@@ -613,18 +620,19 @@ int nmea_parse_GPVTG(const char *s, int len, nmeaGPVTG *pack) {
  * @param info a pointer to the nmeaINFO structure
  */
 void nmea_GPGGA2info(nmeaGPGGA *pack, nmeaINFO *info) {
-	assert(pack && info);
+	assert(pack);
+	assert(info);
 
+	info->smask |= GPGGA;
 	info->utc.hour = pack->utc.hour;
 	info->utc.min = pack->utc.min;
 	info->utc.sec = pack->utc.sec;
 	info->utc.hsec = pack->utc.hsec;
 	info->sig = pack->sig;
 	info->HDOP = pack->HDOP;
-	info->elv = pack->elv;
 	info->lat = ((pack->ns == 'N') ? pack->lat : -(pack->lat));
 	info->lon = ((pack->ew == 'E') ? pack->lon : -(pack->lon));
-	info->smask |= GPGGA;
+	info->elv = pack->elv;
 }
 
 /**
