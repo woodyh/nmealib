@@ -83,6 +83,7 @@ enum nmeaPACKTYPE {
  * </pre>
  */
 typedef struct _nmeaGPGGA {
+	int present;				/**< Mask specifying which fields are present, same as in nmeaINFO */
 	nmeaTIME utc;				/**< UTC of position (just time) */
 	double lat;					/**< Latitude in NDEG - [degree][min].[sec/60] */
 	char ns;					/**< [N]orth or [S]outh */

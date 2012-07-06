@@ -50,6 +50,11 @@
 #define NMEA_SIG_LOW   (1)
 #define NMEA_SIG_MID   (2)
 #define NMEA_SIG_HIGH  (3)
+#define NMEA_SIG_RTKIN (4)
+#define NMEA_SIG_FLRTK (5)
+#define NMEA_SIG_ESTIM (6)
+#define NMEA_SIG_MAN   (7)
+#define NMEA_SIG_SIM   (8)
 
 #define NMEA_FIX_BAD   (1)
 #define NMEA_FIX_2D    (2)
@@ -111,7 +116,12 @@ typedef struct _nmeaINFO {
 
 	nmeaTIME utc;					/**< UTC of position */
 
-	int sig;						/**< GPS quality indicator (0 = Invalid; 1 = Fix; 2 = Differential, 3 = Sensitive) */
+	int sig;						/**< GPS quality indicator (0 = Invalid; 1 = Fix;
+											2 = Differential, 3 = Sensitive,
+											4 = Real Time Kinematic, 5 = Float RTK,
+											6 = estimated (dead reckoning) (2.3 feature),
+											7 = Manual input mode, 8 = Simulation mode) */
+
 	int fix;						/**< Operating mode, used for navigation (1 = Fix not available; 2 = 2D; 3 = 3D) */
 
 	double PDOP;					/**< Position Dilution Of Precision */

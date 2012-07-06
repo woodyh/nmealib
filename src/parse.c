@@ -274,6 +274,7 @@ int nmea_find_tail(const char *s, int len, int *checksum) {
 int nmea_parse_GPGGA(const char *s, int len, nmeaGPGGA *pack) {
 	int token_count;
 	char time_buff[NMEA_TIMEPARSE_BUF];
+	size_t time_buff_len = 0;
 
 	assert(s);
 	assert(pack);
@@ -283,7 +284,25 @@ int nmea_parse_GPGGA(const char *s, int len, nmeaGPGGA *pack) {
 	/*
 	 * Clear before parsing, to be able to detect absent fields
 	 */
-	memset(pack, 0, sizeof(nmeaGPGGA));
+	time_buff[0] = '\0';
+	pack->present = 0;
+	pack->utc.hour = -1;
+	pack->utc.min = -1;
+	pack->utc.sec = -1;
+	pack->utc.hsec = -1;
+	pack->lat = NAN;
+	pack->ns = 0;
+	pack->lon = NAN;
+	pack->ew = 0;
+	pack->sig = -1;
+	pack->satinuse = 0;
+	pack->HDOP = NAN;
+	pack->elv = NAN;
+	pack->elv_units = 0;
+	pack->diff = 0;			/* ignored */
+	pack->diff_units = 0;	/* ignored */
+	pack->dgps_age = 0;		/* ignored */
+	pack->dgps_sid = 0;		/* ignored */
 
 	/* parse */
 	token_count = nmea_scanf(s, len, "$GPGGA,%s,%f,%C,%f,%C,%d,%d,%f,%f,%C,%f,%C,%f,%d*", &time_buff[0], &pack->lat,
@@ -296,10 +315,65 @@ int nmea_parse_GPGGA(const char *s, int len, nmeaGPGGA *pack) {
 		return 0;
 	}
 
-	if (!_nmea_parse_time(&time_buff[0], (int) strlen(&time_buff[0]), &(pack->utc))) {
-		nmea_error("GPGGA time parse error!");
-		return 0;
+	/* determine which fields are present and validate them */
+
+	time_buff_len = strlen(&time_buff[0]);
+	if (time_buff_len) {
+		if (!_nmea_parse_time(&time_buff[0], time_buff_len, &pack->utc)) {
+			return 0;
+		}
+
+		if (!validateTime(&pack->utc)) {
+			return 0;
+		}
+
+		nmea_INFO_set_present(pack, UTCTIME);
 	}
+	if (pack->lat != NAN) {
+		if (!pack->ns) {
+			pack->ns = 'N';
+		} else {
+			if (!validateNSEW(&pack->ns, true)) {
+				return 0;
+			}
+
+			/* only when lat and ns are present and valid */
+			nmea_INFO_set_present(pack, LAT);
+		}
+	}
+	if (pack->lon != NAN) {
+		if (!pack->ew) {
+			pack->ew = 'E';
+		} else {
+			if (!validateNSEW(&pack->ew, false)) {
+				return 0;
+			}
+
+			/* only when lon and ew are present and valid */
+			nmea_INFO_set_present(pack, LON);
+		}
+	}
+	if (pack->sig != -1) {
+		nmea_INFO_set_present(pack, SIG);
+	}
+	if (pack->HDOP != NAN) {
+		nmea_INFO_set_present(pack, HDOP);
+	}
+	if (pack->elv != NAN) {
+		if (!pack->elv_units) {
+			pack->elv_units = 'M';
+		} else {
+			if (pack->elv_units != 'M') {
+				nmea_error("Parse error: invalid elevation unit (%c)", pack->elv_units);
+				return 0;
+			}
+
+			/* only when elv and elv_units are present and valid */
+			nmea_INFO_set_present(pack, ELV);
+		}
+	}
+	/* ignore diff and diff_units */
+	/* ignore dgps_age and dgps_sid */
 
 	return 1;
 }
@@ -623,16 +697,32 @@ void nmea_GPGGA2info(nmeaGPGGA *pack, nmeaINFO *info) {
 	assert(pack);
 	assert(info);
 
+	info->present |= pack->present;
+	nmea_INFO_set_present(info, SMASK);
 	info->smask |= GPGGA;
-	info->utc.hour = pack->utc.hour;
-	info->utc.min = pack->utc.min;
-	info->utc.sec = pack->utc.sec;
-	info->utc.hsec = pack->utc.hsec;
-	info->sig = pack->sig;
-	info->HDOP = pack->HDOP;
-	info->lat = ((pack->ns == 'N') ? pack->lat : -(pack->lat));
-	info->lon = ((pack->ew == 'E') ? pack->lon : -(pack->lon));
-	info->elv = pack->elv;
+	if (nmea_INFO_is_present(pack, UTCTIME)) {
+		info->utc.hour = pack->utc.hour;
+		info->utc.min = pack->utc.min;
+		info->utc.sec = pack->utc.sec;
+		info->utc.hsec = pack->utc.hsec;
+	}
+	if (nmea_INFO_is_present(pack, SIG)) {
+		info->sig = pack->sig;
+	}
+	if (nmea_INFO_is_present(pack, HDOP)) {
+		info->HDOP = pack->HDOP;
+	}
+	if (nmea_INFO_is_present(pack, LAT)) {
+		info->lat = ((pack->ns == 'N') ? pack->lat : -pack->lat);
+	}
+	if (nmea_INFO_is_present(pack, LON)) {
+		info->lon = ((pack->ew == 'E') ? pack->lon : -pack->lon);
+	}
+	if (nmea_INFO_is_present(pack, ELV)) {
+		info->elv = pack->elv;
+	}
+	/* ignore diff and diff_units */
+	/* ignore dgps_age and dgps_sid */
 }
 
 /**

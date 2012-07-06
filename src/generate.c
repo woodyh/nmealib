@@ -36,11 +36,52 @@
  * @return the length of the generated sentence
  */
 int nmea_gen_GPGGA(char *s, int len, nmeaGPGGA *pack) {
-	return nmea_printf(s, len,
-			"$GPGGA,%02d%02d%02d.%02d,%09.4f,%C,%010.4f,%C,%1d,%02d,%03.1f,%03.1f,%C,%03.1f,%C,%03.1f,%04d",
-			pack->utc.hour, pack->utc.min, pack->utc.sec, pack->utc.hsec, pack->lat, pack->ns, pack->lon, pack->ew,
-			pack->sig, pack->satinuse, pack->HDOP, pack->elv, pack->elv_units, pack->diff, pack->diff_units,
-			pack->dgps_age, pack->dgps_sid);
+	char sTime[16];
+	char sLat[16];
+	char sNs[2];
+	char sLon[16];
+	char sEw[2];
+	char sSig[4];
+	char sHdop[16];
+	char sElv[16];
+	char sEmpty[2];
+
+	sTime[0] = 0;
+	sLat[0] = 0;
+	sNs[0] = sNs[1] = 0;
+	sLon[0] = 0;
+	sEw[0] = sEw[1] = 0;
+	sSig[0] = 0;
+	sHdop[0] = 0;
+	sElv[0] = 0;
+	sEmpty[0] = '0';
+	sEmpty[1] = 0;
+
+	if (nmea_INFO_is_present(pack, UTCTIME)) {
+		snprintf(&sTime[0], sizeof(sTime), "%02d%02d%02d.%02d", pack->utc.hour, pack->utc.min, pack->utc.sec,
+				pack->utc.hsec);
+	}
+	if (nmea_INFO_is_present(pack, LAT)) {
+		snprintf(&sLat[0], sizeof(sLat), "%09.4f", pack->lat);
+		sNs[0] = pack->ns;
+	}
+	if (nmea_INFO_is_present(pack, LON)) {
+		snprintf(&sLon[0], sizeof(sLon), "%010.4f", pack->lon);
+		sEw[0] = pack->ew;
+	}
+	if (nmea_INFO_is_present(pack, SIG)) {
+		snprintf(&sSig[0], sizeof(sSig), "%1d", pack->sig);
+	}
+	if (nmea_INFO_is_present(pack, HDOP)) {
+		snprintf(&sHdop[0], sizeof(sHdop), "%03.1f", pack->HDOP);
+	}
+	if (nmea_INFO_is_present(pack, ELV)) {
+		snprintf(&sElv[0], sizeof(sElv), "%03.1f", pack->elv);
+	}
+
+	return nmea_printf(s, len, "$GPGGA,%s,%s,%s,%s,%s,%s,%02d,%s,%s,%C,%s,%C,%s,%s", &sTime[0], &sLat[0], &sNs[0],
+			&sLon[0], &sEw[0], &sSig[0], pack->satinuse, &sHdop[0], &sElv[0], pack->elv_units, &sEmpty[0], 'M',
+			&sEmpty[0], &sEmpty[0]);
 }
 
 /**
@@ -200,6 +241,8 @@ int nmea_gen_GPVTG(char *s, int len, nmeaGPVTG *pack) {
 void nmea_info2GPGGA(const nmeaINFO *info, nmeaGPGGA *pack) {
 	nmea_zero_GPGGA(pack);
 
+	pack->present = info->present;
+	nmea_INFO_unset_present(pack, SMASK);
 	pack->utc.hour = info->utc.hour;
 	pack->utc.min = info->utc.min;
 	pack->utc.sec = info->utc.sec;
@@ -213,6 +256,10 @@ void nmea_info2GPGGA(const nmeaINFO *info, nmeaGPGGA *pack) {
 	pack->HDOP = info->HDOP;
 	pack->elv = info->elv;
 	pack->elv_units = 'M';
+	pack->diff = 0;
+	pack->diff_units = 'M';
+	pack->dgps_age = 0;
+	pack->dgps_sid = 0;
 }
 
 /**
