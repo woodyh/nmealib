@@ -264,11 +264,12 @@ int nmea_find_tail(const char *s, int len, int *checksum) {
 }
 
 /**
- * \brief Parse GGA packet from buffer.
- * @param s a constant character pointer of packet buffer.
- * @param len buffer size.
- * @param pack a pointer of packet which will filled by function.
- * @return 1 (true) - if parsed successfully or 0 (false) - if fail.
+ * Parse a GPGGA sentence from a string
+ *
+ * @param s the string
+ * @param len the length of the string
+ * @param pack a pointer to the result structure
+ * @return 1 (true) - if parsed successfully or 0 (false) otherwise.
  */
 int nmea_parse_GPGGA(const char *s, int len, nmeaGPGGA *pack) {
 	char time_buff[NMEA_TIMEPARSE_BUF];
@@ -297,11 +298,12 @@ int nmea_parse_GPGGA(const char *s, int len, nmeaGPGGA *pack) {
 }
 
 /**
- * \brief Parse GSA packet from buffer.
- * @param s a constant character pointer of packet buffer.
- * @param len buffer size.
- * @param pack a pointer of packet which will filled by function.
- * @return 1 (true) - if parsed successfully or 0 (false) - if fail.
+ * Parse a GPGSA sentence from a string
+ *
+ * @param s the string
+ * @param len the length of the string
+ * @param pack a pointer to the result structure
+ * @return 1 (true) - if parsed successfully or 0 (false) otherwise.
  */
 int nmea_parse_GPGSA(const char *s, int len, nmeaGPGSA *pack) {
 	assert(s && pack);
@@ -324,11 +326,12 @@ int nmea_parse_GPGSA(const char *s, int len, nmeaGPGSA *pack) {
 }
 
 /**
- * \brief Parse GSV packet from buffer.
- * @param s a constant character pointer of packet buffer.
- * @param len buffer size.
- * @param pack a pointer of packet which will filled by function.
- * @return 1 (true) - if parsed successfully or 0 (false) - if fail.
+ * Parse a GPGSV sentence from a string
+ *
+ * @param s the string
+ * @param len the length of the string
+ * @param pack a pointer to the result structure
+ * @return 1 (true) - if parsed successfully or 0 (false) otherwise.
  */
 int nmea_parse_GPGSV(const char *s, int len, nmeaGPGSV *pack) {
 	int nsen, nsat;
@@ -604,9 +607,10 @@ int nmea_parse_GPVTG(const char *s, int len, nmeaGPVTG *pack) {
 }
 
 /**
- * \brief Fill nmeaINFO structure by GGA packet data.
- * @param pack a pointer of packet structure.
- * @param info a pointer of summary information structure.
+ * Fill nmeaINFO structure from GGA packet structure
+ *
+ * @param pack a pointer to the packet structure
+ * @param info a pointer to the nmeaINFO structure
  */
 void nmea_GPGGA2info(nmeaGPGGA *pack, nmeaINFO *info) {
 	assert(pack && info);
@@ -624,9 +628,10 @@ void nmea_GPGGA2info(nmeaGPGGA *pack, nmeaINFO *info) {
 }
 
 /**
- * \brief Fill nmeaINFO structure by GSA packet data.
- * @param pack a pointer of packet structure.
- * @param info a pointer of summary information structure.
+ * Fill nmeaINFO structure from GSA packet structure
+ *
+ * @param pack a pointer to the packet structure
+ * @param info a pointer to the nmeaINFO structure
  */
 void nmea_GPGSA2info(nmeaGPGSA *pack, nmeaINFO *info) {
 	int i, j, nuse = 0;
@@ -652,9 +657,10 @@ void nmea_GPGSA2info(nmeaGPGSA *pack, nmeaINFO *info) {
 }
 
 /**
- * \brief Fill nmeaINFO structure by GSV packet data.
- * @param pack a pointer of packet structure.
- * @param info a pointer of summary information structure.
+ * Fill nmeaINFO structure from GSV packet structure
+ *
+ * @param pack a pointer to the packet structure
+ * @param info a pointer to the nmeaINFO structure
  */
 void nmea_GPGSV2info(nmeaGPGSV *pack, nmeaINFO *info) {
 	int isat, isi, nsat;
