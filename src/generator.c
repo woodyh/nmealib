@@ -137,8 +137,8 @@ static int nmea_igen_noise_loop(nmeaGENERATOR *gen __attribute__ ((unused)), nme
 	info->satinfo.inview = 0;
 
 	for (it = 0; it < 12; ++it) {
+		info->satinfo.in_use[it] = in_use = lrint(nmea_random(0, 3));
 		info->satinfo.sat[it].id = it;
-		info->satinfo.sat[it].in_use = in_use = lrint(nmea_random(0, 3));
 		info->satinfo.sat[it].elv = lrint(nmea_random(0, 90));
 		info->satinfo.sat[it].azimuth = lrint(nmea_random(0, 359));
 		info->satinfo.sat[it].sig = (int) (in_use ? nmea_random(40, 99) : nmea_random(0, 40));
@@ -170,26 +170,26 @@ static int nmea_igen_static_reset(nmeaGENERATOR *gen __attribute__ ((unused)), n
 	info->satinfo.inuse = 4;
 	info->satinfo.inview = 4;
 
+	info->satinfo.in_use[0] = 1;
 	info->satinfo.sat[0].id = 1;
-	info->satinfo.sat[0].in_use = 1;
 	info->satinfo.sat[0].elv = 50;
 	info->satinfo.sat[0].azimuth = 0;
 	info->satinfo.sat[0].sig = 99;
 
+	info->satinfo.in_use[1] = 1;
 	info->satinfo.sat[1].id = 2;
-	info->satinfo.sat[1].in_use = 1;
 	info->satinfo.sat[1].elv = 50;
 	info->satinfo.sat[1].azimuth = 90;
 	info->satinfo.sat[1].sig = 99;
 
+	info->satinfo.in_use[2] = 1;
 	info->satinfo.sat[2].id = 3;
-	info->satinfo.sat[2].in_use = 1;
 	info->satinfo.sat[2].elv = 50;
 	info->satinfo.sat[2].azimuth = 180;
 	info->satinfo.sat[2].sig = 99;
 
+	info->satinfo.in_use[3] = 1;
 	info->satinfo.sat[3].id = 4;
-	info->satinfo.sat[3].in_use = 1;
 	info->satinfo.sat[3].elv = 50;
 	info->satinfo.sat[3].azimuth = 270;
 	info->satinfo.sat[3].sig = 99;
@@ -236,8 +236,8 @@ static int nmea_igen_rotate_reset(nmeaGENERATOR *gen __attribute__ ((unused)), n
 	info->satinfo.inview = 8;
 
 	for (it = 0; it < info->satinfo.inview; ++it) {
+		info->satinfo.in_use[it] = 1;
 		info->satinfo.sat[it].id = it + 1;
-		info->satinfo.sat[it].in_use = 1;
 		info->satinfo.sat[it].elv = 5;
 		info->satinfo.sat[it].azimuth = (int) srt;
 		info->satinfo.sat[it].sig = 80;

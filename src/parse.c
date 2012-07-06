@@ -751,7 +751,7 @@ void nmea_GPGSA2info(nmeaGPGSA *pack, nmeaINFO *info) {
 	for (i = 0; i < NMEA_MAXSAT; ++i) {
 		for (j = 0; j < info->satinfo.inview; ++j) {
 			if (pack->sat_prn[i] && pack->sat_prn[i] == info->satinfo.sat[j].id) {
-				info->satinfo.sat[j].in_use = 1;
+				info->satinfo.in_use[j] = 1;
 				nuse++;
 			}
 		}

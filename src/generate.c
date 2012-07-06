@@ -280,7 +280,7 @@ void nmea_info2GPGSA(const nmeaINFO *info, nmeaGPGSA *pack) {
 	pack->VDOP = info->VDOP;
 
 	for (it = 0; it < NMEA_MAXSAT; ++it) {
-		pack->sat_prn[it] = ((info->satinfo.sat[it].in_use) ? info->satinfo.sat[it].id : 0);
+		pack->sat_prn[it] = ((info->satinfo.in_use[it]) ? info->satinfo.sat[it].id : 0);
 	}
 }
 

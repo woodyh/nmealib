@@ -86,7 +86,6 @@ typedef struct _nmeaPOS {
  */
 typedef struct _nmeaSATELLITE {
 	int id;							/**< Satellite PRN number */
-	int in_use; 					/**< Used in position fix */
 	int elv;						/**< Elevation in degrees, 90 maximum */
 	int azimuth;					/**< Azimuth, degrees from true north, 000 to 359 */
 	int sig;						/**< Signal, 00-99 dB */
@@ -99,8 +98,9 @@ typedef struct _nmeaSATELLITE {
  */
 typedef struct _nmeaSATINFO {
 	int inuse;						/**< Number of satellites in use (not those in view) */
+	int in_use[NMEA_MAXSAT];		/**< IDs of satellites in use (not those in view) */
 	int inview;						/**< Total number of satellites in view */
-	nmeaSATELLITE sat[NMEA_MAXSAT]; /**< Satellites information */
+	nmeaSATELLITE sat[NMEA_MAXSAT]; /**< Satellites information (in view) */
 } nmeaSATINFO;
 
 /**
