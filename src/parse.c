@@ -20,7 +20,7 @@
 
 #include <nmea/parse.h>
 
-#include <nmea/time.h>
+#include <nmea/info.h>
 #include <nmea/tok.h>
 #include <nmea/context.h>
 #include <nmea/units.h>

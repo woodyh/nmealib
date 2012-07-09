@@ -161,7 +161,7 @@ static int nmea_igen_noise_reset(nmeaGENERATOR *gen __attribute__ ((unused)), nm
  */
 
 static int nmea_igen_static_loop(nmeaGENERATOR *gen __attribute__ ((unused)), nmeaINFO *info) {
-	nmea_time_now(&info->utc);
+	nmea_time_now(&info->utc, info);
 	return 1;
 }
 ;
@@ -216,7 +216,7 @@ static int nmea_igen_rotate_loop(nmeaGENERATOR *gen __attribute__ ((unused)), nm
 	double deg = 360 / (count ? count : 1);
 	double srt = (count ? (info->satinfo.sat[0].azimuth) : 0) + 5;
 
-	nmea_time_now(&info->utc);
+	nmea_time_now(&info->utc, info);
 
 	for (it = 0; it < count; ++it) {
 		info->satinfo.sat[it].azimuth = (int) ((srt >= 360) ? srt - 360 : srt);

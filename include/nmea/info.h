@@ -23,7 +23,6 @@
 #ifndef __NMEA_INFO_H__
 #define __NMEA_INFO_H__
 
-#include <nmea/time.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -71,6 +70,20 @@
 #ifdef  __cplusplus
 extern "C" {
 #endif
+
+/**
+ * Date and time data
+ * @see nmea_time_now
+ */
+typedef struct _nmeaTIME {
+	int year;						/**< Years since 1900 */
+	int mon;						/**< Months since January - [0,11] */
+	int day;						/**< Day of the month - [1,31] */
+	int hour;						/**< Hours since midnight - [0,23] */
+	int min;						/**< Minutes after the hour - [0,59] */
+	int sec;						/**< Seconds after the minute - [0,59] */
+	int hsec;						/**< Hundredth part of second - [0,99] */
+} nmeaTIME;
 
 /**
  * Position data in fractional degrees or radians
@@ -164,6 +177,7 @@ typedef enum _nmeaINFO_FIELD {
 	SATINVIEW	= (1 << 16)
 } nmeaINFO_FIELD;
 
+void nmea_time_now(nmeaTIME *utc, void * info);
 void nmea_zero_INFO(nmeaINFO *info);
 
 /**

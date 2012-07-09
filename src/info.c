@@ -22,10 +22,31 @@
 
 #include <nmea/sentence.h>
 #include <nmea/gmath.h>
-#include <nmea/time.h>
 
 #include <string.h>
 #include <math.h>
+#include <time.h>
+#include <sys/time.h>
+
+void nmea_time_now(nmeaTIME *utc, void * info) {
+	struct timeval tp;
+	struct tm tt;
+
+	gettimeofday(&tp, NULL );
+	gmtime_r(&tp.tv_sec, &tt);
+
+	utc->year = tt.tm_year;
+	utc->mon = tt.tm_mon;
+	utc->day = tt.tm_mday;
+	utc->hour = tt.tm_hour;
+	utc->min = tt.tm_min;
+	utc->sec = tt.tm_sec;
+	utc->hsec = (tp.tv_usec / 10000);
+	if (info) {
+		nmea_INFO_set_present((nmeaINFO *)info, UTCDATE);
+		nmea_INFO_set_present((nmeaINFO *)info, UTCTIME);
+	}
+}
 
 void nmea_zero_INFO(nmeaINFO *info) {
 	if (!info) {
@@ -33,7 +54,8 @@ void nmea_zero_INFO(nmeaINFO *info) {
 	}
 
 	memset(info, 0, sizeof(nmeaINFO));
-	nmea_time_now(&info->utc);
+	nmea_time_now(&info->utc, info);
+
 	info->sig = NMEA_SIG_BAD;
 	info->fix = NMEA_FIX_BAD;
 }
@@ -74,7 +96,7 @@ void nmea_INFO_sanitise(nmeaINFO *nmeaInfo) {
 	}
 
 	if (!nmea_INFO_is_present(nmeaInfo, UTCDATE) || !nmea_INFO_is_present(nmeaInfo, UTCTIME)) {
-		nmea_time_now(&utc);
+		nmea_time_now(&utc, NULL);
 	}
 
 	if (!nmea_INFO_is_present(nmeaInfo, UTCDATE)) {

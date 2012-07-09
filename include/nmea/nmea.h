@@ -29,7 +29,6 @@
 #include <nmea/parse.h>
 #include <nmea/parser.h>
 #include <nmea/sentence.h>
-#include <nmea/time.h>
 #include <nmea/tok.h>
 #include <nmea/units.h>
 

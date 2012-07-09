@@ -24,7 +24,7 @@
 
 void nmea_zero_GPGGA(nmeaGPGGA *pack) {
 	memset(pack, 0, sizeof(nmeaGPGGA));
-	nmea_time_now(&pack->utc);
+	nmea_time_now(&pack->utc, pack);
 	pack->ns = 'N';
 	pack->ew = 'E';
 	pack->elv_units = 'M';
@@ -43,7 +43,7 @@ void nmea_zero_GPGSV(nmeaGPGSV *pack) {
 
 void nmea_zero_GPRMC(nmeaGPRMC *pack) {
 	memset(pack, 0, sizeof(nmeaGPRMC));
-	nmea_time_now(&pack->utc);
+	nmea_time_now(&pack->utc, pack);
 	pack->status = 'V';
 	pack->ns = 'N';
 	pack->ew = 'E';

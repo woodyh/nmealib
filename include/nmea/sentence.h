@@ -27,7 +27,6 @@
 #define __NMEA_SENTENCE_H__
 
 #include <nmea/info.h>
-#include <nmea/time.h>
 
 #ifdef  __cplusplus
 extern "C" {
