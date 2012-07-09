@@ -57,7 +57,10 @@ void nmea_zero_INFO(nmeaINFO *info) {
 	nmea_time_now(&info->utc, info);
 
 	info->sig = NMEA_SIG_BAD;
+	nmea_INFO_set_present(info, SIG);
+
 	info->fix = NMEA_FIX_BAD;
+	nmea_INFO_set_present(info, FIX);
 }
 
 /**
