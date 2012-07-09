@@ -388,6 +388,7 @@ int nmea_parse_GPGGA(const char *s, int len, nmeaGPGGA *pack) {
  */
 int nmea_parse_GPGSA(const char *s, int len, nmeaGPGSA *pack) {
 	int token_count;
+	int i;
 
 	assert(s);
 	assert(pack);
@@ -397,7 +398,15 @@ int nmea_parse_GPGSA(const char *s, int len, nmeaGPGSA *pack) {
 	/*
 	 * Clear before parsing, to be able to detect absent fields
 	 */
-	memset(pack, 0, sizeof(nmeaGPGSA));
+	pack->present = 0;
+	pack->fix_mode = 0;
+	pack->fix_type = 0;
+	for (i = 0; i < NMEA_MAXSAT; i++) {
+		pack->sat_prn[i] = 0;
+	}
+	pack->PDOP = NAN;
+	pack->HDOP = NAN;
+	pack->VDOP = NAN;
 
 	/* parse */
 	token_count = nmea_scanf(s, len, "$GPGSA,%C,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%f,%f,%f*", &pack->fix_mode,
@@ -409,6 +418,32 @@ int nmea_parse_GPGSA(const char *s, int len, nmeaGPGSA *pack) {
 	if (token_count != 17) {
 		nmea_error("GPGSA parse error, need 17 tokens, got %d in %s", token_count, s);
 		return 0;
+	}
+
+	/* determine which fields are present and validate them */
+
+	pack->fix_mode = toupper(pack->fix_mode);
+	if (!((pack->fix_mode == 'A') || (pack->fix_mode == 'M'))) {
+		nmea_error("GPGSA parse error: invalid fix mode (%c)", pack->fix_mode);
+		return 0;
+	}
+	if (!pack->fix_type) {
+		nmea_INFO_set_present(pack, FIX);
+	}
+	for (i = 0; i < NMEA_MAXSAT; i++) {
+		if (pack->sat_prn[i] != 0) {
+			nmea_INFO_set_present(pack, SATINUSE);
+			break;
+		}
+	}
+	if (pack->PDOP != NAN) {
+		nmea_INFO_set_present(pack, PDOP);
+	}
+	if (pack->HDOP != NAN) {
+		nmea_INFO_set_present(pack, HDOP);
+	}
+	if (pack->VDOP != NAN) {
+		nmea_INFO_set_present(pack, VDOP);
 	}
 
 	return 1;
@@ -740,26 +775,36 @@ void nmea_GPGGA2info(nmeaGPGGA *pack, nmeaINFO *info) {
  * @param info a pointer to the nmeaINFO structure
  */
 void nmea_GPGSA2info(nmeaGPGSA *pack, nmeaINFO *info) {
-	int i, j, nuse = 0;
+	int i = 0;
 
 	assert(pack);
 	assert(info);
 
+	info->present |= pack->present;
+	nmea_INFO_set_present(info, SMASK);
 	info->smask |= GPGSA;
 	/* fix_mode is ignored */
-	info->fix = pack->fix_type;
-	for (i = 0; i < NMEA_MAXSAT; ++i) {
-		for (j = 0; j < info->satinfo.inview; ++j) {
-			if (pack->sat_prn[i] && pack->sat_prn[i] == info->satinfo.sat[j].id) {
-				info->satinfo.in_use[j] = 1;
-				nuse++;
+	if (nmea_INFO_is_present(pack, FIX)) {
+		info->fix = pack->fix_type;
+	}
+	if (nmea_INFO_is_present(pack, SATINUSE)) {
+		assert(sizeof(info->satinfo.in_use) == sizeof(info->satinfo.in_use));
+		memcpy(info->satinfo.in_use, pack->sat_prn, sizeof(info->satinfo.in_use));
+		for (i = 0; i < NMEA_MAXSAT; ++i) {
+			if (pack->sat_prn[i]) {
+				info->satinfo.inuse++;
 			}
 		}
 	}
-	info->satinfo.inuse = nuse;
-	info->PDOP = pack->PDOP;
-	info->HDOP = pack->HDOP;
-	info->VDOP = pack->VDOP;
+	if (nmea_INFO_is_present(pack, PDOP)) {
+		info->PDOP = pack->PDOP;
+	}
+	if (nmea_INFO_is_present(pack, HDOP)) {
+		info->HDOP = pack->HDOP;
+	}
+	if (nmea_INFO_is_present(pack, VDOP)) {
+		info->VDOP = pack->VDOP;
+	}
 }
 
 /**

@@ -142,9 +142,10 @@ typedef struct _nmeaGPGGA {
  * </pre>
  */
 typedef struct _nmeaGPGSA {
+	uint32_t present;			/**< Mask specifying which fields are present, same as in nmeaINFO */
 	char fix_mode;				/**< Mode (M = Manual, forced to operate in 2D or 3D; A = Automatic, 3D/2D) */
 	int fix_type;				/**< Type, used for navigation (1 = Fix not available; 2 = 2D; 3 = 3D) */
-	int sat_prn[NMEA_MAXSAT];	/**< PRNs of satellites used in position fix (null for unused fields) */
+	int sat_prn[NMEA_MAXSAT];	/**< PRNs of satellites used in position fix (0 for unused fields) */
 	double PDOP;				/**< Dilution of precision */
 	double HDOP;				/**< Horizontal dilution of precision */
 	double VDOP;				/**< Vertical dilution of precision */

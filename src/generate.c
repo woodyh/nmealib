@@ -93,11 +93,56 @@ int nmea_gen_GPGGA(char *s, int len, nmeaGPGGA *pack) {
  * @return the length of the generated sentence
  */
 int nmea_gen_GPGSA(char *s, int len, nmeaGPGSA *pack) {
-	return nmea_printf(s, len,
-			"$GPGSA,%C,%1d,%02d,%02d,%02d,%02d,%02d,%02d,%02d,%02d,%02d,%02d,%02d,%02d,%03.1f,%03.1f,%03.1f",
-			pack->fix_mode, pack->fix_type, pack->sat_prn[0], pack->sat_prn[1], pack->sat_prn[2], pack->sat_prn[3],
-			pack->sat_prn[4], pack->sat_prn[5], pack->sat_prn[6], pack->sat_prn[7], pack->sat_prn[8], pack->sat_prn[9],
-			pack->sat_prn[10], pack->sat_prn[11], pack->PDOP, pack->HDOP, pack->VDOP);
+	int i;
+	char sFixMode[2];
+	char sFixType[2];
+	char sSatPrn[64];
+	char sPdop[16];
+	char sHdop[16];
+	char sVdop[16];
+	char * psSatPrn = &sSatPrn[0];
+	int ssSatPrn = sizeof(sSatPrn);
+	bool satinuse = nmea_INFO_is_present(pack, SATINUSE);
+
+	sFixMode[0] = sFixMode[1] = 0;
+	sFixType[0] = sFixType[1] = 0;
+	sSatPrn[0] = 0;
+	sPdop[0] = 0;
+	sHdop[0] = 0;
+	sVdop[0] = 0;
+
+	if (nmea_INFO_is_present(pack, FIX)) {
+		sFixMode[0] = pack->fix_mode;
+		snprintf(&sFixType[0], sizeof(sFixType), "%1d", pack->fix_type);
+	}
+
+	for (i = 0; i < NMEA_MAXSAT; i++) {
+		int cnt = 0;
+		if (satinuse && pack->sat_prn[i]) {
+			cnt = snprintf(psSatPrn, ssSatPrn, "%d", pack->sat_prn[i]);
+			ssSatPrn -= cnt;
+			psSatPrn += cnt;
+		}
+		if (i < (NMEA_MAXSAT - 1)) {
+			*psSatPrn = ',';
+			psSatPrn++;
+			ssSatPrn--;
+			*psSatPrn = '\0';
+		}
+	}
+
+	if (nmea_INFO_is_present(pack, PDOP)) {
+		snprintf(&sPdop[0], sizeof(sPdop), "%03.1f", pack->PDOP);
+	}
+	if (nmea_INFO_is_present(pack, HDOP)) {
+		snprintf(&sHdop[0], sizeof(sHdop), "%03.1f", pack->HDOP);
+	}
+	if (nmea_INFO_is_present(pack, VDOP)) {
+		snprintf(&sVdop[0], sizeof(sVdop), "%03.1f", pack->VDOP);
+	}
+
+	return nmea_printf(s, len, "$GPGSA,%s,%s,%s,%s,%s,%s", &sFixMode[0], &sFixType[0], &sSatPrn[0], &sPdop[0],
+			&sHdop[0], &sVdop[0]);
 }
 
 /**
@@ -269,19 +314,16 @@ void nmea_info2GPGGA(const nmeaINFO *info, nmeaGPGGA *pack) {
  * @param pack a pointer to the nmeaGPGSA structure
  */
 void nmea_info2GPGSA(const nmeaINFO *info, nmeaGPGSA *pack) {
-	int it;
-
 	nmea_zero_GPGSA(pack);
 
-	/* fix_mode is ignored */
+	pack->present = info->present;
+	nmea_INFO_unset_present(pack, SMASK);
+	pack->fix_mode = 'A';
 	pack->fix_type = info->fix;
+	memcpy(pack->sat_prn, info->satinfo.in_use, sizeof(pack->sat_prn));
 	pack->PDOP = info->PDOP;
 	pack->HDOP = info->HDOP;
 	pack->VDOP = info->VDOP;
-
-	for (it = 0; it < NMEA_MAXSAT; ++it) {
-		pack->sat_prn[it] = ((info->satinfo.in_use[it]) ? info->satinfo.sat[it].id : 0);
-	}
 }
 
 int nmea_gsv_npack(int sat_count) {
