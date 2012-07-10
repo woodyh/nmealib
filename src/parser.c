@@ -24,15 +24,14 @@
 
 #include <nmea/parser.h>
 
-#include <stdlib.h>
-#include <stddef.h>
-#include <string.h>
-#include <assert.h>
-
 #include <nmea/context.h>
 #include <nmea/parse.h>
 #include <nmea/sentence.h>
 #include <nmea/conversions.h>
+
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
 
 typedef struct _nmeaParserNODE {
 	int packType;

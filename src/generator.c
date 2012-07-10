@@ -20,12 +20,12 @@
 
 #include <nmea/generator.h>
 
+#include <nmea/context.h>
+#include <nmea/gmath.h>
+#include <nmea/generate.h>
+
 #include <stdlib.h>
 #include <string.h>
-
-#include <nmea/context.h>
-#include <nmea/generate.h>
-#include <nmea/gmath.h>
 #include <math.h>
 
 static double nmea_random(double min, double max) {

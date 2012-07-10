@@ -20,9 +20,9 @@
 
 #include <nmea/info.h>
 
-#include <nmea/sentence.h>
 #include <nmea/gmath.h>
 
+#include <stdbool.h>
 #include <string.h>
 #include <math.h>
 #include <time.h>

@@ -21,7 +21,6 @@
 #ifndef __NMEA_PARSE_H__
 #define __NMEA_PARSE_H__
 
-#include <nmea/info.h>
 #include <nmea/sentence.h>
 
 #include <stdbool.h>

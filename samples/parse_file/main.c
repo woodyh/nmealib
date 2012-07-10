@@ -24,7 +24,6 @@
 #include <nmea/gmath.h>
 
 #include <stdio.h>
-#include <string.h>
 #include <unistd.h>
 
 static void trace(const char *str, int str_size) {

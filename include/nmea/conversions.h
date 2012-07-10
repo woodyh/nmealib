@@ -22,7 +22,6 @@
 #define __NMEA_CONVERSIONS_H__
 
 #include <nmea/sentence.h>
-#include <nmea/info.h>
 
 #ifdef  __cplusplus
 extern "C" {

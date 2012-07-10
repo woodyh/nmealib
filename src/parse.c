@@ -21,7 +21,6 @@
 #include <nmea/parse.h>
 
 #include <nmea/gmath.h>
-#include <nmea/info.h>
 #include <nmea/tok.h>
 #include <nmea/context.h>
 
@@ -29,7 +28,6 @@
 #include <assert.h>
 #include <math.h>
 #include <ctype.h>
-#include <stdbool.h>
 #include <stdio.h>
 
 #define NMEA_TIMEPARSE_BUF  (256)

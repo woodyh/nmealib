@@ -20,12 +20,11 @@
 
 #include <nmea/generate.h>
 
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-
 #include <nmea/tok.h>
 #include <nmea/conversions.h>
+
+#include <stdio.h>
+#include <stdbool.h>
 
 /**
  * Generate a GPGGA sentence from an nmeaGPGGA structure

@@ -24,7 +24,6 @@
 #define __NMEA_INFO_H__
 
 #include <stdint.h>
-#include <stdbool.h>
 
 /*
  <pre>
