@@ -27,7 +27,7 @@
 #include <math.h>
 
 /**
- * Determine the number of GSV sentences needed from a number of sats
+ * Determine the number of GSV sentences needed for a number of sats
  *
  * @param sat_count the number of sats
  * @return the number of GSV sentences needed
@@ -80,6 +80,36 @@ void nmea_GPGGA2info(nmeaGPGGA *pack, nmeaINFO *info) {
 }
 
 /**
+ * Convert an nmeaINFO structure into an nmeaGPGGA structure
+ *
+ * @param info a pointer to the nmeaINFO structure
+ * @param pack a pointer to the nmeaGPGGA structure
+ */
+void nmea_info2GPGGA(const nmeaINFO *info, nmeaGPGGA *pack) {
+	nmea_zero_GPGGA(pack);
+
+	pack->present = info->present;
+	nmea_INFO_unset_present(pack, SMASK);
+	pack->utc.hour = info->utc.hour;
+	pack->utc.min = info->utc.min;
+	pack->utc.sec = info->utc.sec;
+	pack->utc.hsec = info->utc.hsec;
+	pack->lat = fabs(info->lat);
+	pack->ns = ((info->lat > 0) ? 'N' : 'S');
+	pack->lon = fabs(info->lon);
+	pack->ew = ((info->lon > 0) ? 'E' : 'W');
+	pack->sig = info->sig;
+	pack->satinuse = info->satinfo.inuse;
+	pack->HDOP = info->HDOP;
+	pack->elv = info->elv;
+	pack->elv_units = 'M';
+	pack->diff = 0;
+	pack->diff_units = 'M';
+	pack->dgps_age = 0;
+	pack->dgps_sid = 0;
+}
+
+/**
  * Fill nmeaINFO structure from GSA packet structure
  *
  * @param pack a pointer to the packet structure
@@ -116,6 +146,25 @@ void nmea_GPGSA2info(nmeaGPGSA *pack, nmeaINFO *info) {
 	if (nmea_INFO_is_present(pack, VDOP)) {
 		info->VDOP = pack->VDOP;
 	}
+}
+
+/**
+ * Convert an nmeaINFO structure into an nmeaGPGSA structure
+ *
+ * @param info a pointer to the nmeaINFO structure
+ * @param pack a pointer to the nmeaGPGSA structure
+ */
+void nmea_info2GPGSA(const nmeaINFO *info, nmeaGPGSA *pack) {
+	nmea_zero_GPGSA(pack);
+
+	pack->present = info->present;
+	nmea_INFO_unset_present(pack, SMASK);
+	pack->fix_mode = 'A';
+	pack->fix_type = info->fix;
+	memcpy(pack->sat_prn, info->satinfo.in_use, sizeof(pack->sat_prn));
+	pack->PDOP = info->PDOP;
+	pack->HDOP = info->HDOP;
+	pack->VDOP = info->VDOP;
 }
 
 /**
@@ -156,6 +205,32 @@ void nmea_GPGSV2info(nmeaGPGSV *pack, nmeaINFO *info) {
 			info->satinfo.sat[sat_offset + sat_index].sig = pack->sat_data[sat_index].sig;
 		}
 	}
+}
+
+/**
+ * Convert an nmeaINFO structure into an nmeaGPGSV structure
+ *
+ * @param info a pointer to the nmeaINFO structure
+ * @param pack a pointer to the nmeaGPGSV structure
+ * @param pack_idx pack index (zero based)
+ */
+void nmea_info2GPGSV(const nmeaINFO *info, nmeaGPGSV *pack, int pack_idx) {
+	int sit, pit;
+
+	nmea_zero_GPGSV(pack);
+
+	pack->present = info->present;
+	nmea_INFO_unset_present(pack, SMASK);
+	pack->sat_count = (info->satinfo.inview <= NMEA_MAXSAT) ? info->satinfo.inview : NMEA_MAXSAT;
+	pack->pack_count = nmea_gsv_npack(pack->sat_count);
+
+	if (pack_idx >= pack->pack_count)
+		pack->pack_index = pack_idx % pack->pack_count;
+	else
+		pack->pack_index = pack_idx;
+
+	for (pit = 0, sit = pack->pack_index * NMEA_SATINPACK; pit < NMEA_SATINPACK; ++pit, ++sit)
+		pack->sat_data[pit] = info->satinfo.sat[sit];
 }
 
 /**
@@ -211,105 +286,6 @@ void nmea_GPRMC2info(nmeaGPRMC *pack, nmeaINFO *info) {
 }
 
 /**
- * Fill nmeaINFO structure from VTG packet structure
- *
- * @param pack a pointer to the packet structure
- * @param info a pointer to the nmeaINFO structure
- */
-void nmea_GPVTG2info(nmeaGPVTG *pack, nmeaINFO *info) {
-	assert(pack);
-	assert(info);
-
-	info->present |= pack->present;
-	nmea_INFO_set_present(info, SMASK);
-	info->smask |= GPVTG;
-	if (nmea_INFO_is_present(pack, SPEED)) {
-		info->speed = pack->spk;
-	}
-	if (nmea_INFO_is_present(pack, TRACK)) {
-		info->track = pack->track;
-	}
-	if (nmea_INFO_is_present(pack, MTRACK)) {
-		info->mtrack = pack->mtrack;
-	}
-}
-
-/**
- * Convert an nmeaINFO structure into an nmeaGPGGA structure
- *
- * @param info a pointer to the nmeaINFO structure
- * @param pack a pointer to the nmeaGPGGA structure
- */
-void nmea_info2GPGGA(const nmeaINFO *info, nmeaGPGGA *pack) {
-	nmea_zero_GPGGA(pack);
-
-	pack->present = info->present;
-	nmea_INFO_unset_present(pack, SMASK);
-	pack->utc.hour = info->utc.hour;
-	pack->utc.min = info->utc.min;
-	pack->utc.sec = info->utc.sec;
-	pack->utc.hsec = info->utc.hsec;
-	pack->lat = fabs(info->lat);
-	pack->ns = ((info->lat > 0) ? 'N' : 'S');
-	pack->lon = fabs(info->lon);
-	pack->ew = ((info->lon > 0) ? 'E' : 'W');
-	pack->sig = info->sig;
-	pack->satinuse = info->satinfo.inuse;
-	pack->HDOP = info->HDOP;
-	pack->elv = info->elv;
-	pack->elv_units = 'M';
-	pack->diff = 0;
-	pack->diff_units = 'M';
-	pack->dgps_age = 0;
-	pack->dgps_sid = 0;
-}
-
-/**
- * Convert an nmeaINFO structure into an nmeaGPGSA structure
- *
- * @param info a pointer to the nmeaINFO structure
- * @param pack a pointer to the nmeaGPGSA structure
- */
-void nmea_info2GPGSA(const nmeaINFO *info, nmeaGPGSA *pack) {
-	nmea_zero_GPGSA(pack);
-
-	pack->present = info->present;
-	nmea_INFO_unset_present(pack, SMASK);
-	pack->fix_mode = 'A';
-	pack->fix_type = info->fix;
-	memcpy(pack->sat_prn, info->satinfo.in_use, sizeof(pack->sat_prn));
-	pack->PDOP = info->PDOP;
-	pack->HDOP = info->HDOP;
-	pack->VDOP = info->VDOP;
-}
-
-/**
- * Convert an nmeaINFO structure into an nmeaGPGSV structure
- *
- * @param info a pointer to the nmeaINFO structure
- * @param pack a pointer to the nmeaGPGSV structure
- * @param pack_idx pack index (zero based)
- */
-void nmea_info2GPGSV(const nmeaINFO *info, nmeaGPGSV *pack, int pack_idx) {
-	int sit, pit;
-
-	nmea_zero_GPGSV(pack);
-
-	pack->present = info->present;
-	nmea_INFO_unset_present(pack, SMASK);
-	pack->sat_count = (info->satinfo.inview <= NMEA_MAXSAT) ? info->satinfo.inview : NMEA_MAXSAT;
-	pack->pack_count = nmea_gsv_npack(pack->sat_count);
-
-	if (pack_idx >= pack->pack_count)
-		pack->pack_index = pack_idx % pack->pack_count;
-	else
-		pack->pack_index = pack_idx;
-
-	for (pit = 0, sit = pack->pack_index * NMEA_SATINPACK; pit < NMEA_SATINPACK; ++pit, ++sit)
-		pack->sat_data[pit] = info->satinfo.sat[sit];
-}
-
-/**
  * Convert an nmeaINFO structure into an nmeaGPRMC structure
  *
  * @param info a pointer to the nmeaINFO structure
@@ -331,6 +307,30 @@ void nmea_info2GPRMC(const nmeaINFO *info, nmeaGPRMC *pack) {
 	pack->magvar = fabs(info->magvar);
 	pack->magvar_ew = ((info->magvar > 0) ? 'E' : 'W');
 	pack->mode = ((info->sig > 0) ? 'A' : 'N');
+}
+
+/**
+ * Fill nmeaINFO structure from VTG packet structure
+ *
+ * @param pack a pointer to the packet structure
+ * @param info a pointer to the nmeaINFO structure
+ */
+void nmea_GPVTG2info(nmeaGPVTG *pack, nmeaINFO *info) {
+	assert(pack);
+	assert(info);
+
+	info->present |= pack->present;
+	nmea_INFO_set_present(info, SMASK);
+	info->smask |= GPVTG;
+	if (nmea_INFO_is_present(pack, SPEED)) {
+		info->speed = pack->spk;
+	}
+	if (nmea_INFO_is_present(pack, TRACK)) {
+		info->track = pack->track;
+	}
+	if (nmea_INFO_is_present(pack, MTRACK)) {
+		info->mtrack = pack->mtrack;
+	}
 }
 
 /**
