@@ -50,12 +50,9 @@ typedef struct _nmeaParserNODE {
  */
 int nmea_parser_init(nmeaPARSER *parser) {
 	int resv = 0;
-	int buff_size = nmea_property()->parse_buff_size;
+	int buff_size = nmea_context_get_buffer_size();
 
 	assert(parser);
-
-	if (buff_size < NMEA_MIN_PARSEBUFF)
-		buff_size = NMEA_MIN_PARSEBUFF;
 
 	memset(parser, 0, sizeof(nmeaPARSER));
 
