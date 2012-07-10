@@ -359,4 +359,6 @@ void nmea_info2pos(const nmeaINFO *info, nmeaPOS *pos) {
 void nmea_pos2info(const nmeaPOS *pos, nmeaINFO *info) {
 	info->lat = nmea_radian2ndeg(pos->lat);
 	info->lon = nmea_radian2ndeg(pos->lon);
+	nmea_INFO_set_present(info, LAT);
+	nmea_INFO_set_present(info, LON);
 }

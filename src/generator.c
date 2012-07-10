@@ -46,9 +46,12 @@ int nmea_gen_init(nmeaGENERATOR *gen, nmeaINFO *info) {
 
 	nmea_zero_INFO(info);
 	info->smask = smask;
+	nmea_INFO_set_present(info, SMASK);
 
 	info->lat = NMEA_DEF_LAT;
 	info->lon = NMEA_DEF_LON;
+	nmea_INFO_set_present(info, LAT);
+	nmea_INFO_set_present(info, LON);
 
 	while (RetVal && igen) {
 		if (igen->init_call)
@@ -133,6 +136,19 @@ static int nmea_igen_noise_loop(nmeaGENERATOR *gen __attribute__ ((unused)), nme
 	info->magvar = nmea_random(0, 360);
 	info->elv = lrint(nmea_random(-100, 100));
 
+	nmea_INFO_set_present(info, SIG);
+	nmea_INFO_set_present(info, PDOP);
+	nmea_INFO_set_present(info, HDOP);
+	nmea_INFO_set_present(info, VDOP);
+	nmea_INFO_set_present(info, FIX);
+	nmea_INFO_set_present(info, LAT);
+	nmea_INFO_set_present(info, LON);
+	nmea_INFO_set_present(info, SPEED);
+	nmea_INFO_set_present(info, TRACK);
+	nmea_INFO_set_present(info, MTRACK);
+	nmea_INFO_set_present(info, MAGVAR);
+	nmea_INFO_set_present(info, ELV);
+
 	info->satinfo.inuse = 0;
 	info->satinfo.inview = 0;
 
@@ -148,6 +164,9 @@ static int nmea_igen_noise_loop(nmeaGENERATOR *gen __attribute__ ((unused)), nme
 		if (info->satinfo.sat[it].sig > 0)
 			info->satinfo.inview++;
 	}
+
+	nmea_INFO_set_present(info, SATINUSE);
+	nmea_INFO_set_present(info, SATINVIEW);
 
 	return 1;
 }
@@ -194,12 +213,18 @@ static int nmea_igen_static_reset(nmeaGENERATOR *gen __attribute__ ((unused)), n
 	info->satinfo.sat[3].azimuth = 270;
 	info->satinfo.sat[3].sig = 99;
 
+	nmea_INFO_set_present(info, SATINUSE);
+	nmea_INFO_set_present(info, SATINVIEW);
+
 	return 1;
 }
 
 static int nmea_igen_static_init(nmeaGENERATOR *gen, nmeaINFO *info) {
 	info->sig = 3;
 	info->fix = 3;
+
+	nmea_INFO_set_present(info, SIG);
+	nmea_INFO_set_present(info, FIX);
 
 	nmea_igen_static_reset(gen, info);
 
@@ -223,6 +248,8 @@ static int nmea_igen_rotate_loop(nmeaGENERATOR *gen __attribute__ ((unused)), nm
 		srt += deg;
 	}
 
+	nmea_INFO_set_present(info, SATINVIEW);
+
 	return 1;
 }
 ;
@@ -244,12 +271,18 @@ static int nmea_igen_rotate_reset(nmeaGENERATOR *gen __attribute__ ((unused)), n
 		srt += deg;
 	}
 
+	nmea_INFO_set_present(info, SATINUSE);
+	nmea_INFO_set_present(info, SATINVIEW);
+
 	return 1;
 }
 
 static int nmea_igen_rotate_init(nmeaGENERATOR *gen, nmeaINFO *info) {
 	info->sig = 3;
 	info->fix = 3;
+
+	nmea_INFO_set_present(info, SIG);
+	nmea_INFO_set_present(info, FIX);
 
 	nmea_igen_rotate_reset(gen, info);
 
@@ -267,6 +300,14 @@ static int nmea_igen_pos_rmove_init(nmeaGENERATOR *gen __attribute__ ((unused)),
 	info->mtrack = 0;
 	info->magvar = 0;
 	info->speed = 20;
+
+	nmea_INFO_set_present(info, SIG);
+	nmea_INFO_set_present(info, FIX);
+	nmea_INFO_set_present(info, TRACK);
+	nmea_INFO_set_present(info, MTRACK);
+	nmea_INFO_set_present(info, MAGVAR);
+	nmea_INFO_set_present(info, SPEED);
+
 	return 1;
 }
 
@@ -300,6 +341,14 @@ static int nmea_igen_pos_rmove_loop(nmeaGENERATOR *gen __attribute__ ((unused)),
 	nmea_pos2info(&crd, info);
 
 	info->magvar = info->track;
+
+	nmea_INFO_set_present(info, TRACK);
+	nmea_INFO_set_present(info, MTRACK);
+	nmea_INFO_set_present(info, SPEED);
+	nmea_INFO_set_present(info, TRACK);
+	nmea_INFO_set_present(info, LAT);
+	nmea_INFO_set_present(info, LON);
+	nmea_INFO_set_present(info, MAGVAR);
 
 	return 1;
 }
