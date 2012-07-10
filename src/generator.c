@@ -165,6 +165,7 @@ static int nmea_igen_noise_loop(nmeaGENERATOR *gen __attribute__ ((unused)), nme
 			info->satinfo.inview++;
 	}
 
+	nmea_INFO_set_present(info, SATINUSECOUNT);
 	nmea_INFO_set_present(info, SATINUSE);
 	nmea_INFO_set_present(info, SATINVIEW);
 
@@ -213,6 +214,7 @@ static int nmea_igen_static_reset(nmeaGENERATOR *gen __attribute__ ((unused)), n
 	info->satinfo.sat[3].azimuth = 270;
 	info->satinfo.sat[3].sig = 99;
 
+	nmea_INFO_set_present(info, SATINUSECOUNT);
 	nmea_INFO_set_present(info, SATINUSE);
 	nmea_INFO_set_present(info, SATINVIEW);
 
@@ -271,6 +273,7 @@ static int nmea_igen_rotate_reset(nmeaGENERATOR *gen __attribute__ ((unused)), n
 		srt += deg;
 	}
 
+	nmea_INFO_set_present(info, SATINUSECOUNT);
 	nmea_INFO_set_present(info, SATINUSE);
 	nmea_INFO_set_present(info, SATINVIEW);
 

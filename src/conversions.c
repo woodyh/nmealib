@@ -72,7 +72,7 @@ void nmea_GPGGA2info(const nmeaGPGGA *pack, nmeaINFO *info) {
 	if (nmea_INFO_is_present(pack, SIG)) {
 		info->sig = pack->sig;
 	}
-	if (nmea_INFO_is_present(pack, SATINUSE)) {
+	if (nmea_INFO_is_present(pack, SATINUSECOUNT)) {
 		info->satinfo.inuse = pack->satinuse;
 	}
 	if (nmea_INFO_is_present(pack, HDOP)) {
@@ -116,7 +116,7 @@ void nmea_info2GPGGA(const nmeaINFO *info, nmeaGPGGA *pack) {
 	if (nmea_INFO_is_present(info, SIG)) {
 		pack->sig = info->sig;
 	}
-	if (nmea_INFO_is_present(info, SATINUSE)) {
+	if (nmea_INFO_is_present(info, SATINUSECOUNT)) {
 		pack->satinuse = info->satinfo.inuse;
 	}
 	if (nmea_INFO_is_present(info, HDOP)) {
@@ -161,6 +161,7 @@ void nmea_GPGSA2info(const nmeaGPGSA *pack, nmeaINFO *info) {
 				info->satinfo.inuse++;
 			}
 		}
+		nmea_INFO_set_present(info, SATINUSECOUNT);
 	}
 	if (nmea_INFO_is_present(pack, PDOP)) {
 		info->PDOP = pack->PDOP;

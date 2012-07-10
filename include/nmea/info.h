@@ -157,23 +157,24 @@ typedef struct _nmeaINFO {
  * The values are used in the 'present' mask.
  */
 typedef enum _nmeaINFO_FIELD {
-	SMASK		= (1 << 0),
-	UTCDATE		= (1 << 1),
-	UTCTIME		= (1 << 2),
-	SIG			= (1 << 3),
-	FIX			= (1 << 4),
-	PDOP		= (1 << 5),
-	HDOP		= (1 << 6),
-	VDOP		= (1 << 7),
-	LAT			= (1 << 8),
-	LON			= (1 << 9),
-	ELV			= (1 << 10),
-	SPEED		= (1 << 11),
-	TRACK		= (1 << 12),
-	MTRACK		= (1 << 13),
-	MAGVAR		= (1 << 14),
-	SATINUSE	= (1 << 15),
-	SATINVIEW	= (1 << 16)
+	SMASK			= (1 << 0),
+	UTCDATE			= (1 << 1),
+	UTCTIME			= (1 << 2),
+	SIG				= (1 << 3),
+	FIX				= (1 << 4),
+	PDOP			= (1 << 5),
+	HDOP			= (1 << 6),
+	VDOP			= (1 << 7),
+	LAT				= (1 << 8),
+	LON				= (1 << 9),
+	ELV				= (1 << 10),
+	SPEED			= (1 << 11),
+	TRACK			= (1 << 12),
+	MTRACK			= (1 << 13),
+	MAGVAR			= (1 << 14),
+	SATINUSECOUNT	= (1 << 15),
+	SATINUSE		= (1 << 16),
+	SATINVIEW		= (1 << 17)
 } nmeaINFO_FIELD;
 
 void nmea_time_now(nmeaTIME *utc, void * info);

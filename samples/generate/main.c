@@ -59,6 +59,7 @@ int main(int argc __attribute__((unused)), char *argv[] __attribute__((unused)))
 	nmea_INFO_set_present(&info, PDOP);
 
 	info.satinfo.inuse = NMEA_MAXSAT;
+	nmea_INFO_set_present(&info, SATINUSECOUNT);
 	for (it = 0; it < NMEA_MAXSAT; it++) {
 		info.satinfo.in_use[it] = it + 1;
 	}
