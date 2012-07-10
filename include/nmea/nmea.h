@@ -22,6 +22,7 @@
 #define __NMEA_H__
 
 #include <nmea/context.h>
+#include <nmea/conversions.h>
 #include <nmea/generate.h>
 #include <nmea/generator.h>
 #include <nmea/gmath.h>

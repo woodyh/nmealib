@@ -37,12 +37,6 @@ int nmea_parse_GPGSV(const char *s, int len, nmeaGPGSV *pack);
 int nmea_parse_GPRMC(const char *s, int len, nmeaGPRMC *pack);
 int nmea_parse_GPVTG(const char *s, int len, nmeaGPVTG *pack);
 
-void nmea_GPGGA2info(nmeaGPGGA *pack, nmeaINFO *info);
-void nmea_GPGSA2info(nmeaGPGSA *pack, nmeaINFO *info);
-void nmea_GPGSV2info(nmeaGPGSV *pack, nmeaINFO *info);
-void nmea_GPRMC2info(nmeaGPRMC *pack, nmeaINFO *info);
-void nmea_GPVTG2info(nmeaGPVTG *pack, nmeaINFO *info);
-
 #ifdef  __cplusplus
 }
 #endif

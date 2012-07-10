@@ -25,7 +25,7 @@
 #include <math.h>
 
 #include <nmea/tok.h>
-#include <nmea/units.h>
+#include <nmea/conversions.h>
 
 /**
  * Generate a GPGGA sentence from an nmeaGPGGA structure
@@ -304,135 +304,6 @@ int nmea_gen_GPVTG(char *s, int len, nmeaGPVTG *pack) {
 
 	return nmea_printf(s, len, "$GPVTG,%s,%s,%s,%s,%s,%s,%s,%s", &sTrackT[0], &sUnitT[0], &sTrackM[0],
 			&sUnitM[0], &sSpeedN[0], &sUnitN[0], &sSpeedK[0], &sUnitK[0]);
-}
-
-/**
- * Convert an nmeaINFO structure into an nmeaGPGGA structure
- *
- * @param info a pointer to the nmeaINFO structure
- * @param pack a pointer to the nmeaGPGGA structure
- */
-void nmea_info2GPGGA(const nmeaINFO *info, nmeaGPGGA *pack) {
-	nmea_zero_GPGGA(pack);
-
-	pack->present = info->present;
-	nmea_INFO_unset_present(pack, SMASK);
-	pack->utc.hour = info->utc.hour;
-	pack->utc.min = info->utc.min;
-	pack->utc.sec = info->utc.sec;
-	pack->utc.hsec = info->utc.hsec;
-	pack->lat = fabs(info->lat);
-	pack->ns = ((info->lat > 0) ? 'N' : 'S');
-	pack->lon = fabs(info->lon);
-	pack->ew = ((info->lon > 0) ? 'E' : 'W');
-	pack->sig = info->sig;
-	pack->satinuse = info->satinfo.inuse;
-	pack->HDOP = info->HDOP;
-	pack->elv = info->elv;
-	pack->elv_units = 'M';
-	pack->diff = 0;
-	pack->diff_units = 'M';
-	pack->dgps_age = 0;
-	pack->dgps_sid = 0;
-}
-
-/**
- * Convert an nmeaINFO structure into an nmeaGPGSA structure
- *
- * @param info a pointer to the nmeaINFO structure
- * @param pack a pointer to the nmeaGPGSA structure
- */
-void nmea_info2GPGSA(const nmeaINFO *info, nmeaGPGSA *pack) {
-	nmea_zero_GPGSA(pack);
-
-	pack->present = info->present;
-	nmea_INFO_unset_present(pack, SMASK);
-	pack->fix_mode = 'A';
-	pack->fix_type = info->fix;
-	memcpy(pack->sat_prn, info->satinfo.in_use, sizeof(pack->sat_prn));
-	pack->PDOP = info->PDOP;
-	pack->HDOP = info->HDOP;
-	pack->VDOP = info->VDOP;
-}
-
-static int nmea_gsv_npack(int sat_count) {
-	int pack_count = lrint(ceil((double) sat_count / (double) NMEA_SATINPACK));
-
-	if (!pack_count)
-		pack_count = 1;
-
-	return pack_count;
-}
-
-/**
- * Convert an nmeaINFO structure into an nmeaGPGSV structure
- *
- * @param info a pointer to the nmeaINFO structure
- * @param pack a pointer to the nmeaGPGSV structure
- * @param pack_idx pack index (zero based)
- */
-void nmea_info2GPGSV(const nmeaINFO *info, nmeaGPGSV *pack, int pack_idx) {
-	int sit, pit;
-
-	nmea_zero_GPGSV(pack);
-
-	pack->present = info->present;
-	nmea_INFO_unset_present(pack, SMASK);
-	pack->sat_count = (info->satinfo.inview <= NMEA_MAXSAT) ? info->satinfo.inview : NMEA_MAXSAT;
-	pack->pack_count = nmea_gsv_npack(pack->sat_count);
-
-	if (pack_idx >= pack->pack_count)
-		pack->pack_index = pack_idx % pack->pack_count;
-	else
-		pack->pack_index = pack_idx;
-
-	for (pit = 0, sit = pack->pack_index * NMEA_SATINPACK; pit < NMEA_SATINPACK; ++pit, ++sit)
-		pack->sat_data[pit] = info->satinfo.sat[sit];
-}
-
-/**
- * Convert an nmeaINFO structure into an nmeaGPRMC structure
- *
- * @param info a pointer to the nmeaINFO structure
- * @param pack a pointer to the nmeaGPRMC structure
- */
-void nmea_info2GPRMC(const nmeaINFO *info, nmeaGPRMC *pack) {
-	nmea_zero_GPRMC(pack);
-
-	pack->present = info->present;
-	nmea_INFO_unset_present(pack, SMASK);
-	pack->utc = info->utc;
-	pack->status = ((info->sig > 0) ? 'A' : 'V');
-	pack->lat = fabs(info->lat);
-	pack->ns = ((info->lat > 0) ? 'N' : 'S');
-	pack->lon = fabs(info->lon);
-	pack->ew = ((info->lon > 0) ? 'E' : 'W');
-	pack->speed = info->speed / NMEA_TUD_KNOTS;
-	pack->track = info->track;
-	pack->magvar = fabs(info->magvar);
-	pack->magvar_ew = ((info->magvar > 0) ? 'E' : 'W');
-	pack->mode = ((info->sig > 0) ? 'A' : 'N');
-}
-
-/**
- * Convert an nmeaINFO structure into an nmeaGPVTG structure
- *
- * @param info a pointer to the nmeaINFO structure
- * @param pack a pointer to the nmeaGPRMC structure
- */
-void nmea_info2GPVTG(const nmeaINFO *info, nmeaGPVTG *pack) {
-	nmea_zero_GPVTG(pack);
-
-	pack->present = info->present;
-	nmea_INFO_unset_present(pack, SMASK);
-	pack->track = info->track;
-	pack->track_t = 'T';
-	pack->mtrack = info->mtrack;
-	pack->mtrack_m = 'M';
-	pack->spn = info->speed / NMEA_TUD_KNOTS;
-	pack->spn_n = 'N';
-	pack->spk = info->speed;
-	pack->spk_k = 'K';
 }
 
 int nmea_generate(char *buff, int buff_sz, const nmeaINFO *info, int generate_mask) {

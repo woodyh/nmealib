@@ -32,6 +32,7 @@
 #include <nmea/context.h>
 #include <nmea/parse.h>
 #include <nmea/sentence.h>
+#include <nmea/conversions.h>
 
 typedef struct _nmeaParserNODE {
 	int packType;
