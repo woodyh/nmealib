@@ -72,6 +72,9 @@ void nmea_GPGGA2info(const nmeaGPGGA *pack, nmeaINFO *info) {
 	if (nmea_INFO_is_present(pack, SIG)) {
 		info->sig = pack->sig;
 	}
+	if (nmea_INFO_is_present(pack, SATINUSE)) {
+		info->satinfo.inuse = pack->satinuse;
+	}
 	if (nmea_INFO_is_present(pack, HDOP)) {
 		info->HDOP = pack->HDOP;
 	}
