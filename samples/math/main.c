@@ -18,7 +18,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <nmea/nmea.h>
+#include <nmea/info.h>
+#include <nmea/parser.h>
+#include <nmea/gmath.h>
 
 #include <stdio.h>
 #include <string.h>
