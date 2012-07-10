@@ -63,17 +63,17 @@ void nmea_GPGGA2info(const nmeaGPGGA *pack, nmeaINFO *info) {
 		info->utc.sec = pack->utc.sec;
 		info->utc.hsec = pack->utc.hsec;
 	}
-	if (nmea_INFO_is_present(pack, SIG)) {
-		info->sig = pack->sig;
-	}
-	if (nmea_INFO_is_present(pack, HDOP)) {
-		info->HDOP = pack->HDOP;
-	}
 	if (nmea_INFO_is_present(pack, LAT)) {
 		info->lat = ((pack->ns == 'N') ? pack->lat : -pack->lat);
 	}
 	if (nmea_INFO_is_present(pack, LON)) {
 		info->lon = ((pack->ew == 'E') ? pack->lon : -pack->lon);
+	}
+	if (nmea_INFO_is_present(pack, SIG)) {
+		info->sig = pack->sig;
+	}
+	if (nmea_INFO_is_present(pack, HDOP)) {
+		info->HDOP = pack->HDOP;
 	}
 	if (nmea_INFO_is_present(pack, ELV)) {
 		info->elv = pack->elv;
@@ -93,21 +93,37 @@ void nmea_info2GPGGA(const nmeaINFO *info, nmeaGPGGA *pack) {
 
 	pack->present = info->present;
 	nmea_INFO_unset_present(pack, SMASK);
-	pack->utc.hour = info->utc.hour;
-	pack->utc.min = info->utc.min;
-	pack->utc.sec = info->utc.sec;
-	pack->utc.hsec = info->utc.hsec;
-	pack->lat = fabs(info->lat);
-	pack->ns = ((info->lat > 0) ? 'N' : 'S');
-	pack->lon = fabs(info->lon);
-	pack->ew = ((info->lon > 0) ? 'E' : 'W');
-	pack->sig = info->sig;
-	pack->satinuse = info->satinfo.inuse;
-	pack->HDOP = info->HDOP;
-	pack->elv = info->elv;
-	pack->elv_units = 'M';
+	if (nmea_INFO_is_present(info, UTCTIME)) {
+		pack->utc.hour = info->utc.hour;
+		pack->utc.min = info->utc.min;
+		pack->utc.sec = info->utc.sec;
+		pack->utc.hsec = info->utc.hsec;
+	}
+	if (nmea_INFO_is_present(info, LAT)) {
+		pack->lat = fabs(info->lat);
+		pack->ns = ((info->lat > 0) ? 'N' : 'S');
+	}
+	if (nmea_INFO_is_present(info, LON)) {
+		pack->lon = fabs(info->lon);
+		pack->ew = ((info->lon > 0) ? 'E' : 'W');
+	}
+	if (nmea_INFO_is_present(info, SIG)) {
+		pack->sig = info->sig;
+	}
+	if (nmea_INFO_is_present(info, SATINUSE)) {
+		pack->satinuse = info->satinfo.inuse;
+	}
+	if (nmea_INFO_is_present(info, HDOP)) {
+		pack->HDOP = info->HDOP;
+	}
+	if (nmea_INFO_is_present(info, ELV)) {
+		pack->elv = info->elv;
+		pack->elv_units = 'M';
+	}
+	/* defaults for (ignored) diff and diff_units */
 	pack->diff = 0;
 	pack->diff_units = 'M';
+	/* defaults for (ignored) dgps_age and dgps_sid */
 	pack->dgps_age = 0;
 	pack->dgps_sid = 0;
 }
