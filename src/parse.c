@@ -485,35 +485,54 @@ int nmea_parse_GPGSV(const char *s, int len, nmeaGPGSV *pack) {
 			&pack->sat_data[3].elv, &pack->sat_data[3].azimuth, &pack->sat_data[3].sig);
 
 	/* return if we have no sentences or sats */
-	if ((pack->pack_count < 1) || (pack->pack_index < 1) || (pack->pack_index > NMEA_MAXSAT) || (pack->sat_count < 0)) {
+	if ((pack->pack_count < 1) || (pack->pack_count > NMEA_NSATPACKS) || (pack->pack_index < 1)
+			|| (pack->pack_index > pack->pack_count) || (pack->sat_count < 0) || (pack->sat_count > NMEA_MAXSAT)) {
 		nmea_error("GPGSV parse error, inconsistent pack (count/index/satcount = %d/%d/%d)", pack->pack_count,
 				pack->pack_index, pack->sat_count);
 		return 0;
 	}
 
-	/* index of 1st sat in pack */
-	sat_count = (pack->pack_index - 1) * NMEA_SATINPACK;
-	/* the number of sats in this sentence */
-	sat_count = ((sat_count + NMEA_SATINPACK) > pack->sat_count) ? (pack->sat_count - sat_count) : NMEA_SATINPACK;
-	/* the number of tokens that must be in this sentence */
-	token_count_expected = (sat_count * 4) + 3;
+	/* validate all sat settings and count the number of sats in the sentence */
+	for (sat_count = 0; sat_count < NMEA_SATINPACK; sat_count++) {
+		if (pack->sat_data[sat_count].id != 0) {
+			if ((pack->sat_data[sat_count].id < 0)) {
+				nmea_error("Parse error: invalid sat %d id (%d)", sat_count + 1, pack->sat_data[sat_count].id);
+				return 0;
+			}
+			if ((pack->sat_data[sat_count].elv < 0) || (pack->sat_data[sat_count].elv > 90)) {
+				nmea_error("Parse error: invalid sat %d elevation (%d)", sat_count + 1, pack->sat_data[sat_count].elv);
+				return 0;
+			}
+			if ((pack->sat_data[sat_count].azimuth < 0) || (pack->sat_data[sat_count].azimuth >= 360)) {
+				nmea_error("Parse error: invalid sat %d azimuth (%d)", sat_count + 1, pack->sat_data[sat_count].azimuth);
+				return 0;
+			}
+			if ((pack->sat_data[sat_count].sig < 0) || (pack->sat_data[sat_count].sig > 99)) {
+				nmea_error("Parse error: invalid sat %d signal (%d)", sat_count + 1, pack->sat_data[sat_count].sig);
+				return 0;
+			}
+			sat_counted++;
+		} else {
+			memset(&pack->sat_data[sat_count], 0, sizeof(pack->sat_data[sat_count]));
+		}
+	}
+
+	if (sat_counted != pack->sat_count) {
+		nmea_error("GPGSV parse error, expected %d sats, got %d", pack->sat_count, sat_counted);
+		return 0;
+	}
 
 	/* see that we have enough tokens */
+	token_count_expected = (sat_counted * 4) + 3;
 	if ((token_count < token_count_expected) || (token_count > (NMEA_SATINPACK * 4 + 3))) {
 		nmea_error("GPGSV parse error, need %d tokens, got %d", token_count_expected, token_count);
 		return 0;
 	}
 
-	/* count the number of sats in the sentence */
-	for (sat_count = 0; sat_count < NMEA_SATINPACK; sat_count++) {
-		if (pack->sat_data[sat_count].id > 1) {
-			sat_counted++;
-		}
-	}
+	/* determine which fields are present and validate them */
 
-	if (sat_counted != pack->sat_count) {
-		nmea_error("GPGSV parse error, did not receive %d sats, got %d", pack->sat_count, sat_counted);
-		return 0;
+	if (pack->sat_count > 0) {
+		nmea_INFO_set_present(pack, SATINVIEW);
 	}
 
 	return 1;
@@ -858,19 +877,23 @@ void nmea_GPGSV2info(nmeaGPGSV *pack, nmeaINFO *info) {
 	if (pack->pack_index < 1)
 		pack->pack_index = 1;
 
+	info->present |= pack->present;
+	nmea_INFO_set_present(info, SMASK);
 	info->smask |= GPGSV;
-	info->satinfo.inview = pack->sat_count;
+	if (nmea_INFO_is_present(pack, SATINVIEW)) {
+		info->satinfo.inview = pack->sat_count;
 
-	/* index of 1st sat in pack */
-	sat_offset = (pack->pack_index - 1) * NMEA_SATINPACK;
-	/* the number of sats in this sentence */
-	sat_count = ((sat_offset + NMEA_SATINPACK) > pack->sat_count) ? (pack->sat_count - sat_offset) : NMEA_SATINPACK;
+		/* index of 1st sat in pack */
+		sat_offset = (pack->pack_index - 1) * NMEA_SATINPACK;
+		/* the number of sats in this sentence */
+		sat_count = ((sat_offset + NMEA_SATINPACK) > pack->sat_count) ? (pack->sat_count - sat_offset) : NMEA_SATINPACK;
 
-	for (sat_index = 0; sat_index < sat_count; sat_index++) {
-		info->satinfo.sat[sat_offset + sat_index].id = pack->sat_data[sat_index].id;
-		info->satinfo.sat[sat_offset + sat_index].elv = pack->sat_data[sat_index].elv;
-		info->satinfo.sat[sat_offset + sat_index].azimuth = pack->sat_data[sat_index].azimuth;
-		info->satinfo.sat[sat_offset + sat_index].sig = pack->sat_data[sat_index].sig;
+		for (sat_index = 0; sat_index < sat_count; sat_index++) {
+			info->satinfo.sat[sat_offset + sat_index].id = pack->sat_data[sat_index].id;
+			info->satinfo.sat[sat_offset + sat_index].elv = pack->sat_data[sat_index].elv;
+			info->satinfo.sat[sat_offset + sat_index].azimuth = pack->sat_data[sat_index].azimuth;
+			info->satinfo.sat[sat_offset + sat_index].sig = pack->sat_data[sat_index].sig;
+		}
 	}
 }
 

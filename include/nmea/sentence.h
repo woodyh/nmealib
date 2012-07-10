@@ -195,6 +195,7 @@ typedef struct _nmeaGPGSA {
  * </pre>
  */
 typedef struct _nmeaGPGSV {
+	int present;				/**< Mask specifying which fields are present, same as in nmeaINFO */
 	int pack_count;				/**< Total number of messages of this type in this cycle */
 	int pack_index;				/**< Message number */
 	int sat_count;				/**< Total number of satellites in view */

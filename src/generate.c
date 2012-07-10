@@ -154,15 +154,44 @@ int nmea_gen_GPGSA(char *s, int len, nmeaGPGSA *pack) {
  * @return the length of the generated sentence
  */
 int nmea_gen_GPGSV(char *s, int len, nmeaGPGSV *pack) {
-	return nmea_printf(s, len, "$GPGSV,%1d,%1d,%02d,"
-			"%02d,%02d,%03d,%02d,"
-			"%02d,%02d,%03d,%02d,"
-			"%02d,%02d,%03d,%02d,"
-			"%02d,%02d,%03d,%02d", pack->pack_count, pack->pack_index + 1, pack->sat_count, pack->sat_data[0].id,
-			pack->sat_data[0].elv, pack->sat_data[0].azimuth, pack->sat_data[0].sig, pack->sat_data[1].id,
-			pack->sat_data[1].elv, pack->sat_data[1].azimuth, pack->sat_data[1].sig, pack->sat_data[2].id,
-			pack->sat_data[2].elv, pack->sat_data[2].azimuth, pack->sat_data[2].sig, pack->sat_data[3].id,
-			pack->sat_data[3].elv, pack->sat_data[3].azimuth, pack->sat_data[3].sig);
+	char sCount[2];
+	char sIndex[2];
+	char sSatCount[4];
+	char sSatInfo[64];
+	char * psSatInfo = &sSatInfo[0];
+	int ssSatInfo = sizeof(sSatInfo);
+	bool satinview = nmea_INFO_is_present(pack, SATINVIEW);
+	int i;
+
+	sCount[0] = 0;
+	sIndex[0] = 0;
+	sSatCount[0] = 0;
+	sSatInfo[0] = 0;
+
+	if (satinview) {
+		snprintf(&sCount[0], sizeof(sCount), "%1d", pack->pack_count);
+		snprintf(&sIndex[0], sizeof(sIndex), "%1d", pack->pack_index);
+		snprintf(&sSatCount[0], sizeof(sSatCount), "%02d", pack->sat_count);
+	}
+	for (i = 0; i < NMEA_MAXSAT; i++) {
+		int cnt = 0;
+		if (satinview && pack->sat_data[i].id) {
+			cnt = snprintf(psSatInfo, ssSatInfo, "%02d,%02d,%03d,%02d", pack->sat_data[i].id, pack->sat_data[i].elv,
+					pack->sat_data[i].azimuth, pack->sat_data[i].sig);
+		} else {
+			cnt = snprintf(psSatInfo, ssSatInfo, ",,,");
+		}
+		ssSatInfo -= cnt;
+		psSatInfo += cnt;
+		if (i < (NMEA_MAXSAT - 1)) {
+			*psSatInfo = ',';
+			psSatInfo++;
+			ssSatInfo--;
+			*psSatInfo = '\0';
+		}
+	}
+
+	return nmea_printf(s, len, "$GPGSV,%s,%s,%s,%s", &sCount[0], &sIndex[0], &sSatCount[0], &sSatInfo[0]);
 }
 
 /**
@@ -340,18 +369,17 @@ static int nmea_gsv_npack(int sat_count) {
  *
  * @param info a pointer to the nmeaINFO structure
  * @param pack a pointer to the nmeaGPGSV structure
- * @param pack_idx pack index
+ * @param pack_idx pack index (zero based)
  */
 void nmea_info2GPGSV(const nmeaINFO *info, nmeaGPGSV *pack, int pack_idx) {
 	int sit, pit;
 
 	nmea_zero_GPGSV(pack);
 
+	pack->present = info->present;
+	nmea_INFO_unset_present(pack, SMASK);
 	pack->sat_count = (info->satinfo.inview <= NMEA_MAXSAT) ? info->satinfo.inview : NMEA_MAXSAT;
 	pack->pack_count = nmea_gsv_npack(pack->sat_count);
-
-	if (pack->pack_count == 0)
-		pack->pack_count = 1;
 
 	if (pack_idx >= pack->pack_count)
 		pack->pack_index = pack_idx % pack->pack_count;
