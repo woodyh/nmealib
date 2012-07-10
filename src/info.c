@@ -27,10 +27,13 @@
 #include <math.h>
 #include <time.h>
 #include <sys/time.h>
+#include <assert.h>
 
 void nmea_time_now(nmeaTIME *utc, void * info) {
 	struct timeval tp;
 	struct tm tt;
+
+	assert(utc);
 
 	gettimeofday(&tp, NULL );
 	gmtime_r(&tp.tv_sec, &tt);
