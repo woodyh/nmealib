@@ -89,6 +89,9 @@ void nmea_GPGGA2info(const nmeaGPGGA *pack, nmeaINFO *info) {
  * @param pack a pointer to the nmeaGPGGA structure
  */
 void nmea_info2GPGGA(const nmeaINFO *info, nmeaGPGGA *pack) {
+	assert(pack);
+	assert(info);
+
 	nmea_zero_GPGGA(pack);
 
 	pack->present = info->present;
@@ -174,6 +177,9 @@ void nmea_GPGSA2info(const nmeaGPGSA *pack, nmeaINFO *info) {
  * @param pack a pointer to the nmeaGPGSA structure
  */
 void nmea_info2GPGSA(const nmeaINFO *info, nmeaGPGSA *pack) {
+	assert(pack);
+	assert(info);
+
 	nmea_zero_GPGSA(pack);
 
 	pack->present = info->present;
@@ -237,6 +243,9 @@ void nmea_GPGSV2info(const nmeaGPGSV *pack, nmeaINFO *info) {
  */
 void nmea_info2GPGSV(const nmeaINFO *info, nmeaGPGSV *pack, int pack_idx) {
 	int sit, pit;
+
+	assert(pack);
+	assert(info);
 
 	nmea_zero_GPGSV(pack);
 
@@ -313,6 +322,9 @@ void nmea_GPRMC2info(const nmeaGPRMC *pack, nmeaINFO *info) {
  * @param pack a pointer to the nmeaGPRMC structure
  */
 void nmea_info2GPRMC(const nmeaINFO *info, nmeaGPRMC *pack) {
+	assert(pack);
+	assert(info);
+
 	nmea_zero_GPRMC(pack);
 
 	pack->present = info->present;
@@ -361,6 +373,9 @@ void nmea_GPVTG2info(const nmeaGPVTG *pack, nmeaINFO *info) {
  * @param pack a pointer to the nmeaGPRMC structure
  */
 void nmea_info2GPVTG(const nmeaINFO *info, nmeaGPVTG *pack) {
+	assert(pack);
+	assert(info);
+
 	nmea_zero_GPVTG(pack);
 
 	pack->present = info->present;
