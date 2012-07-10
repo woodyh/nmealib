@@ -47,7 +47,7 @@ int nmea_gsv_npack(int sat_count) {
  * @param pack a pointer to the packet structure
  * @param info a pointer to the nmeaINFO structure
  */
-void nmea_GPGGA2info(nmeaGPGGA *pack, nmeaINFO *info) {
+void nmea_GPGGA2info(const nmeaGPGGA *pack, nmeaINFO *info) {
 	assert(pack);
 	assert(info);
 
@@ -115,7 +115,7 @@ void nmea_info2GPGGA(const nmeaINFO *info, nmeaGPGGA *pack) {
  * @param pack a pointer to the packet structure
  * @param info a pointer to the nmeaINFO structure
  */
-void nmea_GPGSA2info(nmeaGPGSA *pack, nmeaINFO *info) {
+void nmea_GPGSA2info(const nmeaGPGSA *pack, nmeaINFO *info) {
 	int i = 0;
 
 	assert(pack);
@@ -173,10 +173,11 @@ void nmea_info2GPGSA(const nmeaINFO *info, nmeaGPGSA *pack) {
  * @param pack a pointer to the packet structure
  * @param info a pointer to the nmeaINFO structure
  */
-void nmea_GPGSV2info(nmeaGPGSV *pack, nmeaINFO *info) {
+void nmea_GPGSV2info(const nmeaGPGSV *pack, nmeaINFO *info) {
 	int sat_offset;
 	int sat_count;
 	int sat_index;
+	int pack_index;
 
 	assert(pack);
 	assert(info);
@@ -184,8 +185,9 @@ void nmea_GPGSV2info(nmeaGPGSV *pack, nmeaINFO *info) {
 	if ((pack->pack_index > pack->pack_count) || ((pack->pack_index * NMEA_SATINPACK) > NMEA_MAXSAT))
 		return;
 
-	if (pack->pack_index < 1)
-		pack->pack_index = 1;
+	pack_index = pack->pack_index;
+	if (pack_index < 1)
+		pack_index = 1;
 
 	info->present |= pack->present;
 	nmea_INFO_set_present(info, SMASK);
@@ -194,7 +196,7 @@ void nmea_GPGSV2info(nmeaGPGSV *pack, nmeaINFO *info) {
 		info->satinfo.inview = pack->sat_count;
 
 		/* index of 1st sat in pack */
-		sat_offset = (pack->pack_index - 1) * NMEA_SATINPACK;
+		sat_offset = (pack_index - 1) * NMEA_SATINPACK;
 		/* the number of sats in this sentence */
 		sat_count = ((sat_offset + NMEA_SATINPACK) > pack->sat_count) ? (pack->sat_count - sat_offset) : NMEA_SATINPACK;
 
@@ -239,7 +241,7 @@ void nmea_info2GPGSV(const nmeaINFO *info, nmeaGPGSV *pack, int pack_idx) {
  * @param pack a pointer to the packet structure
  * @param info a pointer to the nmeaINFO structure
  */
-void nmea_GPRMC2info(nmeaGPRMC *pack, nmeaINFO *info) {
+void nmea_GPRMC2info(const nmeaGPRMC *pack, nmeaINFO *info) {
 	assert(pack);
 	assert(info);
 
@@ -315,7 +317,7 @@ void nmea_info2GPRMC(const nmeaINFO *info, nmeaGPRMC *pack) {
  * @param pack a pointer to the packet structure
  * @param info a pointer to the nmeaINFO structure
  */
-void nmea_GPVTG2info(nmeaGPVTG *pack, nmeaINFO *info) {
+void nmea_GPVTG2info(const nmeaGPVTG *pack, nmeaINFO *info) {
 	assert(pack);
 	assert(info);
 

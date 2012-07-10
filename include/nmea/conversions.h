@@ -30,19 +30,19 @@ extern "C" {
 
 int nmea_gsv_npack(int sat_count);
 
-void nmea_GPGGA2info(nmeaGPGGA *pack, nmeaINFO *info);
+void nmea_GPGGA2info(const nmeaGPGGA *pack, nmeaINFO *info);
 void nmea_info2GPGGA(const nmeaINFO *info, nmeaGPGGA *pack);
 
-void nmea_GPGSA2info(nmeaGPGSA *pack, nmeaINFO *info);
+void nmea_GPGSA2info(const nmeaGPGSA *pack, nmeaINFO *info);
 void nmea_info2GPGSA(const nmeaINFO *info, nmeaGPGSA *pack);
 
-void nmea_GPGSV2info(nmeaGPGSV *pack, nmeaINFO *info);
+void nmea_GPGSV2info(const nmeaGPGSV *pack, nmeaINFO *info);
 void nmea_info2GPGSV(const nmeaINFO *info, nmeaGPGSV *pack, int pack_idx);
 
-void nmea_GPRMC2info(nmeaGPRMC *pack, nmeaINFO *info);
+void nmea_GPRMC2info(const nmeaGPRMC *pack, nmeaINFO *info);
 void nmea_info2GPRMC(const nmeaINFO *info, nmeaGPRMC *pack);
 
-void nmea_GPVTG2info(nmeaGPVTG *pack, nmeaINFO *info);
+void nmea_GPVTG2info(const nmeaGPVTG *pack, nmeaINFO *info);
 void nmea_info2GPVTG(const nmeaINFO *info, nmeaGPVTG *pack);
 
 #ifdef  __cplusplus
