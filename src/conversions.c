@@ -29,14 +29,17 @@
 /**
  * Determine the number of GSV sentences needed for a number of sats
  *
- * @param sat_count the number of sats
+ * @param sats the number of sats
  * @return the number of GSV sentences needed
  */
-int nmea_gsv_npack(int sat_count) {
-	int pack_count = lrint(ceil((double) sat_count / (double) NMEA_SATINPACK));
+int nmea_gsv_npack(int sats) {
+	int pack_count = sats / NMEA_SATINPACK;
+
+	if ((sats % NMEA_SATINPACK) > 0)
+		pack_count++;
 
 	if (!pack_count)
-		pack_count = 1;
+		pack_count++;
 
 	return pack_count;
 }
