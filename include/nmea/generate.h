@@ -42,8 +42,6 @@ void nmea_info2GPGSV(const nmeaINFO *info, nmeaGPGSV *pack, int pack_idx);
 void nmea_info2GPRMC(const nmeaINFO *info, nmeaGPRMC *pack);
 void nmea_info2GPVTG(const nmeaINFO *info, nmeaGPVTG *pack);
 
-int nmea_gsv_npack(int sat_count);
-
 #ifdef  __cplusplus
 }
 #endif

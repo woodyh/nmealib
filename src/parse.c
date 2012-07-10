@@ -458,30 +458,61 @@ int nmea_parse_GPGSA(const char *s, int len, nmeaGPGSA *pack) {
  * @return 1 (true) - if parsed successfully or 0 (false) otherwise.
  */
 int nmea_parse_GPGSV(const char *s, int len, nmeaGPGSV *pack) {
-	int nsen, nsat;
+	int token_count;
+	int token_count_expected;
+	int sat_count;
+	int sat_counted = 0;
 
-	assert(s && pack);
-
-	memset(pack, 0, sizeof(nmeaGPGSV));
+	assert(s);
+	assert(pack);
 
 	nmea_trace_buff(s, len);
 
-	nsen = nmea_scanf(s, len, "$GPGSV,%d,%d,%d,"
-			"%d,%d,%d,%d,"
-			"%d,%d,%d,%d,"
-			"%d,%d,%d,%d,"
-			"%d,%d,%d,%d*", &(pack->pack_count), &(pack->pack_index), &(pack->sat_count), &(pack->sat_data[0].id),
-			&(pack->sat_data[0].elv), &(pack->sat_data[0].azimuth), &(pack->sat_data[0].sig), &(pack->sat_data[1].id),
-			&(pack->sat_data[1].elv), &(pack->sat_data[1].azimuth), &(pack->sat_data[1].sig), &(pack->sat_data[2].id),
-			&(pack->sat_data[2].elv), &(pack->sat_data[2].azimuth), &(pack->sat_data[2].sig), &(pack->sat_data[3].id),
-			&(pack->sat_data[3].elv), &(pack->sat_data[3].azimuth), &(pack->sat_data[3].sig));
+	/*
+	 * Clear before parsing, to be able to detect absent fields
+	 */
+	memset(pack, 0, sizeof(nmeaGPGSV));
 
-	nsat = (pack->pack_index - 1) * NMEA_SATINPACK;
-	nsat = (nsat + NMEA_SATINPACK > pack->sat_count) ? pack->sat_count - nsat : NMEA_SATINPACK;
-	nsat = nsat * 4 + 3 /* first three sentence`s */;
+	/* parse */
+	token_count = nmea_scanf(s, len, "$GPGSV,%d,%d,%d,"
+			"%d,%d,%d,%d,"
+			"%d,%d,%d,%d,"
+			"%d,%d,%d,%d,"
+			"%d,%d,%d,%d*", &pack->pack_count, &pack->pack_index, &pack->sat_count, &pack->sat_data[0].id,
+			&pack->sat_data[0].elv, &pack->sat_data[0].azimuth, &pack->sat_data[0].sig, &pack->sat_data[1].id,
+			&pack->sat_data[1].elv, &pack->sat_data[1].azimuth, &pack->sat_data[1].sig, &pack->sat_data[2].id,
+			&pack->sat_data[2].elv, &pack->sat_data[2].azimuth, &pack->sat_data[2].sig, &pack->sat_data[3].id,
+			&pack->sat_data[3].elv, &pack->sat_data[3].azimuth, &pack->sat_data[3].sig);
 
-	if (nsen < nsat || nsen > (NMEA_SATINPACK * 4 + 3)) {
-		nmea_error("GPGSV parse error!");
+	/* return if we have no sentences or sats */
+	if ((pack->pack_count < 1) || (pack->pack_index < 1) || (pack->pack_index > NMEA_MAXSAT) || (pack->sat_count < 0)) {
+		nmea_error("GPGSV parse error, inconsistent pack (count/index/satcount = %d/%d/%d)", pack->pack_count,
+				pack->pack_index, pack->sat_count);
+		return 0;
+	}
+
+	/* index of 1st sat in pack */
+	sat_count = (pack->pack_index - 1) * NMEA_SATINPACK;
+	/* the number of sats in this sentence */
+	sat_count = ((sat_count + NMEA_SATINPACK) > pack->sat_count) ? (pack->sat_count - sat_count) : NMEA_SATINPACK;
+	/* the number of tokens that must be in this sentence */
+	token_count_expected = (sat_count * 4) + 3;
+
+	/* see that we have enough tokens */
+	if ((token_count < token_count_expected) || (token_count > (NMEA_SATINPACK * 4 + 3))) {
+		nmea_error("GPGSV parse error, need %d tokens, got %d", token_count_expected, token_count);
+		return 0;
+	}
+
+	/* count the number of sats in the sentence */
+	for (sat_count = 0; sat_count < NMEA_SATINPACK; sat_count++) {
+		if (pack->sat_data[sat_count].id > 1) {
+			sat_counted++;
+		}
+	}
+
+	if (sat_counted != pack->sat_count) {
+		nmea_error("GPGSV parse error, did not receive %d sats, got %d", pack->sat_count, sat_counted);
 		return 0;
 	}
 
@@ -814,30 +845,33 @@ void nmea_GPGSA2info(nmeaGPGSA *pack, nmeaINFO *info) {
  * @param info a pointer to the nmeaINFO structure
  */
 void nmea_GPGSV2info(nmeaGPGSV *pack, nmeaINFO *info) {
-	int isat, isi, nsat;
+	int sat_offset;
+	int sat_count;
+	int sat_index;
 
-	assert(pack && info);
+	assert(pack);
+	assert(info);
 
-	if (pack->pack_index > pack->pack_count || pack->pack_index * NMEA_SATINPACK > NMEA_MAXSAT)
+	if ((pack->pack_index > pack->pack_count) || ((pack->pack_index * NMEA_SATINPACK) > NMEA_MAXSAT))
 		return;
 
 	if (pack->pack_index < 1)
 		pack->pack_index = 1;
 
+	info->smask |= GPGSV;
 	info->satinfo.inview = pack->sat_count;
 
-	nsat = (pack->pack_index - 1) * NMEA_SATINPACK;
-	nsat = (nsat + NMEA_SATINPACK > pack->sat_count) ? pack->sat_count - nsat : NMEA_SATINPACK;
+	/* index of 1st sat in pack */
+	sat_offset = (pack->pack_index - 1) * NMEA_SATINPACK;
+	/* the number of sats in this sentence */
+	sat_count = ((sat_offset + NMEA_SATINPACK) > pack->sat_count) ? (pack->sat_count - sat_offset) : NMEA_SATINPACK;
 
-	for (isat = 0; isat < nsat; ++isat) {
-		isi = (pack->pack_index - 1) * NMEA_SATINPACK + isat;
-		info->satinfo.sat[isi].id = pack->sat_data[isat].id;
-		info->satinfo.sat[isi].elv = pack->sat_data[isat].elv;
-		info->satinfo.sat[isi].azimuth = pack->sat_data[isat].azimuth;
-		info->satinfo.sat[isi].sig = pack->sat_data[isat].sig;
+	for (sat_index = 0; sat_index < sat_count; sat_index++) {
+		info->satinfo.sat[sat_offset + sat_index].id = pack->sat_data[sat_index].id;
+		info->satinfo.sat[sat_offset + sat_index].elv = pack->sat_data[sat_index].elv;
+		info->satinfo.sat[sat_offset + sat_index].azimuth = pack->sat_data[sat_index].azimuth;
+		info->satinfo.sat[sat_offset + sat_index].sig = pack->sat_data[sat_index].sig;
 	}
-
-	info->smask |= GPGSV;
 }
 
 /**

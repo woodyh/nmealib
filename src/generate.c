@@ -326,10 +326,10 @@ void nmea_info2GPGSA(const nmeaINFO *info, nmeaGPGSA *pack) {
 	pack->VDOP = info->VDOP;
 }
 
-int nmea_gsv_npack(int sat_count) {
-	int pack_count = lrint(ceil(((double) sat_count) / (double) NMEA_SATINPACK));
+static int nmea_gsv_npack(int sat_count) {
+	int pack_count = lrint(ceil((double) sat_count / (double) NMEA_SATINPACK));
 
-	if (0 == pack_count)
+	if (!pack_count)
 		pack_count = 1;
 
 	return pack_count;
