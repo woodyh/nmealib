@@ -56,7 +56,7 @@ clean:
 	rm -fr build lib
 
 doc:
-	$(MAKE) -C doc all
+	@$(MAKE) -C doc all
 
 doc-clean:
 	@$(MAKE) -C doc clean
