@@ -19,7 +19,8 @@
  */
 
 #include <nmea/conversions.h>
-#include <nmea/units.h>
+
+#include <nmea/gmath.h>
 
 #include <assert.h>
 #include <string.h>

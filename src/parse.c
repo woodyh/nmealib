@@ -20,10 +20,10 @@
 
 #include <nmea/parse.h>
 
+#include <nmea/gmath.h>
 #include <nmea/info.h>
 #include <nmea/tok.h>
 #include <nmea/context.h>
-#include <nmea/units.h>
 
 #include <string.h>
 #include <assert.h>

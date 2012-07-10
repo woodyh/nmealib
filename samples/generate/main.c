@@ -19,7 +19,8 @@
  */
 
 #include <nmea/info.h>
-#include <nmea/units.h>
+
+#include <nmea/gmath.h>
 #include <nmea/generate.h>
 
 #include <stdio.h>
