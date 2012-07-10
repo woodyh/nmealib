@@ -24,9 +24,14 @@
 #include <nmea/info.h>
 #include <nmea/sentence.h>
 
+#include <stdbool.h>
+#include <stddef.h>
+
 #ifdef  __cplusplus
 extern "C" {
 #endif
+
+bool nmea_string_has_invalid_chars(const char * str, const char * strName, char * report, size_t reportSize);
 
 int nmea_pack_type(const char *s, int len);
 int nmea_find_tail(const char *s, int len, int *checksum);
