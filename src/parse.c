@@ -119,7 +119,7 @@ static bool validateDate(nmeaTIME * t) {
 		return false;
 	}
 
-	if (!((t->year >= 90) && (t->year < 190) && (t->mon >= 0) && (t->mon < 12) && (t->day >= 0) && (t->day < 31))) {
+	if (!((t->year >= 90) && (t->year <= 189) && (t->mon >= 0) && (t->mon <= 11) && (t->day >= 1) && (t->day <= 31))) {
 		nmea_error("Parse error: invalid date (%d-%d-%d - D-M-Y)", t->day, t->mon, t->year);
 		return false;
 	}
