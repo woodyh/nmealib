@@ -57,6 +57,14 @@ void nmea_time_now(nmeaTIME *utc, uint32_t * present) {
 	}
 }
 
+/**
+ * Clear an info structure.
+ * Resets the time to now, sets up the signal as BAD, the FIX as BAD, and
+ * signals presence of these fields.
+ * Resets all other fields to 0.
+ *
+ * @param info a pointer to the structure
+ */
 void nmea_zero_INFO(nmeaINFO *info) {
 	if (!info) {
 		return;
