@@ -183,7 +183,7 @@ typedef enum _nmeaINFO_FIELD {
 	SATINVIEW		= (1 << 17)
 } nmeaINFO_FIELD;
 
-void nmea_time_now(nmeaTIME *utc, void * info);
+void nmea_time_now(nmeaTIME *utc, uint32_t * present);
 void nmea_zero_INFO(nmeaINFO *info);
 
 /**

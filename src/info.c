@@ -29,7 +29,14 @@
 #include <sys/time.h>
 #include <assert.h>
 
-void nmea_time_now(nmeaTIME *utc, void * info) {
+/**
+ * Reset the time to now
+ *
+ * @param utc a pointer to the time structure
+ * @param present a pointer to a present field. when non-NULL then the UTCDATE
+ * and UTCTIME flags are set in it.
+ */
+void nmea_time_now(nmeaTIME *utc, uint32_t * present) {
 	struct timeval tp;
 	struct tm tt;
 
@@ -45,9 +52,8 @@ void nmea_time_now(nmeaTIME *utc, void * info) {
 	utc->min = tt.tm_min;
 	utc->sec = tt.tm_sec;
 	utc->hsec = (tp.tv_usec / 10000);
-	if (info) {
-		nmea_INFO_set_present((nmeaINFO *)info, UTCDATE);
-		nmea_INFO_set_present((nmeaINFO *)info, UTCTIME);
+	if (present) {
+		*present |= (UTCDATE | UTCTIME);
 	}
 }
 
@@ -57,7 +63,7 @@ void nmea_zero_INFO(nmeaINFO *info) {
 	}
 
 	memset(info, 0, sizeof(nmeaINFO));
-	nmea_time_now(&info->utc, info);
+	nmea_time_now(&info->utc, &info->present);
 
 	info->sig = NMEA_SIG_BAD;
 	nmea_INFO_set_present(info, SIG);
