@@ -149,14 +149,14 @@ void nmea_GPGSA2info(const nmeaGPGSA *pack, nmeaINFO *info) {
 	info->present |= pack->present;
 	nmea_INFO_set_present(info, SMASK);
 	info->smask |= GPGSA;
-	/* fix_mode is ignored */
 	if (nmea_INFO_is_present(pack, FIX)) {
+		/* fix_mode is ignored */
 		info->fix = pack->fix_type;
 	}
 	if (nmea_INFO_is_present(pack, SATINUSE)) {
 		assert(sizeof(info->satinfo.in_use) == sizeof(info->satinfo.in_use));
-		memcpy(info->satinfo.in_use, pack->sat_prn, sizeof(info->satinfo.in_use));
 		for (i = 0; i < NMEA_MAXSAT; i++) {
+			info->satinfo.in_use[i] = pack->sat_prn[i];
 			if (pack->sat_prn[i]) {
 				info->satinfo.inuse++;
 			}
@@ -188,12 +188,22 @@ void nmea_info2GPGSA(const nmeaINFO *info, nmeaGPGSA *pack) {
 
 	pack->present = info->present;
 	nmea_INFO_unset_present(pack, SMASK);
-	pack->fix_mode = 'A';
-	pack->fix_type = info->fix;
-	memcpy(pack->sat_prn, info->satinfo.in_use, sizeof(pack->sat_prn));
-	pack->PDOP = info->PDOP;
-	pack->HDOP = info->HDOP;
-	pack->VDOP = info->VDOP;
+	if (nmea_INFO_is_present(info, FIX)) {
+		pack->fix_mode = 'A';
+		pack->fix_type = info->fix;
+	}
+	if (nmea_INFO_is_present(info, SATINUSE)) {
+		memcpy(pack->sat_prn, info->satinfo.in_use, sizeof(pack->sat_prn));
+	}
+	if (nmea_INFO_is_present(info, PDOP)) {
+		pack->PDOP = info->PDOP;
+	}
+	if (nmea_INFO_is_present(info, HDOP)) {
+		pack->HDOP = info->HDOP;
+	}
+	if (nmea_INFO_is_present(info, VDOP)) {
+		pack->VDOP = info->VDOP;
+	}
 }
 
 /**
