@@ -95,7 +95,7 @@ static bool validateTime(nmeaTIME * t) {
 
 	if (!((t->hour >= 0) && (t->hour < 24) && (t->min >= 0) && (t->min < 60) && (t->sec >= 0) && (t->sec <= 60)
 			&& (t->hsec >= 0) && (t->hsec < 100))) {
-		nmea_error("Parse error: invalid time (%02d%02d%02d.%02d)", t->hour, t->min, t->sec, t->hsec);
+		nmea_error("Parse error: invalid time (%d:%d:%d.%d)", t->hour, t->min, t->sec, t->hsec);
 		return false;
 	}
 
@@ -120,7 +120,7 @@ static bool validateDate(nmeaTIME * t) {
 	}
 
 	if (!((t->year >= 90) && (t->year < 190) && (t->mon >= 0) && (t->mon < 12) && (t->day >= 0) && (t->day < 31))) {
-		nmea_error("Parse error: invalid date (%02d%02d%02d)", t->day, t->mon, t->year);
+		nmea_error("Parse error: invalid date (%d-%d-%d - D-M-Y)", t->day, t->mon, t->year);
 		return false;
 	}
 
