@@ -129,25 +129,31 @@ typedef struct _nmeaINFO {
 
 	nmeaTIME utc;					/**< UTC of position */
 
-	int sig;						/**< GPS quality indicator (0 = Invalid; 1 = Fix;
-											2 = Differential, 3 = Sensitive,
-											4 = Real Time Kinematic, 5 = Float RTK,
-											6 = estimated (dead reckoning) (2.3 feature),
-											7 = Manual input mode, 8 = Simulation mode) */
+	int sig;						/**< GPS quality indicator: 0 = Invalid
+	                                                            1 = Fix;
+											                    2 = Differential
+											                    3 = Sensitive
+											                    4 = Real Time Kinematic
+											                    5 = Float RTK,
+											                    6 = estimated (dead reckoning) (v2.3)
+											                    7 = Manual input mode
+											                    8 = Simulation mode) */
 
-	int fix;						/**< Operating mode, used for navigation (1 = Fix not available; 2 = 2D; 3 = 3D) */
+	int fix;						/**< Operating mode, used for navigation: 1 = Fix not available
+	                                                                          2 = 2D
+	                                                                          3 = 3D) */
 
 	double PDOP;					/**< Position Dilution Of Precision */
 	double HDOP;					/**< Horizontal Dilution Of Precision */
 	double VDOP;					/**< Vertical Dilution Of Precision */
 
-	double lat;						/**< Latitude in NDEG - +/-[degree][min].[sec/60] */
-	double lon;						/**< Longitude in NDEG - +/-[degree][min].[sec/60] */
+	double lat;						/**< Latitude in NDEG:  +/-[degree][min].[sec/60] */
+	double lon;						/**< Longitude in NDEG: +/-[degree][min].[sec/60] */
 	double elv;						/**< Antenna altitude above/below mean sea level (geoid) in meters */
-	double speed;					/**< Speed over the ground in kilometers/hour */
+	double speed;					/**< Speed over the ground in kph */
 	double track;					/**< Track angle in degrees True */
 	double mtrack;					/**< Magnetic Track angle in degrees True */
-	double magvar;					/**< Magnetic variation degrees (Easterly var. subtracts from true course) */
+	double magvar;					/**< Magnetic variation degrees */
 
 	nmeaSATINFO satinfo;			/**< Satellites information */
 } nmeaINFO;
