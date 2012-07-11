@@ -357,7 +357,7 @@ int nmea_parse_GPGGA(const char *s, const int len, nmeaGPGGA *pack) {
 	pack->lon = NAN;
 	pack->ew = 0;
 	pack->sig = -1;
-	pack->satinuse = 0;
+	pack->satinuse = -1;
 	pack->HDOP = NAN;
 	pack->elv = NAN;
 	pack->elv_units = 0;
@@ -380,6 +380,8 @@ int nmea_parse_GPGGA(const char *s, const int len, nmeaGPGGA *pack) {
 	/* determine which fields are present and validate them */
 
 	time_buff_len = strlen(&time_buff[0]);
+	if (time_buff_len > (NMEA_TIMEPARSE_BUF - 1))
+		time_buff_len = NMEA_TIMEPARSE_BUF - 1;
 	if (time_buff_len) {
 		if (!_nmea_parse_time(&time_buff[0], time_buff_len, &pack->utc)) {
 			return 0;
@@ -391,48 +393,41 @@ int nmea_parse_GPGGA(const char *s, const int len, nmeaGPGGA *pack) {
 
 		nmea_INFO_set_present(pack, UTCTIME);
 	}
-	if (pack->lat != NAN) {
-		if (!pack->ns) {
-			pack->ns = 'N';
-		} else {
-			if (!validateNSEW(&pack->ns, true)) {
-				return 0;
-			}
-
-			/* only when lat and ns are present and valid */
-			nmea_INFO_set_present(pack, LAT);
+	if ((pack->lat != NAN) && (pack->ns)) {
+		if (!validateNSEW(&pack->ns, true)) {
+			return 0;
 		}
+
+		nmea_INFO_set_present(pack, LAT);
 	}
-	if (pack->lon != NAN) {
-		if (!pack->ew) {
-			pack->ew = 'E';
-		} else {
-			if (!validateNSEW(&pack->ew, false)) {
-				return 0;
-			}
-
-			/* only when lon and ew are present and valid */
-			nmea_INFO_set_present(pack, LON);
+	if ((pack->lon != NAN) && (pack->ew)) {
+		if (!validateNSEW(&pack->ew, false)) {
+			return 0;
 		}
+
+		nmea_INFO_set_present(pack, LON);
 	}
 	if (pack->sig != -1) {
+		if (!((pack->sig >= 0) && (pack->sig <= 8))) {
+			nmea_error("Parse error: invalid signal %d, expected [0, 8]", pack->sig);
+			return 0;
+		}
+
 		nmea_INFO_set_present(pack, SIG);
+	}
+	if (pack->satinuse != -1) {
+		nmea_INFO_set_present(pack, SATINUSECOUNT);
 	}
 	if (pack->HDOP != NAN) {
 		nmea_INFO_set_present(pack, HDOP);
 	}
-	if (pack->elv != NAN) {
-		if (!pack->elv_units) {
-			pack->elv_units = 'M';
-		} else {
-			if (pack->elv_units != 'M') {
-				nmea_error("Parse error: invalid elevation unit (%c)", pack->elv_units);
-				return 0;
-			}
-
-			/* only when elv and elv_units are present and valid */
-			nmea_INFO_set_present(pack, ELV);
+	if ((pack->elv != NAN) && (pack->elv_units)) {
+		if (pack->elv_units != 'M') {
+			nmea_error("Parse error: invalid elevation unit (%c)", pack->elv_units);
+			return 0;
 		}
+
+		nmea_INFO_set_present(pack, ELV);
 	}
 	/* ignore diff and diff_units */
 	/* ignore dgps_age and dgps_sid */
