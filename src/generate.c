@@ -34,7 +34,7 @@
  * @param pack the structure
  * @return the length of the generated sentence
  */
-int nmea_gen_GPGGA(char *s, int len, nmeaGPGGA *pack) {
+int nmea_gen_GPGGA(char *s, const int len, const nmeaGPGGA *pack) {
 	char sTime[16];
 	char sLat[16];
 	char sNs[2];
@@ -91,7 +91,7 @@ int nmea_gen_GPGGA(char *s, int len, nmeaGPGGA *pack) {
  * @param pack the structure
  * @return the length of the generated sentence
  */
-int nmea_gen_GPGSA(char *s, int len, nmeaGPGSA *pack) {
+int nmea_gen_GPGSA(char *s, const int len, const nmeaGPGSA *pack) {
 	int i;
 	char sFixMode[2];
 	char sFixType[2];
@@ -152,7 +152,7 @@ int nmea_gen_GPGSA(char *s, int len, nmeaGPGSA *pack) {
  * @param pack the structure
  * @return the length of the generated sentence
  */
-int nmea_gen_GPGSV(char *s, int len, nmeaGPGSV *pack) {
+int nmea_gen_GPGSV(char *s, const int len, const nmeaGPGSV *pack) {
 	char sCount[2];
 	char sIndex[2];
 	char sSatCount[4];
@@ -201,7 +201,7 @@ int nmea_gen_GPGSV(char *s, int len, nmeaGPGSV *pack) {
  * @param pack the structure
  * @return the length of the generated sentence
  */
-int nmea_gen_GPRMC(char *s, int len, nmeaGPRMC *pack) {
+int nmea_gen_GPRMC(char *s, const int len, const nmeaGPRMC *pack) {
 	char sTime[16];
 	char sDate[16];
 	char sLat[16];
@@ -267,7 +267,7 @@ int nmea_gen_GPRMC(char *s, int len, nmeaGPRMC *pack) {
  * @param pack the structure
  * @return the length of the generated sentence
  */
-int nmea_gen_GPVTG(char *s, int len, nmeaGPVTG *pack) {
+int nmea_gen_GPVTG(char *s, const int len, const nmeaGPVTG *pack) {
 	char sTrackT[16];
 	char sTrackM[16];
 	char sSpeedN[16];
@@ -305,7 +305,7 @@ int nmea_gen_GPVTG(char *s, int len, nmeaGPVTG *pack) {
 			&sUnitM[0], &sSpeedN[0], &sUnitN[0], &sSpeedK[0], &sUnitK[0]);
 }
 
-int nmea_generate(char *buff, int buff_sz, const nmeaINFO *info, int generate_mask) {
+int nmea_generate(char *s, const int len, const nmeaINFO *info, const int generate_mask) {
 	int gen_count = 0, gsv_it, gsv_count;
 	int pack_mask = generate_mask;
 
@@ -315,37 +315,37 @@ int nmea_generate(char *buff, int buff_sz, const nmeaINFO *info, int generate_ma
 	nmeaGPRMC rmc;
 	nmeaGPVTG vtg;
 
-	if (!buff)
+	if (!s)
 		return 0;
 
 	while (pack_mask) {
 		if (pack_mask & GPGGA) {
 			nmea_info2GPGGA(info, &gga);
-			gen_count += nmea_gen_GPGGA(buff + gen_count, buff_sz - gen_count, &gga);
+			gen_count += nmea_gen_GPGGA(s + gen_count, len - gen_count, &gga);
 			pack_mask &= ~GPGGA;
 		} else if (pack_mask & GPGSA) {
 			nmea_info2GPGSA(info, &gsa);
-			gen_count += nmea_gen_GPGSA(buff + gen_count, buff_sz - gen_count, &gsa);
+			gen_count += nmea_gen_GPGSA(s + gen_count, len - gen_count, &gsa);
 			pack_mask &= ~GPGSA;
 		} else if (pack_mask & GPGSV) {
 			gsv_count = nmea_gsv_npack(info->satinfo.inview);
-			for (gsv_it = 0; gsv_it < gsv_count && buff_sz - gen_count > 0; gsv_it++) {
+			for (gsv_it = 0; gsv_it < gsv_count && len - gen_count > 0; gsv_it++) {
 				nmea_info2GPGSV(info, &gsv, gsv_it);
-				gen_count += nmea_gen_GPGSV(buff + gen_count, buff_sz - gen_count, &gsv);
+				gen_count += nmea_gen_GPGSV(s + gen_count, len - gen_count, &gsv);
 			}
 			pack_mask &= ~GPGSV;
 		} else if (pack_mask & GPRMC) {
 			nmea_info2GPRMC(info, &rmc);
-			gen_count += nmea_gen_GPRMC(buff + gen_count, buff_sz - gen_count, &rmc);
+			gen_count += nmea_gen_GPRMC(s + gen_count, len - gen_count, &rmc);
 			pack_mask &= ~GPRMC;
 		} else if (pack_mask & GPVTG) {
 			nmea_info2GPVTG(info, &vtg);
-			gen_count += nmea_gen_GPVTG(buff + gen_count, buff_sz - gen_count, &vtg);
+			gen_count += nmea_gen_GPVTG(s + gen_count, len - gen_count, &vtg);
 			pack_mask &= ~GPVTG;
 		} else
 			break;
 
-		if (buff_sz - gen_count <= 0)
+		if (len - gen_count <= 0)
 			break;
 	}
 

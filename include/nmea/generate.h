@@ -27,13 +27,13 @@
 extern "C" {
 #endif
 
-int nmea_gen_GPGGA(char *s, int len, nmeaGPGGA *pack);
-int nmea_gen_GPGSA(char *s, int len, nmeaGPGSA *pack);
-int nmea_gen_GPGSV(char *s, int len, nmeaGPGSV *pack);
-int nmea_gen_GPRMC(char *s, int len, nmeaGPRMC *pack);
-int nmea_gen_GPVTG(char *s, int len, nmeaGPVTG *pack);
+int nmea_gen_GPGGA(char *s, const int len, const nmeaGPGGA *pack);
+int nmea_gen_GPGSA(char *s, const int len, const nmeaGPGSA *pack);
+int nmea_gen_GPGSV(char *s, const int len, const nmeaGPGSV *pack);
+int nmea_gen_GPRMC(char *s, const int len, const nmeaGPRMC *pack);
+int nmea_gen_GPVTG(char *s, const int len, const nmeaGPVTG *pack);
 
-int nmea_generate(char *buff, int buff_sz, const nmeaINFO *info, int generate_mask);
+int nmea_generate(char *s, const int len, const nmeaINFO *info, const int generate_mask);
 
 #ifdef  __cplusplus
 }
