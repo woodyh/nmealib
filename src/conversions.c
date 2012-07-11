@@ -213,31 +213,31 @@ void nmea_info2GPGSA(const nmeaINFO *info, nmeaGPGSA *pack) {
  * @param info a pointer to the nmeaINFO structure
  */
 void nmea_GPGSV2info(const nmeaGPGSV *pack, nmeaINFO *info) {
-	int sat_offset;
-	int sat_count;
-	int sat_index;
 	int pack_index;
 
 	assert(pack);
 	assert(info);
 
-	if ((pack->pack_index > pack->pack_count) || ((pack->pack_index * NMEA_SATINPACK) > NMEA_MAXSAT))
-		return;
-
 	pack_index = pack->pack_index;
 	if (pack_index < 1)
 		pack_index = 1;
+
+	if (pack_index > pack->pack_count)
+		pack_index = pack->pack_count;
+
+	if ((pack_index * NMEA_SATINPACK) > NMEA_MAXSAT)
+		pack_index = NMEA_NSATPACKS;
 
 	info->present |= pack->present;
 	nmea_INFO_set_present(info, SMASK);
 	info->smask |= GPGSV;
 	if (nmea_INFO_is_present(pack, SATINVIEW)) {
-		info->satinfo.inview = pack->sat_count;
+		int sat_index;
 
 		/* index of 1st sat in pack */
-		sat_offset = (pack_index - 1) * NMEA_SATINPACK;
+		int sat_offset = (pack_index - 1) * NMEA_SATINPACK;
 		/* the number of sats in this sentence */
-		sat_count = ((sat_offset + NMEA_SATINPACK) > pack->sat_count) ? (pack->sat_count - sat_offset) : NMEA_SATINPACK;
+		int sat_count = ((sat_offset + NMEA_SATINPACK) > pack->sat_count) ? (pack->sat_count - sat_offset) : NMEA_SATINPACK;
 
 		for (sat_index = 0; sat_index < sat_count; sat_index++) {
 			info->satinfo.sat[sat_offset + sat_index].id = pack->sat_data[sat_index].id;
@@ -245,6 +245,8 @@ void nmea_GPGSV2info(const nmeaGPGSV *pack, nmeaINFO *info) {
 			info->satinfo.sat[sat_offset + sat_index].azimuth = pack->sat_data[sat_index].azimuth;
 			info->satinfo.sat[sat_offset + sat_index].sig = pack->sat_data[sat_index].sig;
 		}
+
+		info->satinfo.inview = pack->sat_count;
 	}
 }
 
@@ -256,7 +258,8 @@ void nmea_GPGSV2info(const nmeaGPGSV *pack, nmeaINFO *info) {
  * @param pack_idx pack index (zero based)
  */
 void nmea_info2GPGSV(const nmeaINFO *info, nmeaGPGSV *pack, int pack_idx) {
-	int sit, pit;
+	int sit;
+	int pit;
 
 	assert(pack);
 	assert(info);
@@ -265,16 +268,18 @@ void nmea_info2GPGSV(const nmeaINFO *info, nmeaGPGSV *pack, int pack_idx) {
 
 	pack->present = info->present;
 	nmea_INFO_unset_present(pack, SMASK);
-	pack->sat_count = (info->satinfo.inview <= NMEA_MAXSAT) ? info->satinfo.inview : NMEA_MAXSAT;
-	pack->pack_count = nmea_gsv_npack(pack->sat_count);
+	if (nmea_INFO_is_present(info, SATINVIEW)) {
+		pack->sat_count = (info->satinfo.inview < NMEA_MAXSAT) ? info->satinfo.inview : NMEA_MAXSAT;
+		pack->pack_count = nmea_gsv_npack(pack->sat_count);
 
-	if (pack_idx >= pack->pack_count)
-		pack->pack_index = pack_idx % pack->pack_count;
-	else
-		pack->pack_index = pack_idx;
+		if (pack_idx >= pack->pack_count)
+			pack->pack_index = (pack_idx % pack->pack_count) + 1;
+		else
+			pack->pack_index = pack_idx + 1;
 
-	for (pit = 0, sit = pack->pack_index * NMEA_SATINPACK; pit < NMEA_SATINPACK; pit++, sit++)
-		pack->sat_data[pit] = info->satinfo.sat[sit];
+		for (pit = 0, sit = ((pack->pack_index - 1) * NMEA_SATINPACK); pit < NMEA_SATINPACK; pit++, sit++)
+			pack->sat_data[pit] = info->satinfo.sat[sit];
+	}
 }
 
 /**
