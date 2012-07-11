@@ -30,11 +30,13 @@
 #include <ctype.h>
 #include <stdio.h>
 
-#define NMEA_TIMEPARSE_BUF  (256)
+/** the size of the buffer to put time string (that is to be parsed) into */
+#define NMEA_TIMEPARSE_BUF  256
 
 /**
  * Parse nmeaTIME (time only, no date) from a string.
- * The format that is used (hhmmss, hhmmss.s, hhmmss.ss or hhmmss.sss) is determined by the length of the string.
+ * The format that is used (hhmmss, hhmmss.s, hhmmss.ss or hhmmss.sss) is
+ * determined by the length of the string.
  *
  * @param s the string
  * @param len the length of the string
@@ -104,9 +106,9 @@ static bool validateTime(nmeaTIME * t) {
  * Validate the date fields in an nmeaTIME structure.
  * Expects:
  * <pre>
- *   90 <= year  < 190
- *    0 <= month <  12
- *    0 <= day   <  31
+ *   year  [90, 189]
+ *   month [ 0,  11]
+ *   day   [ 1,  31]
  * </pre>
  *
  * @param t a pointer to the structure
