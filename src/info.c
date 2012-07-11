@@ -115,6 +115,8 @@ void nmea_INFO_sanitise(nmeaINFO *nmeaInfo) {
 		return;
 	}
 
+	nmeaInfo->present = nmeaInfo->present & NMEA_INFO_PRESENT_MASK;
+
 	if (!nmea_INFO_is_present(nmeaInfo, UTCDATE) || !nmea_INFO_is_present(nmeaInfo, UTCTIME)) {
 		nmea_time_now(&utc, NULL);
 	}

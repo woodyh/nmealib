@@ -180,8 +180,11 @@ typedef enum _nmeaINFO_FIELD {
 	MAGVAR			= (1 << 14),
 	SATINUSECOUNT	= (1 << 15),
 	SATINUSE		= (1 << 16),
-	SATINVIEW		= (1 << 17)
+	SATINVIEW		= (1 << 17),
+	_nmeaINFO_FIELD_LAST = SATINVIEW
 } nmeaINFO_FIELD;
+
+#define NMEA_INFO_PRESENT_MASK ((_nmeaINFO_FIELD_LAST << 1) - 1)
 
 void nmea_time_now(nmeaTIME *utc, uint32_t * present);
 void nmea_zero_INFO(nmeaINFO *info);
