@@ -63,8 +63,8 @@
 #define NMEA_SATINPACK (4)
 #define NMEA_NSATPACKS (NMEA_MAXSAT / NMEA_SATINPACK)
 
-#define NMEA_DEF_LAT   (5001.2621)
-#define NMEA_DEF_LON   (3613.0595)
+#define NMEA_DEF_LAT   (0.0)
+#define NMEA_DEF_LON   (0.0)
 
 #ifdef  __cplusplus
 extern "C" {
