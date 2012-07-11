@@ -48,6 +48,7 @@ void nmea_zero_GPRMC(nmeaGPRMC *pack) {
 	pack->ns = 'N';
 	pack->ew = 'E';
 	pack->magvar_ew = 'E';
+	pack->mode = 'N';
 }
 
 void nmea_zero_GPVTG(nmeaGPVTG *pack) {
