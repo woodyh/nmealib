@@ -457,7 +457,7 @@ int nmea_parse_GPGSA(const char *s, const int len, nmeaGPGSA *pack) {
 	 */
 	pack->present = 0;
 	pack->fix_mode = 0;
-	pack->fix_type = 0;
+	pack->fix_type = -1;
 	for (i = 0; i < NMEA_MAXSAT; i++) {
 		pack->sat_prn[i] = 0;
 	}
@@ -484,7 +484,12 @@ int nmea_parse_GPGSA(const char *s, const int len, nmeaGPGSA *pack) {
 		nmea_error("GPGSA parse error: invalid fix mode (%c)", pack->fix_mode);
 		return 0;
 	}
-	if (!pack->fix_type) {
+	if (pack->fix_type != -1) {
+		if (!((pack->fix_type >= 1) && (pack->fix_type <= 3))) {
+			nmea_error("Parse error: invalid fix type %d, expected [1, 3]", pack->fix_type);
+			return 0;
+		}
+
 		nmea_INFO_set_present(pack, FIX);
 	}
 	for (i = 0; i < NMEA_MAXSAT; i++) {
