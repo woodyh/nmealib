@@ -647,9 +647,6 @@ int nmea_parse_GPRMC(const char *s, const int len, nmeaGPRMC *pack) {
 
 	/* determine which fields are present and validate them */
 
-	nmea_INFO_set_present(pack, SIG);
-	nmea_INFO_set_present(pack, FIX);
-
 	if ((pack->utc.year != -1) && (pack->utc.mon != -1) && (pack->utc.day != -1)) {
 		if (pack->utc.year < 90) {
 			pack->utc.year += 100;
@@ -685,29 +682,19 @@ int nmea_parse_GPRMC(const char *s, const int len, nmeaGPRMC *pack) {
 			return 0;
 		}
 	}
-	if (pack->lat != NAN) {
-		if (!pack->ns) {
-			pack->ns = 'N';
-		} else {
-			if (!validateNSEW(&pack->ns, true)) {
-				return 0;
-			}
-
-			/* only when lat and ns are present and valid */
-			nmea_INFO_set_present(pack, LAT);
+	if ((pack->lat != NAN) && (pack->ns)) {
+		if (!validateNSEW(&pack->ns, true)) {
+			return 0;
 		}
+
+		nmea_INFO_set_present(pack, LAT);
 	}
-	if (pack->lon != NAN) {
-		if (!pack->ew) {
-			pack->ew = 'E';
-		} else {
-			if (!validateNSEW(&pack->ew, false)) {
-				return 0;
-			}
-
-			/* only when lon and ew are present and valid */
-			nmea_INFO_set_present(pack, LON);
+	if ((pack->lon != NAN) && (pack->ew)) {
+		if (!validateNSEW(&pack->ew, false)) {
+			return 0;
 		}
+
+		nmea_INFO_set_present(pack, LON);
 	}
 	if (pack->speed != NAN) {
 		nmea_INFO_set_present(pack, SPEED);
@@ -715,17 +702,12 @@ int nmea_parse_GPRMC(const char *s, const int len, nmeaGPRMC *pack) {
 	if (pack->track != NAN) {
 		nmea_INFO_set_present(pack, TRACK);
 	}
-	if (pack->magvar != NAN) {
-		if (!pack->magvar_ew) {
-			pack->magvar_ew = 'E';
-		} else {
-			if (!validateNSEW(&pack->magvar_ew, false)) {
-				return 0;
-			}
-
-			/* only when magvar and magvar_ew are present and valid */
-			nmea_INFO_set_present(pack, MAGVAR);
+	if ((pack->magvar != NAN) && (pack->magvar_ew)) {
+		if (!validateNSEW(&pack->magvar_ew, false)) {
+			return 0;
 		}
+
+		nmea_INFO_set_present(pack, MAGVAR);
 	}
 	if (token_count == 13) {
 		pack->mode = 'A';
