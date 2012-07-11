@@ -306,6 +306,8 @@ void nmea_GPRMC2info(const nmeaGPRMC *pack, nmeaINFO *info) {
 		info->utc.sec = pack->utc.sec;
 		info->utc.hsec = pack->utc.hsec;
 	}
+	nmea_INFO_set_present(info, SIG);
+	nmea_INFO_set_present(info, FIX);
 	if (pack->status == 'A') {
 		if (info->sig == NMEA_SIG_BAD) {
 			info->sig = NMEA_SIG_MID;
@@ -332,6 +334,7 @@ void nmea_GPRMC2info(const nmeaGPRMC *pack, nmeaINFO *info) {
 	if (nmea_INFO_is_present(pack, MAGVAR)) {
 		info->magvar = ((pack->magvar_ew == 'E') ? pack->magvar : -pack->magvar);
 	}
+	/* mode is ignored */
 }
 
 /**
@@ -348,17 +351,45 @@ void nmea_info2GPRMC(const nmeaINFO *info, nmeaGPRMC *pack) {
 
 	pack->present = info->present;
 	nmea_INFO_unset_present(pack, SMASK);
-	pack->utc = info->utc;
-	pack->status = ((info->sig > 0) ? 'A' : 'V');
-	pack->lat = fabs(info->lat);
-	pack->ns = ((info->lat > 0) ? 'N' : 'S');
-	pack->lon = fabs(info->lon);
-	pack->ew = ((info->lon > 0) ? 'E' : 'W');
-	pack->speed = info->speed / NMEA_TUD_KNOTS;
-	pack->track = info->track;
-	pack->magvar = fabs(info->magvar);
-	pack->magvar_ew = ((info->magvar > 0) ? 'E' : 'W');
-	pack->mode = ((info->sig > 0) ? 'A' : 'N');
+	if (nmea_INFO_is_present(info, UTCDATE)) {
+		pack->utc.year = info->utc.year;
+		pack->utc.mon = info->utc.mon;
+		pack->utc.day = info->utc.day;
+	}
+	if (nmea_INFO_is_present(info, UTCTIME)) {
+		pack->utc.hour = info->utc.hour;
+		pack->utc.min = info->utc.min;
+		pack->utc.sec = info->utc.sec;
+		pack->utc.hsec = info->utc.hsec;
+	}
+	if (nmea_INFO_is_present(info, SIG)) {
+		pack->status = ((info->sig != NMEA_SIG_BAD) ? 'A' : 'V');
+	} else {
+		pack->status = 'V';
+	}
+	if (nmea_INFO_is_present(info, LAT)) {
+		pack->lat = fabs(info->lat);
+		pack->ns = ((info->lat > 0) ? 'N' : 'S');
+	}
+	if (nmea_INFO_is_present(info, LON)) {
+		pack->lon = fabs(info->lon);
+		pack->ew = ((info->lon > 0) ? 'E' : 'W');
+	}
+	if (nmea_INFO_is_present(info, SPEED)) {
+		pack->speed = info->speed / NMEA_TUD_KNOTS;
+	}
+	if (nmea_INFO_is_present(info, TRACK)) {
+		pack->track = info->track;
+	}
+	if (nmea_INFO_is_present(info, MAGVAR)) {
+		pack->magvar = fabs(info->magvar);
+		pack->magvar_ew = ((info->magvar > 0) ? 'E' : 'W');
+	}
+	if (nmea_INFO_is_present(info, SIG)) {
+		pack->mode = ((info->sig != NMEA_SIG_BAD) ? 'A' : 'N');
+	} else {
+		pack->mode = 'N';
+	}
 }
 
 /**
