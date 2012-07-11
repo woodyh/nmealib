@@ -42,7 +42,7 @@ int main(int argc __attribute__((unused)), char *argv[] __attribute__((unused)))
 	nmea_zero_INFO(&info);
 	nmea_parser_init(&parser);
 
-	for (it = 0; it < 6; ++it) {
+	for (it = 0; it < 6; it++) {
 		nmea_parse(&parser, buff[it], (int) strlen(buff[it]), &info);
 
 		nmea_info2pos(&info, &dpos);

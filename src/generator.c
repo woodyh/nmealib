@@ -152,7 +152,7 @@ static int nmea_igen_noise_loop(nmeaGENERATOR *gen __attribute__ ((unused)), nme
 	info->satinfo.inuse = 0;
 	info->satinfo.inview = 0;
 
-	for (it = 0; it < 12; ++it) {
+	for (it = 0; it < 12; it++) {
 		info->satinfo.in_use[it] = in_use = lrint(nmea_random(0, 3));
 		info->satinfo.sat[it].id = it;
 		info->satinfo.sat[it].elv = lrint(nmea_random(0, 90));
@@ -245,7 +245,7 @@ static int nmea_igen_rotate_loop(nmeaGENERATOR *gen __attribute__ ((unused)), nm
 
 	nmea_time_now(&info->utc, info);
 
-	for (it = 0; it < count; ++it) {
+	for (it = 0; it < count; it++) {
 		info->satinfo.sat[it].azimuth = (int) ((srt >= 360) ? srt - 360 : srt);
 		srt += deg;
 	}
@@ -264,7 +264,7 @@ static int nmea_igen_rotate_reset(nmeaGENERATOR *gen __attribute__ ((unused)), n
 	info->satinfo.inuse = 8;
 	info->satinfo.inview = 8;
 
-	for (it = 0; it < info->satinfo.inview; ++it) {
+	for (it = 0; it < info->satinfo.inview; it++) {
 		info->satinfo.in_use[it] = 1;
 		info->satinfo.sat[it].id = it + 1;
 		info->satinfo.sat[it].elv = 5;

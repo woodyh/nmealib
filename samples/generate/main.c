@@ -74,7 +74,7 @@ int main(int argc __attribute__((unused)), char *argv[] __attribute__((unused)))
 	}
 	nmea_INFO_set_present(&info, SATINVIEW);
 
-	for (it = 0; it < 10; ++it) {
+	for (it = 0; it < 10; it++) {
 		gen_sz = nmea_generate(&buff[0], 2048, &info, GPGGA | GPGSA | GPGSV | GPRMC | GPVTG);
 
 		buff[gen_sz] = 0;

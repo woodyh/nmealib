@@ -42,7 +42,7 @@ int main(int argc __attribute__((unused)), char *argv[] __attribute__((unused)))
 	nmeaPARSER parser;
 	nmea_parser_init(&parser);
 
-	for (it = 0; it < NUM_POINTS; ++it) {
+	for (it = 0; it < NUM_POINTS; it++) {
 		nmeaINFO info;
 		nmea_zero_INFO(&info);
 		(void) nmea_parse(&parser, buff[it], (int) strlen(buff[it]), &info);
@@ -51,12 +51,12 @@ int main(int argc __attribute__((unused)), char *argv[] __attribute__((unused)))
 
 	nmea_parser_destroy(&parser);
 
-	for (it = 0; it < NUM_POINTS; ++it) {
+	for (it = 0; it < NUM_POINTS; it++) {
 		dist[it][0] = nmea_distance(&pos[0], &pos[it]);
 		dist[it][1] = nmea_distance_ellipsoid(&pos[0], &pos[it], &azimuth[it][0], &azimuth[it][1]);
 	}
 
-	for (it = 0; it < NUM_POINTS; ++it) {
+	for (it = 0; it < NUM_POINTS; it++) {
 		result[0] = nmea_move_horz(&pos[0], &pos_moved[it][0], azimuth[it][0], dist[it][0]);
 		result[1] = nmea_move_horz_ellipsoid(&pos[0], &pos_moved[it][1], azimuth[it][0], dist[it][0],
 				&azimuth_moved[it]);
@@ -65,13 +65,13 @@ int main(int argc __attribute__((unused)), char *argv[] __attribute__((unused)))
 
 	/* Output of results */
 	printf("Coordinate points:\n");
-	for (it = 0; it < NUM_POINTS; ++it) {
+	for (it = 0; it < NUM_POINTS; it++) {
 		printf("P%d in radians: lat:%9.6lf lon:%9.6lf  \tin degree: lat:%+010.6lf° lon:%+011.6lf°\n", it, pos[it].lat,
 				pos[it].lon, nmea_radian2degree(pos[it].lat), nmea_radian2degree(pos[it].lon));
 	}
 
 	printf("\nCalculation results:\n");
-	for (it = 0; it < NUM_POINTS; ++it) {
+	for (it = 0; it < NUM_POINTS; it++) {
 		printf("\n");
 		printf("Distance P0 to P%d\ton spheroid:  %14.3lf m\n", it, dist[it][0]);
 		printf("Distance P0 to P%d\ton ellipsoid: %14.3lf m\n", it, dist[it][1]);

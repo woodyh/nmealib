@@ -41,7 +41,7 @@
 int nmea_calc_crc(const char *buff, int buff_sz) {
 	int chsum = 0, it;
 
-	for (it = 0; it < buff_sz; ++it)
+	for (it = 0; it < buff_sz; it++)
 		chsum ^= (int) buff[it];
 
 	return chsum;
@@ -129,7 +129,7 @@ int nmea_scanf(const char *buff, int buff_sz, const char *format, ...) {
 
 	va_start(arg_ptr, format);
 
-	for (; *format && buff < end_buf; ++format) {
+	for (; *format && buff < end_buf; format++) {
 		switch (tok_type) {
 		case NMEA_TOKS_COMPARE:
 			if ('%' == *format)

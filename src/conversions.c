@@ -156,7 +156,7 @@ void nmea_GPGSA2info(const nmeaGPGSA *pack, nmeaINFO *info) {
 	if (nmea_INFO_is_present(pack, SATINUSE)) {
 		assert(sizeof(info->satinfo.in_use) == sizeof(info->satinfo.in_use));
 		memcpy(info->satinfo.in_use, pack->sat_prn, sizeof(info->satinfo.in_use));
-		for (i = 0; i < NMEA_MAXSAT; ++i) {
+		for (i = 0; i < NMEA_MAXSAT; i++) {
 			if (pack->sat_prn[i]) {
 				info->satinfo.inuse++;
 			}
@@ -263,7 +263,7 @@ void nmea_info2GPGSV(const nmeaINFO *info, nmeaGPGSV *pack, int pack_idx) {
 	else
 		pack->pack_index = pack_idx;
 
-	for (pit = 0, sit = pack->pack_index * NMEA_SATINPACK; pit < NMEA_SATINPACK; ++pit, ++sit)
+	for (pit = 0, sit = pack->pack_index * NMEA_SATINPACK; pit < NMEA_SATINPACK; pit++, sit++)
 		pack->sat_data[pit] = info->satinfo.sat[sit];
 }
 

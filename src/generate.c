@@ -329,7 +329,7 @@ int nmea_generate(char *buff, int buff_sz, const nmeaINFO *info, int generate_ma
 			pack_mask &= ~GPGSA;
 		} else if (pack_mask & GPGSV) {
 			gsv_count = nmea_gsv_npack(info->satinfo.inview);
-			for (gsv_it = 0; gsv_it < gsv_count && buff_sz - gen_count > 0; ++gsv_it) {
+			for (gsv_it = 0; gsv_it < gsv_count && buff_sz - gen_count > 0; gsv_it++) {
 				nmea_info2GPGSV(info, &gsv, gsv_it);
 				gen_count += nmea_gen_GPGSV(buff + gen_count, buff_sz - gen_count, &gsv);
 			}

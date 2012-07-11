@@ -294,7 +294,7 @@ int nmea_find_tail(const char *s, int len, int *checksum) {
 
 	*checksum = -1;
 
-	for (; s < s_end; ++s, ++nread) {
+	for (; s < s_end; s++, nread++) {
 		if (('$' == *s) && nread) {
 			s = NULL;
 			break;
