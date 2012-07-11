@@ -574,14 +574,7 @@ int nmea_parse_GPGSV(const char *s, const int len, nmeaGPGSV *pack) {
 				return 0;
 			}
 			sat_counted++;
-		} else {
-			memset(&pack->sat_data[sat_count], 0, sizeof(pack->sat_data[sat_count]));
 		}
-	}
-
-	if (sat_counted != pack->sat_count) {
-		nmea_error("GPGSV parse error, expected %d sats, got %d", pack->sat_count, sat_counted);
-		return 0;
 	}
 
 	/* see that we have enough tokens */
