@@ -491,7 +491,8 @@ void nmea_INFO_unit_conversion(nmeaINFO * nmeaInfo) {
 	/* elv (already in correct format) */
 	/* speed (already in correct format) */
 	/* track (already in correct format) */
-	/* declination (already in correct format) */
+	/* mtrack (already in correct format) */
+	/* magvar (already in correct format) */
 
-	/* satinfo (not used) */
+	/* satinfo (already in correct format) */
 }
