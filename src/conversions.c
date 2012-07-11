@@ -426,16 +426,18 @@ void nmea_info2GPVTG(const nmeaINFO *info, nmeaGPVTG *pack) {
 	assert(pack);
 	assert(info);
 
-	nmea_zero_GPVTG(pack);
+	nmea_zero_GPVTG(pack); /* also sets up units */
 
 	pack->present = info->present;
 	nmea_INFO_unset_present(pack, SMASK);
-	pack->track = info->track;
-	pack->track_t = 'T';
-	pack->mtrack = info->mtrack;
-	pack->mtrack_m = 'M';
-	pack->spn = info->speed / NMEA_TUD_KNOTS;
-	pack->spn_n = 'N';
-	pack->spk = info->speed;
-	pack->spk_k = 'K';
+	if (nmea_INFO_is_present(pack, TRACK)) {
+		pack->track = info->track;
+	}
+	if (nmea_INFO_is_present(pack, MTRACK)) {
+		pack->mtrack = info->mtrack;
+	}
+	if (nmea_INFO_is_present(pack, SPEED)) {
+		pack->spn = info->speed / NMEA_TUD_KNOTS;
+		pack->spk = info->speed;
+	}
 }
