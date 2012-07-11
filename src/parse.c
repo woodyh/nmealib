@@ -71,7 +71,7 @@ static bool _nmea_parse_time(const char *s, const int len, nmeaTIME *t) {
 		return false;
 	}
 
-	nmea_error("Time parse error: invalid format in %s", s);
+	nmea_error("Parse error: invalid time format in %s", s);
 	return false;
 }
 
@@ -373,7 +373,7 @@ int nmea_parse_GPGGA(const char *s, const int len, nmeaGPGGA *pack) {
 
 	/* see that we have enough tokens */
 	if (token_count != 14) {
-		nmea_error("GPGGA parse error!");
+		nmea_error("GPGGA parse error: need 14 tokens, got %d in %s", token_count, s);
 		return 0;
 	}
 
@@ -409,7 +409,7 @@ int nmea_parse_GPGGA(const char *s, const int len, nmeaGPGGA *pack) {
 	}
 	if (pack->sig != -1) {
 		if (!((pack->sig >= 0) && (pack->sig <= 8))) {
-			nmea_error("Parse error: invalid signal %d, expected [0, 8]", pack->sig);
+			nmea_error("GPGGA parse error: invalid signal %d, expected [0, 8]", pack->sig);
 			return 0;
 		}
 
@@ -423,7 +423,7 @@ int nmea_parse_GPGGA(const char *s, const int len, nmeaGPGGA *pack) {
 	}
 	if ((pack->elv != NAN) && (pack->elv_units)) {
 		if (pack->elv_units != 'M') {
-			nmea_error("Parse error: invalid elevation unit (%c)", pack->elv_units);
+			nmea_error("GPGGA parse error: invalid elevation unit (%c)", pack->elv_units);
 			return 0;
 		}
 
@@ -473,7 +473,7 @@ int nmea_parse_GPGSA(const char *s, const int len, nmeaGPGSA *pack) {
 
 	/* see that we have enough tokens */
 	if (token_count != 17) {
-		nmea_error("GPGSA parse error, need 17 tokens, got %d in %s", token_count, s);
+		nmea_error("GPGSA parse error: need 17 tokens, got %d in %s", token_count, s);
 		return 0;
 	}
 
@@ -486,7 +486,7 @@ int nmea_parse_GPGSA(const char *s, const int len, nmeaGPGSA *pack) {
 	}
 	if (pack->fix_type != -1) {
 		if (!((pack->fix_type >= 1) && (pack->fix_type <= 3))) {
-			nmea_error("Parse error: invalid fix type %d, expected [1, 3]", pack->fix_type);
+			nmea_error("GPGSA parse error: invalid fix type %d, expected [1, 3]", pack->fix_type);
 			return 0;
 		}
 
@@ -549,7 +549,7 @@ int nmea_parse_GPGSV(const char *s, const int len, nmeaGPGSV *pack) {
 	/* return if we have no sentences or sats */
 	if ((pack->pack_count < 1) || (pack->pack_count > NMEA_NSATPACKS) || (pack->pack_index < 1)
 			|| (pack->pack_index > pack->pack_count) || (pack->sat_count < 0) || (pack->sat_count > NMEA_MAXSAT)) {
-		nmea_error("GPGSV parse error, inconsistent pack (count/index/satcount = %d/%d/%d)", pack->pack_count,
+		nmea_error("GPGSV parse error: inconsistent pack (count/index/satcount = %d/%d/%d)", pack->pack_count,
 				pack->pack_index, pack->sat_count);
 		return 0;
 	}
@@ -558,19 +558,19 @@ int nmea_parse_GPGSV(const char *s, const int len, nmeaGPGSV *pack) {
 	for (sat_count = 0; sat_count < NMEA_SATINPACK; sat_count++) {
 		if (pack->sat_data[sat_count].id != 0) {
 			if ((pack->sat_data[sat_count].id < 0)) {
-				nmea_error("Parse error: invalid sat %d id (%d)", sat_count + 1, pack->sat_data[sat_count].id);
+				nmea_error("GPGSV parse error: invalid sat %d id (%d)", sat_count + 1, pack->sat_data[sat_count].id);
 				return 0;
 			}
 			if ((pack->sat_data[sat_count].elv < 0) || (pack->sat_data[sat_count].elv > 90)) {
-				nmea_error("Parse error: invalid sat %d elevation (%d)", sat_count + 1, pack->sat_data[sat_count].elv);
+				nmea_error("GPGSV parse error: invalid sat %d elevation (%d)", sat_count + 1, pack->sat_data[sat_count].elv);
 				return 0;
 			}
 			if ((pack->sat_data[sat_count].azimuth < 0) || (pack->sat_data[sat_count].azimuth >= 360)) {
-				nmea_error("Parse error: invalid sat %d azimuth (%d)", sat_count + 1, pack->sat_data[sat_count].azimuth);
+				nmea_error("GPGSV parse error: invalid sat %d azimuth (%d)", sat_count + 1, pack->sat_data[sat_count].azimuth);
 				return 0;
 			}
 			if ((pack->sat_data[sat_count].sig < 0) || (pack->sat_data[sat_count].sig > 99)) {
-				nmea_error("Parse error: invalid sat %d signal (%d)", sat_count + 1, pack->sat_data[sat_count].sig);
+				nmea_error("GPGSV parse error: invalid sat %d signal (%d)", sat_count + 1, pack->sat_data[sat_count].sig);
 				return 0;
 			}
 			sat_counted++;
@@ -587,7 +587,7 @@ int nmea_parse_GPGSV(const char *s, const int len, nmeaGPGSV *pack) {
 	/* see that we have enough tokens */
 	token_count_expected = (sat_counted * 4) + 3;
 	if ((token_count < token_count_expected) || (token_count > (NMEA_SATINPACK * 4 + 3))) {
-		nmea_error("GPGSV parse error, need %d tokens, got %d", token_count_expected, token_count);
+		nmea_error("GPGSV parse error: need %d tokens, got %d", token_count_expected, token_count);
 		return 0;
 	}
 
@@ -648,7 +648,7 @@ int nmea_parse_GPRMC(const char *s, const int len, nmeaGPRMC *pack) {
 
 	/* see that we have enough tokens */
 	if ((token_count != 13) && (token_count != 14)) {
-		nmea_error("GPRMC parse error, need 13 or 14 tokens, got %d in %s", token_count, s);
+		nmea_error("GPRMC parse error: need 13 or 14 tokens, got %d in %s", token_count, s);
 		return 0;
 	}
 
@@ -784,7 +784,7 @@ int nmea_parse_GPVTG(const char *s, const int len, nmeaGPVTG *pack) {
 
 	/* see that we have enough tokens */
 	if (token_count != 8) {
-		nmea_error("GPVTG parse error, need 8 tokens, got %d in %s", token_count, s);
+		nmea_error("GPVTG parse error: need 8 tokens, got %d in %s", token_count, s);
 		return 0;
 	}
 
