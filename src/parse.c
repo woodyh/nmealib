@@ -207,35 +207,35 @@ static bool validateMode(char * c) {
 bool nmea_string_has_invalid_chars(const char * str, const char * strName, char * report, size_t reportSize) {
 	static const char invalidChars[] = { '$', '*', ',', '!', '\\', '^', '~' };
 	static const char * invalidCharsNames[] = { "sentence delimiter ($)", "checksum field delimiter (*)", "comma (,)",
-			"exclamation mark (!)", "backslash (\\)", "^ (^)", "tilde (~)" };
+			"exclamation mark (!)", "backslash (\\)", "power (^)", "tilde (~)" };
 
 	size_t i;
 	size_t j;
+	size_t slen;
 
 	if (!str) {
 		return false;
 	}
 
-	for (i = 0; i < strlen(str); i++) {
+	slen = strlen(str);
+	for (i = 0; i < slen; i++) {
 		char c = str[i];
 
-		if ((c < 32) || (c > 126)) {
-			if (report) {
-				snprintf((char*) report, reportSize, "Configured %s (%s),"
+		if (!((c >= 32) && (c <= 126))) {
+			if (report && reportSize) {
+				snprintf(report, reportSize, "Configured %s (%s),"
 						" character %lu, can not contain non-printable"
 						" characters (codes outside the range [32, 126])", strName, str, (unsigned long) i + 1);
-				report[reportSize - 1] = '\0';
 			}
 			return true;
 		}
 
 		for (j = 0; j < sizeof(invalidChars); j++) {
 			if (c == invalidChars[j]) {
-				if (report) {
-					snprintf((char *) report, reportSize, "Configured %s (%s),"
+				if (report && reportSize) {
+					snprintf(report, reportSize, "Configured %s (%s),"
 							" character %lu, can not contain %s characters", strName, str, (unsigned long) i + 1,
 							invalidCharsNames[j]);
-					report[reportSize - 1] = '\0';
 				}
 				return true;
 			}
