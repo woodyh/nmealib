@@ -43,7 +43,7 @@
  * @param t a pointer to the nmeaTIME structure in which to store the parsed time
  * @return true on success, false otherwise
  */
-static bool _nmea_parse_time(const char *s, int len, nmeaTIME *t) {
+static bool _nmea_parse_time(const char *s, const int len, nmeaTIME *t) {
 	assert(s);
 	assert(t);
 
@@ -88,7 +88,7 @@ static bool _nmea_parse_time(const char *s, int len, nmeaTIME *t) {
  * @param t a pointer to the structure
  * @return true when valid, false otherwise
  */
-static bool validateTime(nmeaTIME * t) {
+static bool validateTime(const nmeaTIME * t) {
 	if (!t) {
 		return false;
 	}
@@ -114,7 +114,7 @@ static bool validateTime(nmeaTIME * t) {
  * @param t a pointer to the structure
  * @return true when valid, false otherwise
  */
-static bool validateDate(nmeaTIME * t) {
+static bool validateDate(const nmeaTIME * t) {
 	if (!t) {
 		return false;
 	}
@@ -139,7 +139,7 @@ static bool validateDate(nmeaTIME * t) {
  * @param ns true: evaluate north/south, false: evaluate east/west
  * @return true when valid, false otherwise
  */
-static bool validateNSEW(char * c, bool ns) {
+static bool validateNSEW(char * c, const bool ns) {
 	if (!c) {
 		return false;
 	}
@@ -207,7 +207,7 @@ static bool validateMode(char * c) {
  * - false otherwise
  */
 bool nmea_parse_sentence_has_invalid_chars(const char * str, const size_t strlen, const char * strName, char * report,
-		size_t reportSize) {
+		const size_t reportSize) {
 	static const char invalidChars[] = { '$', '*', ',', '!', '\\', '^', '~' };
 	static const char * invalidCharsNames[] = { "sentence delimiter ($)", "checksum field delimiter (*)", "comma (,)",
 			"exclamation mark (!)", "backslash (\\)", "power (^)", "tilde (~)" };
@@ -254,7 +254,7 @@ bool nmea_parse_sentence_has_invalid_chars(const char * str, const size_t strlen
  * @param len the length of the string
  * @return The packet type (or GPNON when it could not be determined)
  */
-int nmea_parse_get_sentence_type(const char *s, int len) {
+int nmea_parse_get_sentence_type(const char *s, const int len) {
 	static const char *pheads[] = { "GPGGA", "GPGSA", "GPGSV", "GPRMC", "GPVTG" };
 	static const int types[] = { GPGGA, GPGSA, GPGSV, GPRMC, GPVTG };
 	unsigned int i;
@@ -283,7 +283,7 @@ int nmea_parse_get_sentence_type(const char *s, int len) {
  * @return Number of bytes from the start of the string until the tail or 0 when the checksum did not match
  * the calculated checksum
  */
-int nmea_parse_get_sentence_length(const char *s, int len, int *checksum) {
+int nmea_parse_get_sentence_length(const char *s, const int len, int *checksum) {
 	static const int tail_sz = 1 + 2 + 2 /* *xx\r\n */;
 
 	const char *s_end = s + len;
@@ -330,7 +330,7 @@ int nmea_parse_get_sentence_length(const char *s, int len, int *checksum) {
  * @param pack a pointer to the result structure
  * @return 1 (true) - if parsed successfully or 0 (false) otherwise.
  */
-int nmea_parse_GPGGA(const char *s, int len, nmeaGPGGA *pack) {
+int nmea_parse_GPGGA(const char *s, const int len, nmeaGPGGA *pack) {
 	int token_count;
 	char time_buff[NMEA_TIMEPARSE_BUF];
 	size_t time_buff_len = 0;
@@ -445,7 +445,7 @@ int nmea_parse_GPGGA(const char *s, int len, nmeaGPGGA *pack) {
  * @param pack a pointer to the result structure
  * @return 1 (true) - if parsed successfully or 0 (false) otherwise.
  */
-int nmea_parse_GPGSA(const char *s, int len, nmeaGPGSA *pack) {
+int nmea_parse_GPGSA(const char *s, const int len, nmeaGPGSA *pack) {
 	int token_count;
 	int i;
 
@@ -516,7 +516,7 @@ int nmea_parse_GPGSA(const char *s, int len, nmeaGPGSA *pack) {
  * @param pack a pointer to the result structure
  * @return 1 (true) - if parsed successfully or 0 (false) otherwise.
  */
-int nmea_parse_GPGSV(const char *s, int len, nmeaGPGSV *pack) {
+int nmea_parse_GPGSV(const char *s, const int len, nmeaGPGSV *pack) {
 	int token_count;
 	int token_count_expected;
 	int sat_count;
@@ -605,7 +605,7 @@ int nmea_parse_GPGSV(const char *s, int len, nmeaGPGSV *pack) {
  * @param pack a pointer to the result structure
  * @return 1 (true) - if parsed successfully or 0 (false) otherwise.
  */
-int nmea_parse_GPRMC(const char *s, int len, nmeaGPRMC *pack) {
+int nmea_parse_GPRMC(const char *s, const int len, nmeaGPRMC *pack) {
 	int token_count;
 	char time_buff[NMEA_TIMEPARSE_BUF];
 	size_t time_buff_len = 0;
@@ -754,7 +754,7 @@ int nmea_parse_GPRMC(const char *s, int len, nmeaGPRMC *pack) {
  * @param pack a pointer to the result structure
  * @return 1 (true) - if parsed successfully or 0 (false) otherwise.
  */
-int nmea_parse_GPVTG(const char *s, int len, nmeaGPVTG *pack) {
+int nmea_parse_GPVTG(const char *s, const int len, nmeaGPVTG *pack) {
 	int token_count;
 
 	assert(s);

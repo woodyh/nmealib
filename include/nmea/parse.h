@@ -31,16 +31,16 @@ extern "C" {
 #endif
 
 bool nmea_parse_sentence_has_invalid_chars(const char * str, const size_t strlen, const char * strName, char * report,
-		size_t reportSize);
+		const size_t reportSize);
 
-int nmea_parse_get_sentence_type(const char *s, int len);
-int nmea_parse_get_sentence_length(const char *s, int len, int *checksum);
+int nmea_parse_get_sentence_type(const char *s, const int len);
+int nmea_parse_get_sentence_length(const char *s, const int len, int *checksum);
 
-int nmea_parse_GPGGA(const char *s, int len, nmeaGPGGA *pack);
-int nmea_parse_GPGSA(const char *s, int len, nmeaGPGSA *pack);
-int nmea_parse_GPGSV(const char *s, int len, nmeaGPGSV *pack);
-int nmea_parse_GPRMC(const char *s, int len, nmeaGPRMC *pack);
-int nmea_parse_GPVTG(const char *s, int len, nmeaGPVTG *pack);
+int nmea_parse_GPGGA(const char *s, const int len, nmeaGPGGA *pack);
+int nmea_parse_GPGSA(const char *s, const int len, nmeaGPGSA *pack);
+int nmea_parse_GPGSV(const char *s, const int len, nmeaGPGSV *pack);
+int nmea_parse_GPRMC(const char *s, const int len, nmeaGPRMC *pack);
+int nmea_parse_GPVTG(const char *s, const int len, nmeaGPVTG *pack);
 
 #ifdef  __cplusplus
 }
