@@ -278,15 +278,16 @@ int nmea_parse_get_sentence_type(const char *s, const int len) {
  *
  * @param s the string
  * @param len the length of the string
- * @param checksum a pointer to the location where the checksum (as specified in the sentence) should be stored
- * (will be -1 if the checksum did not match the calculated checksum)
- * @return Number of bytes from the start of the string until the tail or 0 when the checksum did not match
- * the calculated checksum
+ * @param checksum a pointer to the location where the checksum (as specified
+ * in the sentence) should be stored (will be -1 if the checksum did not match
+ * the calculated checksum or a new sentence was found in s after the start of s)
+ * @return Number of bytes from the start of the string until the tail or 0
+ * when no sentence was found
  */
 int nmea_parse_get_sentence_length(const char *s, const int len, int *checksum) {
 	static const int tail_sz = 1 + 2 + 2 /* *xx\r\n */;
 
-	const char *s_end = s + len;
+	const char * s_end = s + len;
 	int nread = 0;
 	int cksum = 0;
 
@@ -296,17 +297,19 @@ int nmea_parse_get_sentence_length(const char *s, const int len, int *checksum) 
 	*checksum = -1;
 
 	for (; s < s_end; s++, nread++) {
-		if (('$' == *s) && nread) {
-			s = NULL;
+		if ((*s == '$') && nread) {
+			/* found a new sentence start marker _after_ the first character of s */
+			s = NULL; /* do not reset nread when exiting */
 			break;
 		}
 		if ('*' == *s) {
+			/* found a sentence checksum marker */
 			if (((s + tail_sz) <= s_end) && ('\r' == s[3]) && ('\n' == s[4])) {
 				*checksum = nmea_atoi(s + 1, 2, 16);
 				nread = len - (int) (s_end - (s + tail_sz));
 				if (*checksum != cksum) {
 					*checksum = -1;
-					s = NULL;
+					s = NULL; /* do not reset nread when exiting */
 				}
 			}
 			break;
