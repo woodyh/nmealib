@@ -249,27 +249,25 @@ bool nmea_string_has_invalid_chars(const char * str, const char * strName, char 
  * Determine packet type (see nmeaPACKTYPE) by the header of a string.
  * The header is the start of an NMEA sentence, right after the $.
  *
- * @param s the string
+ * @param s the string. must be the NMEA string, right after the initial $
  * @param len the length of the string
  * @return The packet type (or GPNON when it could not be determined)
  */
 int nmea_pack_type(const char *s, int len) {
 	static const char *pheads[] = { "GPGGA", "GPGSA", "GPGSV", "GPRMC", "GPVTG" };
+	static const int types[] = { GPGGA, GPGSA, GPGSV, GPRMC, GPVTG };
+	unsigned int i;
 
 	assert(s);
 
 	if (len < 5)
 		return GPNON;
-	if (!memcmp(s, pheads[0], 5))
-		return GPGGA;
-	if (!memcmp(s, pheads[1], 5))
-		return GPGSA;
-	if (!memcmp(s, pheads[2], 5))
-		return GPGSV;
-	if (!memcmp(s, pheads[3], 5))
-		return GPRMC;
-	if (!memcmp(s, pheads[4], 5))
-		return GPVTG;
+
+	for (i = 0; i < (sizeof(types) / sizeof(int)); i++) {
+		if (!memcmp(s, pheads[i], 5)) {
+			return types[i];
+		}
+	}
 
 	return GPNON;
 }
