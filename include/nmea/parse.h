@@ -30,10 +30,10 @@
 extern "C" {
 #endif
 
-bool nmea_string_has_invalid_chars(const char * str, const char * strName, char * report, size_t reportSize);
+bool nmea_parse_sentence_has_invalid_chars(const char * str, const char * strName, char * report, size_t reportSize);
 
-int nmea_pack_type(const char *s, int len);
-int nmea_find_tail(const char *s, int len, int *checksum);
+int nmea_parse_get_sentence_type(const char *s, int len);
+int nmea_parse_get_sentence_length(const char *s, int len, int *checksum);
 
 int nmea_parse_GPGGA(const char *s, int len, nmeaGPGGA *pack);
 int nmea_parse_GPGSA(const char *s, int len, nmeaGPGSA *pack);

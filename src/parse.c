@@ -204,7 +204,7 @@ static bool validateMode(char * c) {
  * - true when the string has invalid characters
  * - false otherwise
  */
-bool nmea_string_has_invalid_chars(const char * str, const char * strName, char * report, size_t reportSize) {
+bool nmea_parse_sentence_has_invalid_chars(const char * str, const char * strName, char * report, size_t reportSize) {
 	static const char invalidChars[] = { '$', '*', ',', '!', '\\', '^', '~' };
 	static const char * invalidCharsNames[] = { "sentence delimiter ($)", "checksum field delimiter (*)", "comma (,)",
 			"exclamation mark (!)", "backslash (\\)", "power (^)", "tilde (~)" };
@@ -246,14 +246,14 @@ bool nmea_string_has_invalid_chars(const char * str, const char * strName, char 
 }
 
 /**
- * Determine packet type (see nmeaPACKTYPE) by the header of a string.
+ * Determine sentence type (see nmeaPACKTYPE) by the header of a string.
  * The header is the start of an NMEA sentence, right after the $.
  *
  * @param s the string. must be the NMEA string, right after the initial $
  * @param len the length of the string
  * @return The packet type (or GPNON when it could not be determined)
  */
-int nmea_pack_type(const char *s, int len) {
+int nmea_parse_get_sentence_type(const char *s, int len) {
 	static const char *pheads[] = { "GPGGA", "GPGSA", "GPGSV", "GPRMC", "GPVTG" };
 	static const int types[] = { GPGGA, GPGSA, GPGSV, GPRMC, GPVTG };
 	unsigned int i;
@@ -282,7 +282,7 @@ int nmea_pack_type(const char *s, int len) {
  * @return Number of bytes from the start of the string until the tail or 0 when the checksum did not match
  * the calculated checksum
  */
-int nmea_find_tail(const char *s, int len, int *checksum) {
+int nmea_parse_get_sentence_length(const char *s, int len, int *checksum) {
 	static const int tail_sz = 1 + 2 + 2 /* *xx\r\n */;
 
 	const char *s_end = s + len;

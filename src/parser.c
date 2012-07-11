@@ -147,14 +147,14 @@ static int nmea_parser_real_push(nmeaPARSER *parser, const char *buff, int buff_
 
 	/* parse */
 	for (;; node = 0) {
-		sen_sz = nmea_find_tail((const char *) parser->buffer + nparsed, (int) parser->buff_use - nparsed, &crc);
+		sen_sz = nmea_parse_get_sentence_length((const char *) parser->buffer + nparsed, (int) parser->buff_use - nparsed, &crc);
 
 		if (!sen_sz) {
 			if (nparsed)
 				memcpy(parser->buffer, parser->buffer + nparsed, parser->buff_use -= nparsed);
 			break;
 		} else if (crc >= 0) {
-			ptype = nmea_pack_type((const char *) parser->buffer + nparsed + 1, parser->buff_use - nparsed - 1);
+			ptype = nmea_parse_get_sentence_type((const char *) parser->buffer + nparsed + 1, parser->buff_use - nparsed - 1);
 
 			if (0 == (node = malloc(sizeof(nmeaParserNODE))))
 				goto mem_fail;
