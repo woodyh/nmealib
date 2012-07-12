@@ -184,7 +184,7 @@ int nmea_gen_GPGSV(char *s, const int len, const nmeaGPGSV *pack) {
 		snprintf(&sIndex[0], sizeof(sIndex), "%1d", pack->pack_index);
 		snprintf(&sSatCount[0], sizeof(sSatCount), "%02d", pack->sat_count);
 	}
-	for (i = 0; i < NMEA_MAXSAT; i++) {
+	for (i = 0; i < NMEA_SATINPACK; i++) {
 		int cnt = 0;
 		if (satinview && pack->sat_data[i].id) {
 			cnt = snprintf(psSatInfo, ssSatInfo, "%02d,%02d,%03d,%02d", pack->sat_data[i].id, pack->sat_data[i].elv,
@@ -201,7 +201,7 @@ int nmea_gen_GPGSV(char *s, const int len, const nmeaGPGSV *pack) {
 			ssSatInfo -= cnt;
 			psSatInfo += cnt;
 		}
-		if (i < (NMEA_MAXSAT - 1)) {
+		if (i < (NMEA_SATINPACK - 1)) {
 			*psSatInfo = ',';
 			psSatInfo++;
 			ssSatInfo--;
