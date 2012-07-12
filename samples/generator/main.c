@@ -33,6 +33,11 @@ int main(int argc __attribute__((unused)), char *argv[] __attribute__((unused)))
 
 	nmea_zero_INFO(&info);
 
+	nmea_INFO_set_present(&info, PDOP);
+	nmea_INFO_set_present(&info, HDOP);
+	nmea_INFO_set_present(&info, VDOP);
+	nmea_INFO_set_present(&info, ELV);
+
 	if (0 == (gen = nmea_create_generator(NMEA_GEN_ROTATE, &info)))
 		return -1;
 
