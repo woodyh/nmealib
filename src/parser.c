@@ -33,13 +33,6 @@
 #include <string.h>
 #include <assert.h>
 
-typedef struct _nmeaParserNODE {
-	int packType;
-	void *pack;
-	struct _nmeaParserNODE *next_node;
-
-} nmeaParserNODE;
-
 /*
  * high level
  */

@@ -27,9 +27,14 @@
 extern "C" {
 #endif
 
-/*
- * high level
+/**
+ * Description of a parser node / packet
  */
+typedef struct _nmeaParserNODE {
+	int packType;						/**< the type of the packet (see nmeaPACKTYPE) */
+	void *pack;                         /**< the packet (a pointer to a malloced sentence sctucture) */
+	struct _nmeaParserNODE *next_node;  /**< pointer to the next node / packet */
+} nmeaParserNODE;
 
 typedef struct _nmeaPARSER {
 	void *top_node;
