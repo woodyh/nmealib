@@ -27,12 +27,12 @@
 extern "C" {
 #endif
 
-/*
- * high level
- */
-
+/* forward declaration */
 struct _nmeaGENERATOR;
 
+/**
+ * Generator type enum
+ */
 enum nmeaGENTYPE {
 	NMEA_GEN_NOISE = 0,
 	NMEA_GEN_STATIC,
@@ -43,26 +43,53 @@ enum nmeaGENTYPE {
 	NMEA_GEN_LAST
 };
 
-struct _nmeaGENERATOR * nmea_create_generator(int type, nmeaINFO *info);
-void nmea_destroy_generator(struct _nmeaGENERATOR *gen);
+struct _nmeaGENERATOR * nmea_create_generator(const int type, nmeaINFO *info);
 int nmea_generate_from(char *buff, int buff_sz, nmeaINFO *info, struct _nmeaGENERATOR *gen, int generate_mask);
 
-/*
- * low level
+/**
+ * Generator initialiser function definition.
+ *
+ * @param gen a pointer to the generator
+ * @param info a pointer to an nmeaINFO structure to use during generation
+ * @return 1 (true) on success, 0 (false) otherwise
  */
-
 typedef int (*nmeaNMEA_GEN_INIT)(struct _nmeaGENERATOR *gen, nmeaINFO *info);
-typedef int (*nmeaNMEA_GEN_LOOP)(struct _nmeaGENERATOR *gen, nmeaINFO *info);
-typedef int (*nmeaNMEA_GEN_RESET)(struct _nmeaGENERATOR *gen, nmeaINFO *info);
-typedef int (*nmeaNMEA_GEN_DESTROY)(struct _nmeaGENERATOR *gen);
 
+/**
+ * Generator loop function definition.
+ *
+ * @param gen a pointer to the generator
+ * @param info a pointer to an nmeaINFO structure to use during generation
+ * @return 1 (true) on success, 0 (false) otherwise
+ */
+typedef int (*nmeaNMEA_GEN_LOOP)(struct _nmeaGENERATOR *gen, nmeaINFO *info);
+
+/**
+ * Generator reset function definition.
+ *
+ * @param gen a pointer to the generator
+ * @param info a pointer to an nmeaINFO structure to use during generation
+ * @return 1 (true) on success, 0 (false) otherwise
+ */
+typedef int (*nmeaNMEA_GEN_RESET)(struct _nmeaGENERATOR *gen, nmeaINFO *info);
+
+/**
+ * Generator destroy function definition.
+ *
+ * @param gen a pointer to the generator
+ * @return 1 (true) on success, 0 (false) otherwise
+ */typedef int (*nmeaNMEA_GEN_DESTROY)(struct _nmeaGENERATOR *gen);
+
+/**
+ * Generator structure
+ */
 typedef struct _nmeaGENERATOR {
-	void *gen_data;
-	nmeaNMEA_GEN_INIT init_call;
-	nmeaNMEA_GEN_LOOP loop_call;
-	nmeaNMEA_GEN_RESET reset_call;
-	nmeaNMEA_GEN_DESTROY destroy_call;
-	struct _nmeaGENERATOR *next;
+	void *gen_data;                    /**< generator data */
+	nmeaNMEA_GEN_INIT init_call;       /**< initialiser function */
+	nmeaNMEA_GEN_LOOP loop_call;       /**< loop function */
+	nmeaNMEA_GEN_RESET reset_call;     /**< reset function */
+	nmeaNMEA_GEN_DESTROY destroy_call; /**< destroy function */
+	struct _nmeaGENERATOR *next;       /**< the next generator */
 } nmeaGENERATOR;
 
 int nmea_gen_init(nmeaGENERATOR *gen, nmeaINFO *info);
