@@ -23,9 +23,9 @@
 
 #include <nmea/info.h>
 
-#define NMEA_TUD_YARDS              (1.0936)                        /**< Yards, meter * NMEA_TUD_YARDS = yard */
+#define NMEA_TUD_YARDS              (1.0936133)                     /**< Yards, meter * NMEA_TUD_YARDS = yard */
 #define NMEA_TUD_KNOTS              (1.852)                         /**< Knots, kilometer / NMEA_TUD_KNOTS = knot */
-#define NMEA_TUD_MILES              (1.609)                         /**< Miles, kilometer / NMEA_TUD_MILES = mile */
+#define NMEA_TUD_MILES              (1.609344)                      /**< Miles, kilometer / NMEA_TUD_MILES = mile */
 #define NMEA_TUS_MS                 (3.6)                           /**< Meters per seconds, (k/h) / NMEA_TUS_MS= (m/s) */
 #define NMEA_PI                     (3.141592653589793)             /**< PI value */
 #define NMEA_PI180                  (NMEA_PI / 180)                 /**< PI division by 180 */
