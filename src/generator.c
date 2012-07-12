@@ -133,7 +133,7 @@ void nmea_gen_destroy(nmeaGENERATOR *gen) {
  */
 void nmea_gen_add(nmeaGENERATOR *to, nmeaGENERATOR *gen) {
 	nmeaGENERATOR * next = to;
-	while (!next->next)
+	while (next->next)
 		next = to->next;
 
 	next->next = gen;
