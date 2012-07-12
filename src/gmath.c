@@ -18,100 +18,133 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*! \file gmath.h */
-
 #include <nmea/gmath.h>
 
 #include <math.h>
 #include <assert.h>
 
 /**
- * \brief Convert degree to radian
+ * Convert degrees to radians
+ *
+ * @param val degrees
+ * @return radians
  */
-double nmea_degree2radian(double val) {
+double nmea_degree2radian(const double val) {
 	return (val * NMEA_PI180);
 }
 
 /**
- * \brief Convert radian to degree
+ * Convert radians to degrees
+ *
+ * @param val radians
+ * @return degrees
  */
-double nmea_radian2degree(double val) {
+double nmea_radian2degree(const double val) {
 	return (val / NMEA_PI180);
 }
 
 /**
- * \brief Convert NDEG (NMEA degree) to fractional degree
+ * Convert NDEG (NMEA degrees) to decimal (fractional) degrees
+ *
+ * @param val NDEG (NMEA degrees)
+ * @return decimal (fractional) degrees
  */
-double nmea_ndeg2degree(double val) {
+double nmea_ndeg2degree(const double val) {
 	double deg;
 	double fra_part = modf(val / 100.0, &deg);
 	return (deg + ((fra_part * 100.0) / 60.0));
 }
 
 /**
- * \brief Convert fractional degree to NDEG (NMEA degree)
+ * Convert decimal (fractional) degrees to NDEG (NMEA degrees)
+ *
+ * @param val decimal (fractional) degrees
+ * @return NDEG (NMEA degrees)
  */
-double nmea_degree2ndeg(double val) {
+double nmea_degree2ndeg(const double val) {
 	double deg;
 	double fra_part = modf(val, &deg);
 	return ((deg * 100.0) + (fra_part * 60.0));
 }
 
 /**
- * \brief Convert NDEG (NMEA degree) to radian
+ * Convert NDEG (NMEA degrees) to radians
+ *
+ * @param val NDEG (NMEA degrees)
+ * @return radians
  */
-double nmea_ndeg2radian(double val) {
+double nmea_ndeg2radian(const double val) {
 	return nmea_degree2radian(nmea_ndeg2degree(val));
 }
 
 /**
- * \brief Convert radian to NDEG (NMEA degree)
+ * Convert radians to NDEG (NMEA degrees)
+ *
+ * @param val radians
+ * @return NDEG (NMEA degrees)
  */
-double nmea_radian2ndeg(double val) {
+double nmea_radian2ndeg(const double val) {
 	return nmea_degree2ndeg(nmea_radian2degree(val));
 }
 
 /**
- * \brief Calculate PDOP (Position Dilution Of Precision) factor
+ * Calculate PDOP (Position Dilution Of Precision) factor from HDOP and VDOP
+ *
+ * @param hdop HDOP
+ * @param vdop VDOP
+ * @return PDOP
  */
-double nmea_calc_pdop(double hdop, double vdop) {
+double nmea_calc_pdop(const double hdop, const double vdop) {
 	return sqrt(pow(hdop, 2) + pow(vdop, 2));
 }
 
-double nmea_dop2meters(double dop) {
+/**
+ * Convert DOP to meters, using the NMEA_DOP_FACTOR factor
+ *
+ * @param dop the DOP
+ * @return the DOP in meters
+ */
+double nmea_dop2meters(const double dop) {
 	return (dop * NMEA_DOP_FACTOR);
 }
 
-double nmea_meters2dop(double meters) {
+/**
+ * Convert DOP in meters to plain DOP, using the NMEA_DOP_FACTOR factor
+ *
+ * @param meters the DOP in meters
+ * @return the plain DOP
+ */
+double nmea_meters2dop(const double meters) {
 	return (meters / NMEA_DOP_FACTOR);
 }
 
 /**
- * \brief Calculate distance between two points
- * \return Distance in meters
+ * Calculate distance between two points
+ *
+ * @param from_pos a pointer to the from position (in radians)
+ * @param to_pos a pointer to the to position (in radians)
+ * @return distance in meters
  */
-double nmea_distance(const nmeaPOS *from_pos, /**< From position in radians */
-const nmeaPOS *to_pos /**< To position in radians */
-) {
-	double dist = ((double) NMEA_EARTHRADIUS_M)
+double nmea_distance(const nmeaPOS *from_pos, const nmeaPOS *to_pos) {
+	return ((double) NMEA_EARTHRADIUS_M)
 			* acos(
 					sin(to_pos->lat) * sin(from_pos->lat)
 							+ cos(to_pos->lat) * cos(from_pos->lat) * cos(to_pos->lon - from_pos->lon));
-	return dist;
 }
 
 /**
- * \brief Calculate distance between two points
+ * Calculate the distance between two points.
  * This function uses an algorithm for an oblate spheroid earth model.
  * The algorithm is described here: 
  * http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf
- * \return Distance in meters
+ *
+ * @param from_pos a pointer to the from position (in radians)
+ * @param to_pos a pointer to the to position (in radians)
+ * @param from_azimuth a pointer to the azimuth at "from" position (in radians) (output)
+ * @param to_azimuth a pointer to the azimuth at "to" position (in radians) (output)
+ * @return distance in meters
  */
-double nmea_distance_ellipsoid(const nmeaPOS *from_pos, /**< From position in radians */
-const nmeaPOS *to_pos, /**< To position in radians */
-double *from_azimuth, /**< (O) azimuth at "from" position in radians */
-double *to_azimuth /**< (O) azimuth at "to" position in radians */
-) {
+double nmea_distance_ellipsoid(const nmeaPOS *from_pos, const nmeaPOS *to_pos, double *from_azimuth, double *to_azimuth) {
 	/* All variables */
 	double f, a, b, sqr_a, sqr_b;
 	double L, phi1, phi2, U1, U2, sin_U1, sin_U2, cos_U1, cos_U2;
@@ -219,13 +252,15 @@ double *to_azimuth /**< (O) azimuth at "to" position in radians */
 }
 
 /**
- * \brief Horizontal move of point position
+ * Perform a horizontal move.
+ *
+ * @param start_pos a pointer to the start position (in radians)
+ * @param end_pos a pointer to the end position (in radians) (output)
+ * @param azimuth azimuth (in degrees, [0, 359])
+ * @param distance the distance (in km)
+ * @return 1 (true) on success, 0 (false) on failure
  */
-int nmea_move_horz(const nmeaPOS *start_pos, /**< Start position in radians */
-nmeaPOS *end_pos, /**< Result position in radians */
-double azimuth, /**< Azimuth (degree) [0, 359] */
-double distance /**< Distance (km) */
-) {
+int nmea_move_horz(const nmeaPOS *start_pos, nmeaPOS *end_pos, double azimuth, double distance) {
 	nmeaPOS p1 = *start_pos;
 	int RetVal = 1;
 
@@ -246,17 +281,20 @@ double distance /**< Distance (km) */
 }
 
 /**
- * \brief Horizontal move of point position
+ * Perform a horizontal move.
  * This function uses an algorithm for an oblate spheroid earth model.
  * The algorithm is described here: 
  * http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf
+ *
+ * @param start_pos a pointer to the start position (in radians)
+ * @param end_pos a pointer to the end position (in radians) (output)
+ * @param azimuth azimuth (in radians)
+ * @param distance the distance (in km)
+ * @param end_azimuth azimuth at end position (in radians) (output)
+ * @return 1 (true) on success, 0 (false) on failure
  */
-int nmea_move_horz_ellipsoid(const nmeaPOS *start_pos, /**< Start position in radians */
-nmeaPOS *end_pos, /**< (O) Result position in radians */
-double azimuth, /**< Azimuth in radians */
-double distance, /**< Distance (km) */
-double *end_azimuth /**< (O) Azimuth at end position in radians */
-) {
+int nmea_move_horz_ellipsoid(const nmeaPOS *start_pos, nmeaPOS *end_pos, double azimuth, double distance,
+		double *end_azimuth) {
 	/* Variables */
 	double f, a, b, sqr_a, sqr_b;
 	double phi1, tan_U1, sin_U1, cos_U1, s, alpha1, sin_alpha1, cos_alpha1;
@@ -346,15 +384,28 @@ double *end_azimuth /**< (O) Azimuth at end position in radians */
 }
 
 /**
- * \brief Convert position from INFO to radians position
+ * Convert a position from INFO to radians position
+ *
+ * @param info a pointer to the INFO position
+ * @param pos a pointer to the radians position (output)
  */
 void nmea_info2pos(const nmeaINFO *info, nmeaPOS *pos) {
-	pos->lat = nmea_ndeg2radian(info->lat);
-	pos->lon = nmea_ndeg2radian(info->lon);
+	if (nmea_INFO_is_present(info, LAT))
+		pos->lat = nmea_ndeg2radian(info->lat);
+	else
+		pos->lat = NMEA_DEF_LAT;
+
+	if (nmea_INFO_is_present(info, LON))
+		pos->lon = nmea_ndeg2radian(info->lon);
+	else
+		pos->lat = NMEA_DEF_LON;
 }
 
 /**
- * \brief Convert radians position to INFOs position
+ * Convert a radians position to a position from INFO
+ *
+ * @param pos a pointer to the radians position
+ * @param info a pointer to the INFO position (output)
  */
 void nmea_pos2info(const nmeaPOS *pos, nmeaINFO *info) {
 	info->lat = nmea_radian2ndeg(pos->lat);

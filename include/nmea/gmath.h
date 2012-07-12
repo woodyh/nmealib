@@ -44,26 +44,26 @@ extern "C" {
  * degree VS radian
  */
 
-double nmea_degree2radian(double val);
-double nmea_radian2degree(double val);
+double nmea_degree2radian(const double val);
+double nmea_radian2degree(const double val);
 
 /*
  * NDEG (NMEA degree)
  */
 
-double nmea_ndeg2degree(double val);
-double nmea_degree2ndeg(double val);
+double nmea_ndeg2degree(const double val);
+double nmea_degree2ndeg(const double val);
 
-double nmea_ndeg2radian(double val);
-double nmea_radian2ndeg(double val);
+double nmea_ndeg2radian(const double val);
+double nmea_radian2ndeg(const double val);
 
 /*
  * DOP
  */
 
-double nmea_calc_pdop(double hdop, double vdop);
-double nmea_dop2meters(double dop);
-double nmea_meters2dop(double meters);
+double nmea_calc_pdop(const double hdop, const double vdop);
+double nmea_dop2meters(const double dop);
+double nmea_meters2dop(const double meters);
 
 /*
  * positions work
