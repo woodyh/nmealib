@@ -47,15 +47,17 @@ static double nmea_random(const double min, const double max) {
  *
  * @param gen a pointer to the generator
  * @param info a pointer to an nmeaINFO structure to use during generation
- * (smask is preserved, other fields are reset before generation starts)
+ * (present and smask are preserved, other fields are reset before generation starts)
  * @return 1 (true) on success, 0 (false) otherwise
  */
 int nmea_gen_init(nmeaGENERATOR *gen, nmeaINFO *info) {
 	int retval = 1;
+	int present = info->present;
 	int smask = info->smask;
 	nmeaGENERATOR *igen = gen;
 
 	nmea_zero_INFO(info);
+	info->present = present;
 	info->smask = smask;
 	nmea_INFO_set_present(info, SMASK);
 
