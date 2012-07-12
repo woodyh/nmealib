@@ -393,14 +393,14 @@ int nmea_parse_GPGGA(const char *s, const int len, nmeaGPGGA *pack) {
 
 		nmea_INFO_set_present(pack, UTCTIME);
 	}
-	if ((pack->lat != NAN) && (pack->ns)) {
+	if (!isnan(pack->lat) && (pack->ns)) {
 		if (!validateNSEW(&pack->ns, true)) {
 			return 0;
 		}
 
 		nmea_INFO_set_present(pack, LAT);
 	}
-	if ((pack->lon != NAN) && (pack->ew)) {
+	if (!isnan(pack->lon) && (pack->ew)) {
 		if (!validateNSEW(&pack->ew, false)) {
 			return 0;
 		}
@@ -418,10 +418,10 @@ int nmea_parse_GPGGA(const char *s, const int len, nmeaGPGGA *pack) {
 	if (pack->satinuse != -1) {
 		nmea_INFO_set_present(pack, SATINUSECOUNT);
 	}
-	if (pack->HDOP != NAN) {
+	if (!isnan(pack->HDOP)) {
 		nmea_INFO_set_present(pack, HDOP);
 	}
-	if ((pack->elv != NAN) && (pack->elv_units)) {
+	if (!isnan(pack->elv) && (pack->elv_units)) {
 		if (pack->elv_units != 'M') {
 			nmea_error("GPGGA parse error: invalid elevation unit (%c)", pack->elv_units);
 			return 0;
@@ -498,13 +498,13 @@ int nmea_parse_GPGSA(const char *s, const int len, nmeaGPGSA *pack) {
 			break;
 		}
 	}
-	if (pack->PDOP != NAN) {
+	if (!isnan(pack->PDOP)) {
 		nmea_INFO_set_present(pack, PDOP);
 	}
-	if (pack->HDOP != NAN) {
+	if (!isnan(pack->HDOP)) {
 		nmea_INFO_set_present(pack, HDOP);
 	}
-	if (pack->VDOP != NAN) {
+	if (!isnan(pack->VDOP)) {
 		nmea_INFO_set_present(pack, VDOP);
 	}
 
@@ -682,27 +682,27 @@ int nmea_parse_GPRMC(const char *s, const int len, nmeaGPRMC *pack) {
 			return 0;
 		}
 	}
-	if ((pack->lat != NAN) && (pack->ns)) {
+	if (!isnan(pack->lat) && (pack->ns)) {
 		if (!validateNSEW(&pack->ns, true)) {
 			return 0;
 		}
 
 		nmea_INFO_set_present(pack, LAT);
 	}
-	if ((pack->lon != NAN) && (pack->ew)) {
+	if (!isnan(pack->lon) && (pack->ew)) {
 		if (!validateNSEW(&pack->ew, false)) {
 			return 0;
 		}
 
 		nmea_INFO_set_present(pack, LON);
 	}
-	if (pack->speed != NAN) {
+	if (!isnan(pack->speed)) {
 		nmea_INFO_set_present(pack, SPEED);
 	}
-	if (pack->track != NAN) {
+	if (!isnan(pack->track)) {
 		nmea_INFO_set_present(pack, TRACK);
 	}
-	if ((pack->magvar != NAN) && (pack->magvar_ew)) {
+	if (!isnan(pack->magvar) && (pack->magvar_ew)) {
 		if (!validateNSEW(&pack->magvar_ew, false)) {
 			return 0;
 		}
@@ -765,7 +765,7 @@ int nmea_parse_GPVTG(const char *s, const int len, nmeaGPVTG *pack) {
 
 	/* determine which fields are present and validate them */
 
-	if ((pack->track != NAN) && (pack->track_t)) {
+	if (!isnan(pack->track) && (pack->track_t)) {
 		pack->track_t = toupper(pack->track_t);
 		if (pack->track_t != 'T') {
 			nmea_error("GPVTG parse error: invalid track unit, got %C, expected T", pack->track_t);
@@ -774,7 +774,7 @@ int nmea_parse_GPVTG(const char *s, const int len, nmeaGPVTG *pack) {
 
 		nmea_INFO_set_present(pack, TRACK);
 	}
-	if ((pack->mtrack != NAN) && (pack->mtrack_m)) {
+	if (!isnan(pack->mtrack) && (pack->mtrack_m)) {
 		pack->mtrack_m = toupper(pack->mtrack_m);
 		if (pack->mtrack_m != 'M') {
 			nmea_error("GPVTG parse error: invalid mtrack unit, got %C, expected M", pack->mtrack_m);
@@ -783,7 +783,7 @@ int nmea_parse_GPVTG(const char *s, const int len, nmeaGPVTG *pack) {
 
 		nmea_INFO_set_present(pack, MTRACK);
 	}
-	if ((pack->spn != NAN) && (pack->spn_n)) {
+	if (!isnan(pack->spn) && (pack->spn_n)) {
 		pack->spn_n = toupper(pack->spn_n);
 		if (pack->spn_n != 'N') {
 			nmea_error("GPVTG parse error: invalid knots speed unit, got %C, expected N", pack->spn_n);
@@ -792,12 +792,12 @@ int nmea_parse_GPVTG(const char *s, const int len, nmeaGPVTG *pack) {
 
 		nmea_INFO_set_present(pack, SPEED);
 
-		if (pack->spk == NAN) {
+		if (isnan(pack->spk)) {
 			pack->spk = pack->spn * NMEA_TUD_KNOTS;
 			pack->spk_k = 'K';
 		}
 	}
-	if ((pack->spk != NAN) && (pack->spk_k)) {
+	if (!isnan(pack->spk) && (pack->spk_k)) {
 		pack->spk_k = toupper(pack->spk_k);
 		if (pack->spk_k != 'K') {
 			nmea_error("GPVTG parse error: invalid kph speed unit, got %C, expected K", pack->spk_k);
@@ -806,7 +806,7 @@ int nmea_parse_GPVTG(const char *s, const int len, nmeaGPVTG *pack) {
 
 		nmea_INFO_set_present(pack, SPEED);
 
-		if (pack->spn == NAN) {
+		if (isnan(pack->spn)) {
 			pack->spn = pack->spk / NMEA_TUD_KNOTS;
 			pack->spn_n = 'N';
 		}
