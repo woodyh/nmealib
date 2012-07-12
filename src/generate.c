@@ -57,28 +57,28 @@ int nmea_gen_GPGGA(char *s, const int len, const nmeaGPGGA *pack) {
 	sElv[0] = 0;
 	sElvUnit[0] = sElvUnit[1] = 0;
 
-	if (nmea_INFO_is_present(pack, UTCTIME)) {
+	if (nmea_INFO_is_present(pack->present, UTCTIME)) {
 		snprintf(&sTime[0], sizeof(sTime), "%02d%02d%02d.%02d", pack->utc.hour, pack->utc.min, pack->utc.sec,
 				pack->utc.hsec);
 	}
-	if (nmea_INFO_is_present(pack, LAT)) {
+	if (nmea_INFO_is_present(pack->present, LAT)) {
 		snprintf(&sLat[0], sizeof(sLat), "%09.4f", pack->lat);
 		sNs[0] = pack->ns;
 	}
-	if (nmea_INFO_is_present(pack, LON)) {
+	if (nmea_INFO_is_present(pack->present, LON)) {
 		snprintf(&sLon[0], sizeof(sLon), "%010.4f", pack->lon);
 		sEw[0] = pack->ew;
 	}
-	if (nmea_INFO_is_present(pack, SIG)) {
+	if (nmea_INFO_is_present(pack->present, SIG)) {
 		snprintf(&sSig[0], sizeof(sSig), "%1d", pack->sig);
 	}
-	if (nmea_INFO_is_present(pack, SATINUSECOUNT)) {
+	if (nmea_INFO_is_present(pack->present, SATINUSECOUNT)) {
 		snprintf(&sSatInUse[0], sizeof(sSatInUse), "%02d", pack->satinuse);
 	}
-	if (nmea_INFO_is_present(pack, HDOP)) {
+	if (nmea_INFO_is_present(pack->present, HDOP)) {
 		snprintf(&sHdop[0], sizeof(sHdop), "%03.1f", pack->HDOP);
 	}
-	if (nmea_INFO_is_present(pack, ELV)) {
+	if (nmea_INFO_is_present(pack->present, ELV)) {
 		snprintf(&sElv[0], sizeof(sElv), "%03.1f", pack->elv);
 		sElvUnit[0] = pack->elv_units;
 	}
@@ -107,7 +107,7 @@ int nmea_gen_GPGSA(char *s, const int len, const nmeaGPGSA *pack) {
 	char * psSatPrn = &sSatPrn[0];
 	int ssSatPrn = sizeof(sSatPrn);
 
-	bool satinuse = nmea_INFO_is_present(pack, SATINUSE);
+	bool satinuse = nmea_INFO_is_present(pack->present, SATINUSE);
 
 	sFixMode[0] = sFixMode[1] = 0;
 	sFixType[0] = sFixType[1] = 0;
@@ -116,7 +116,7 @@ int nmea_gen_GPGSA(char *s, const int len, const nmeaGPGSA *pack) {
 	sHdop[0] = 0;
 	sVdop[0] = 0;
 
-	if (nmea_INFO_is_present(pack, FIX)) {
+	if (nmea_INFO_is_present(pack->present, FIX)) {
 		sFixMode[0] = pack->fix_mode;
 		snprintf(&sFixType[0], sizeof(sFixType), "%1d", pack->fix_type);
 	}
@@ -142,13 +142,13 @@ int nmea_gen_GPGSA(char *s, const int len, const nmeaGPGSA *pack) {
 		}
 	}
 
-	if (nmea_INFO_is_present(pack, PDOP)) {
+	if (nmea_INFO_is_present(pack->present, PDOP)) {
 		snprintf(&sPdop[0], sizeof(sPdop), "%03.1f", pack->PDOP);
 	}
-	if (nmea_INFO_is_present(pack, HDOP)) {
+	if (nmea_INFO_is_present(pack->present, HDOP)) {
 		snprintf(&sHdop[0], sizeof(sHdop), "%03.1f", pack->HDOP);
 	}
-	if (nmea_INFO_is_present(pack, VDOP)) {
+	if (nmea_INFO_is_present(pack->present, VDOP)) {
 		snprintf(&sVdop[0], sizeof(sVdop), "%03.1f", pack->VDOP);
 	}
 
@@ -171,7 +171,7 @@ int nmea_gen_GPGSV(char *s, const int len, const nmeaGPGSV *pack) {
 	char sSatInfo[64];
 	char * psSatInfo = &sSatInfo[0];
 	int ssSatInfo = sizeof(sSatInfo);
-	bool satinview = nmea_INFO_is_present(pack, SATINVIEW);
+	bool satinview = nmea_INFO_is_present(pack->present, SATINVIEW);
 	int i;
 
 	sCount[0] = 0;
@@ -243,28 +243,28 @@ int nmea_gen_GPRMC(char *s, const int len, const nmeaGPRMC *pack) {
 	sMagvar[0] = 0;
 	sMagvar_ew[0] = sMagvar_ew[1] = 0;
 
-	if (nmea_INFO_is_present(pack, UTCDATE)) {
+	if (nmea_INFO_is_present(pack->present, UTCDATE)) {
 		snprintf(&sDate[0], sizeof(sDate), "%02d%02d%02d", pack->utc.day, pack->utc.mon + 1, pack->utc.year - 100);
 	}
-	if (nmea_INFO_is_present(pack, UTCTIME)) {
+	if (nmea_INFO_is_present(pack->present, UTCTIME)) {
 		snprintf(&sTime[0], sizeof(sTime), "%02d%02d%02d.%02d", pack->utc.hour, pack->utc.min, pack->utc.sec,
 				pack->utc.hsec);
 	}
-	if (nmea_INFO_is_present(pack, LAT)) {
+	if (nmea_INFO_is_present(pack->present, LAT)) {
 		snprintf(&sLat[0], sizeof(sLat), "%09.4f", pack->lat);
 		sNs[0] = pack->ns;
 	}
-	if (nmea_INFO_is_present(pack, LON)) {
+	if (nmea_INFO_is_present(pack->present, LON)) {
 		snprintf(&sLon[0], sizeof(sLon), "%010.4f", pack->lon);
 		sEw[0] = pack->ew;
 	}
-	if (nmea_INFO_is_present(pack, SPEED)) {
+	if (nmea_INFO_is_present(pack->present, SPEED)) {
 		snprintf(&sSpeed[0], sizeof(sSpeed), "%03.1f", pack->speed);
 	}
-	if (nmea_INFO_is_present(pack, TRACK)) {
+	if (nmea_INFO_is_present(pack->present, TRACK)) {
 		snprintf(&sTrack[0], sizeof(sTrack), "%03.1f", pack->track);
 	}
-	if (nmea_INFO_is_present(pack, MAGVAR)) {
+	if (nmea_INFO_is_present(pack->present, MAGVAR)) {
 		snprintf(&sMagvar[0], sizeof(sMagvar), "%03.1f", pack->magvar);
 		sMagvar_ew[0] = pack->magvar_ew;
 	}
@@ -300,15 +300,15 @@ int nmea_gen_GPVTG(char *s, const int len, const nmeaGPVTG *pack) {
 	sUnitN[0] = sUnitN[1] = 0;
 	sUnitK[0] = sUnitK[1] = 0;
 
-	if (nmea_INFO_is_present(pack, TRACK)) {
+	if (nmea_INFO_is_present(pack->present, TRACK)) {
 		snprintf(&sTrackT[0], sizeof(sTrackT), "%03.1f", pack->track);
 		sUnitT[0] = 'T';
 	}
-	if (nmea_INFO_is_present(pack, MTRACK)) {
+	if (nmea_INFO_is_present(pack->present, MTRACK)) {
 		snprintf(&sTrackM[0], sizeof(sTrackM), "%03.1f", pack->mtrack);
 		sUnitM[0] = 'M';
 	}
-	if (nmea_INFO_is_present(pack, SPEED)) {
+	if (nmea_INFO_is_present(pack->present, SPEED)) {
 		snprintf(&sSpeedN[0], sizeof(sSpeedN), "%03.1f", pack->spn);
 		sUnitN[0] = 'N';
 		snprintf(&sSpeedK[0], sizeof(sSpeedK), "%03.1f", pack->spk);

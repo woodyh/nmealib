@@ -47,25 +47,25 @@ int main(int argc __attribute__((unused)), char *argv[] __attribute__((unused)))
 	info.VDOP = 1.2;
 	info.PDOP = 2.594224354;
 
-	nmea_INFO_set_present(&info, SIG);
-	nmea_INFO_set_present(&info, FIX);
-	nmea_INFO_set_present(&info, LAT);
-	nmea_INFO_set_present(&info, LON);
-	nmea_INFO_set_present(&info, SPEED);
-	nmea_INFO_set_present(&info, ELV);
-	nmea_INFO_set_present(&info, TRACK);
-	nmea_INFO_set_present(&info, MTRACK);
-	nmea_INFO_set_present(&info, MAGVAR);
-	nmea_INFO_set_present(&info, HDOP);
-	nmea_INFO_set_present(&info, VDOP);
-	nmea_INFO_set_present(&info, PDOP);
+	nmea_INFO_set_present(&info.present, SIG);
+	nmea_INFO_set_present(&info.present, FIX);
+	nmea_INFO_set_present(&info.present, LAT);
+	nmea_INFO_set_present(&info.present, LON);
+	nmea_INFO_set_present(&info.present, SPEED);
+	nmea_INFO_set_present(&info.present, ELV);
+	nmea_INFO_set_present(&info.present, TRACK);
+	nmea_INFO_set_present(&info.present, MTRACK);
+	nmea_INFO_set_present(&info.present, MAGVAR);
+	nmea_INFO_set_present(&info.present, HDOP);
+	nmea_INFO_set_present(&info.present, VDOP);
+	nmea_INFO_set_present(&info.present, PDOP);
 
 	info.satinfo.inuse = NMEA_MAXSAT;
-	nmea_INFO_set_present(&info, SATINUSECOUNT);
+	nmea_INFO_set_present(&info.present, SATINUSECOUNT);
 	for (it = 0; it < NMEA_MAXSAT; it++) {
 		info.satinfo.in_use[it] = it + 1;
 	}
-	nmea_INFO_set_present(&info, SATINUSE);
+	nmea_INFO_set_present(&info.present, SATINUSE);
 
 	info.satinfo.inview = NMEA_MAXSAT;
 	for (it = 0; it < NMEA_MAXSAT; it++) {
@@ -74,7 +74,7 @@ int main(int argc __attribute__((unused)), char *argv[] __attribute__((unused)))
 		info.satinfo.sat[it].azimuth = it + 1;
 		info.satinfo.sat[it].sig = 99 - it;
 	}
-	nmea_INFO_set_present(&info, SATINVIEW);
+	nmea_INFO_set_present(&info.present, SATINVIEW);
 
 	for (it = 0; it < 10; it++) {
 		gen_sz = nmea_generate(&buff[0], 2048, &info, GPGGA | GPGSA | GPGSV | GPRMC | GPVTG);

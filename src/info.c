@@ -74,10 +74,43 @@ void nmea_zero_INFO(nmeaINFO *info) {
 	nmea_time_now(&info->utc, &info->present);
 
 	info->sig = NMEA_SIG_BAD;
-	nmea_INFO_set_present(info, SIG);
+	nmea_INFO_set_present(&info->present, SIG);
 
 	info->fix = NMEA_FIX_BAD;
-	nmea_INFO_set_present(info, FIX);
+	nmea_INFO_set_present(&info->present, FIX);
+}
+
+/**
+ * Determine if a nmeaINFO structure has a certain field
+ *
+ * @param present the presence field
+ * @param fieldName use a name from nmeaINFO_FIELD
+ * @return a boolean, true when the structure has the requested field
+ */
+bool nmea_INFO_is_present(uint32_t present, nmeaINFO_FIELD fieldName) {
+	return ((present & fieldName) != 0);
+}
+
+/**
+ * Flag a nmeaINFO structure to contain a certain field
+ *
+ * @param present a pointer to the presence field
+ * @param fieldName use a name from nmeaINFO_FIELD
+ */
+void nmea_INFO_set_present(uint32_t * present, nmeaINFO_FIELD fieldName) {
+	assert(present);
+	*present |= fieldName;
+}
+
+/**
+ * Flag a nmeaINFO structure to NOT contain a certain field
+ *
+ * @param present a pointer to the presence field
+ * @param fieldName use a name from nmeaINFO_FIELD
+ */
+void nmea_INFO_unset_present(uint32_t * present, nmeaINFO_FIELD fieldName) {
+	assert(present);
+	*present &= ~fieldName;
 }
 
 /**
@@ -127,28 +160,28 @@ void nmea_INFO_sanitise(nmeaINFO *nmeaInfo) {
 
 	nmeaInfo->present = nmeaInfo->present & NMEA_INFO_PRESENT_MASK;
 
-	if (!nmea_INFO_is_present(nmeaInfo, SMASK)) {
+	if (!nmea_INFO_is_present(nmeaInfo->present, SMASK)) {
 		nmeaInfo->smask = 0;
 	}
 
-	if (!nmea_INFO_is_present(nmeaInfo, UTCDATE) || !nmea_INFO_is_present(nmeaInfo, UTCTIME)) {
+	if (!nmea_INFO_is_present(nmeaInfo->present, UTCDATE) || !nmea_INFO_is_present(nmeaInfo->present, UTCTIME)) {
 		nmea_time_now(&utc, NULL);
 	}
 
-	if (!nmea_INFO_is_present(nmeaInfo, UTCDATE)) {
+	if (!nmea_INFO_is_present(nmeaInfo->present, UTCDATE)) {
 		nmeaInfo->utc.year = utc.year;
 		nmeaInfo->utc.mon = utc.mon;
 		nmeaInfo->utc.day = utc.day;
 	}
 
-	if (!nmea_INFO_is_present(nmeaInfo, UTCTIME)) {
+	if (!nmea_INFO_is_present(nmeaInfo->present, UTCTIME)) {
 		nmeaInfo->utc.hour = utc.hour;
 		nmeaInfo->utc.min = utc.min;
 		nmeaInfo->utc.sec = utc.sec;
 		nmeaInfo->utc.hsec = utc.hsec;
 	}
 
-	if (!nmea_INFO_is_present(nmeaInfo, SIG)) {
+	if (!nmea_INFO_is_present(nmeaInfo->present, SIG)) {
 		nmeaInfo->sig = NMEA_SIG_BAD;
 	} else {
 		if ((nmeaInfo->sig < NMEA_SIG_BAD) || (nmeaInfo->sig > NMEA_SIG_SIM)) {
@@ -156,7 +189,7 @@ void nmea_INFO_sanitise(nmeaINFO *nmeaInfo) {
 		}
 	}
 
-	if (!nmea_INFO_is_present(nmeaInfo, FIX)) {
+	if (!nmea_INFO_is_present(nmeaInfo->present, FIX)) {
 		nmeaInfo->fix = NMEA_FIX_BAD;
 	} else {
 		if ((nmeaInfo->fix < NMEA_FIX_BAD) || (nmeaInfo->fix > NMEA_FIX_3D)) {
@@ -164,59 +197,59 @@ void nmea_INFO_sanitise(nmeaINFO *nmeaInfo) {
 		}
 	}
 
-	if (!nmea_INFO_is_present(nmeaInfo, PDOP)) {
+	if (!nmea_INFO_is_present(nmeaInfo->present, PDOP)) {
 		nmeaInfo->PDOP = 0;
 	} else {
 		nmeaInfo->PDOP = fabs(nmeaInfo->PDOP);
 	}
 
-	if (!nmea_INFO_is_present(nmeaInfo, HDOP)) {
+	if (!nmea_INFO_is_present(nmeaInfo->present, HDOP)) {
 		nmeaInfo->HDOP = 0;
 	} else {
 		nmeaInfo->HDOP = fabs(nmeaInfo->HDOP);
 	}
 
-	if (!nmea_INFO_is_present(nmeaInfo, VDOP)) {
+	if (!nmea_INFO_is_present(nmeaInfo->present, VDOP)) {
 		nmeaInfo->VDOP = 0;
 	} else {
 		nmeaInfo->VDOP = fabs(nmeaInfo->VDOP);
 	}
 
-	if (!nmea_INFO_is_present(nmeaInfo, LAT)) {
+	if (!nmea_INFO_is_present(nmeaInfo->present, LAT)) {
 		nmeaInfo->lat = 0;
 	}
 
-	if (!nmea_INFO_is_present(nmeaInfo, LON)) {
+	if (!nmea_INFO_is_present(nmeaInfo->present, LON)) {
 		nmeaInfo->lon = 0;
 	}
 
-	if (!nmea_INFO_is_present(nmeaInfo, ELV)) {
+	if (!nmea_INFO_is_present(nmeaInfo->present, ELV)) {
 		nmeaInfo->elv = 0;
 	}
 
-	if (!nmea_INFO_is_present(nmeaInfo, SPEED)) {
+	if (!nmea_INFO_is_present(nmeaInfo->present, SPEED)) {
 		nmeaInfo->speed = 0;
 	}
 
-	if (!nmea_INFO_is_present(nmeaInfo, TRACK)) {
+	if (!nmea_INFO_is_present(nmeaInfo->present, TRACK)) {
 		nmeaInfo->track = 0;
 	}
 
-	if (!nmea_INFO_is_present(nmeaInfo, MTRACK)) {
+	if (!nmea_INFO_is_present(nmeaInfo->present, MTRACK)) {
 		nmeaInfo->mtrack = 0;
 	}
 
-	if (!nmea_INFO_is_present(nmeaInfo, MAGVAR)) {
+	if (!nmea_INFO_is_present(nmeaInfo->present, MAGVAR)) {
 		nmeaInfo->magvar = 0;
 	}
 
-	if (!nmea_INFO_is_present(nmeaInfo, SATINUSECOUNT)) {
+	if (!nmea_INFO_is_present(nmeaInfo->present, SATINUSECOUNT)) {
 		nmeaInfo->satinfo.inuse = 0;
 	}
-	if (!nmea_INFO_is_present(nmeaInfo, SATINUSE)) {
+	if (!nmea_INFO_is_present(nmeaInfo->present, SATINUSE)) {
 		memset(&nmeaInfo->satinfo.in_use, 0, sizeof(nmeaInfo->satinfo.in_use));
 	}
-	if (!nmea_INFO_is_present(nmeaInfo, SATINVIEW)) {
+	if (!nmea_INFO_is_present(nmeaInfo->present, SATINVIEW)) {
 		nmeaInfo->satinfo.inview = 0;
 		memset(&nmeaInfo->satinfo.sat, 0, sizeof(nmeaInfo->satinfo.sat));
 	}
@@ -468,23 +501,23 @@ void nmea_INFO_unit_conversion(nmeaINFO * nmeaInfo) {
 	/* sig (already in correct format) */
 	/* fix (already in correct format) */
 
-	if (nmea_INFO_is_present(nmeaInfo, PDOP)) {
+	if (nmea_INFO_is_present(nmeaInfo->present, PDOP)) {
 		nmeaInfo->PDOP = nmea_dop2meters(nmeaInfo->PDOP);
 	}
 
-	if (nmea_INFO_is_present(nmeaInfo, HDOP)) {
+	if (nmea_INFO_is_present(nmeaInfo->present, HDOP)) {
 		nmeaInfo->HDOP = nmea_dop2meters(nmeaInfo->HDOP);
 	}
 
-	if (nmea_INFO_is_present(nmeaInfo, VDOP)) {
+	if (nmea_INFO_is_present(nmeaInfo->present, VDOP)) {
 		nmeaInfo->VDOP = nmea_dop2meters(nmeaInfo->VDOP);
 	}
 
-	if (nmea_INFO_is_present(nmeaInfo, LAT)) {
+	if (nmea_INFO_is_present(nmeaInfo->present, LAT)) {
 		nmeaInfo->lat = nmea_ndeg2degree(nmeaInfo->lat);
 	}
 
-	if (nmea_INFO_is_present(nmeaInfo, LON)) {
+	if (nmea_INFO_is_present(nmeaInfo->present, LON)) {
 		nmeaInfo->lon = nmea_ndeg2degree(nmeaInfo->lon);
 	}
 

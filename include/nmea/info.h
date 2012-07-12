@@ -24,6 +24,7 @@
 #define __NMEA_INFO_H__
 
 #include <stdint.h>
+#include <stdbool.h>
 
 /*
  <pre>
@@ -189,30 +190,9 @@ typedef enum _nmeaINFO_FIELD {
 void nmea_time_now(nmeaTIME *utc, uint32_t * present);
 void nmea_zero_INFO(nmeaINFO *info);
 
-/**
- * Determine if a nmeaINFO structure has a certain field
- *
- * @param nmeaInfo use a pointer to nmeaINFO
- * @param fieldName use a name from nmeaINFO_FIELD
- * @return a boolean, true when the structure has the requested field
- */
-#define nmea_INFO_is_present(nmeaInfo, fieldName) (((nmeaInfo)->present & fieldName) != 0)
-
-/**
- * Flag a nmeaINFO structure to contain a certain field
- *
- * @param nmeaInfo use a pointer to nmeaINFO
- * @param fieldName use a name from nmeaINFO_FIELD
- */
-#define nmea_INFO_set_present(nmeaInfo, fieldName) ((nmeaInfo)->present |= fieldName)
-
-/**
- * Flag a nmeaINFO structure to NOT contain a certain field
- *
- * @param nmeaInfo use a pointer to nmeaINFO
- * @param fieldName use a name from nmeaINFO_FIELD
- */
-#define nmea_INFO_unset_present(nmeaInfo, fieldName) ((nmeaInfo)->present &= ~fieldName)
+bool nmea_INFO_is_present(uint32_t present, nmeaINFO_FIELD fieldName);
+void nmea_INFO_set_present(uint32_t * present, nmeaINFO_FIELD fieldName);
+void nmea_INFO_unset_present(uint32_t * present, nmeaINFO_FIELD fieldName);
 
 void nmea_INFO_sanitise(nmeaINFO *nmeaInfo);
 

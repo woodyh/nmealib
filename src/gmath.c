@@ -390,12 +390,12 @@ int nmea_move_horz_ellipsoid(const nmeaPOS *start_pos, nmeaPOS *end_pos, double 
  * @param pos a pointer to the radians position (output)
  */
 void nmea_info2pos(const nmeaINFO *info, nmeaPOS *pos) {
-	if (nmea_INFO_is_present(info, LAT))
+	if (nmea_INFO_is_present(info->present, LAT))
 		pos->lat = nmea_ndeg2radian(info->lat);
 	else
 		pos->lat = NMEA_DEF_LAT;
 
-	if (nmea_INFO_is_present(info, LON))
+	if (nmea_INFO_is_present(info->present, LON))
 		pos->lon = nmea_ndeg2radian(info->lon);
 	else
 		pos->lat = NMEA_DEF_LON;
@@ -410,6 +410,6 @@ void nmea_info2pos(const nmeaINFO *info, nmeaPOS *pos) {
 void nmea_pos2info(const nmeaPOS *pos, nmeaINFO *info) {
 	info->lat = nmea_radian2ndeg(pos->lat);
 	info->lon = nmea_radian2ndeg(pos->lon);
-	nmea_INFO_set_present(info, LAT);
-	nmea_INFO_set_present(info, LON);
+	nmea_INFO_set_present(&info->present, LAT);
+	nmea_INFO_set_present(&info->present, LON);
 }

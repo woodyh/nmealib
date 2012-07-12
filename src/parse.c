@@ -391,21 +391,21 @@ int nmea_parse_GPGGA(const char *s, const int len, nmeaGPGGA *pack) {
 			return 0;
 		}
 
-		nmea_INFO_set_present(pack, UTCTIME);
+		nmea_INFO_set_present(&pack->present, UTCTIME);
 	}
 	if (!isnan(pack->lat) && (pack->ns)) {
 		if (!validateNSEW(&pack->ns, true)) {
 			return 0;
 		}
 
-		nmea_INFO_set_present(pack, LAT);
+		nmea_INFO_set_present(&pack->present, LAT);
 	}
 	if (!isnan(pack->lon) && (pack->ew)) {
 		if (!validateNSEW(&pack->ew, false)) {
 			return 0;
 		}
 
-		nmea_INFO_set_present(pack, LON);
+		nmea_INFO_set_present(&pack->present, LON);
 	}
 	if (pack->sig != -1) {
 		if (!((pack->sig >= 0) && (pack->sig <= 8))) {
@@ -413,13 +413,13 @@ int nmea_parse_GPGGA(const char *s, const int len, nmeaGPGGA *pack) {
 			return 0;
 		}
 
-		nmea_INFO_set_present(pack, SIG);
+		nmea_INFO_set_present(&pack->present, SIG);
 	}
 	if (pack->satinuse != -1) {
-		nmea_INFO_set_present(pack, SATINUSECOUNT);
+		nmea_INFO_set_present(&pack->present, SATINUSECOUNT);
 	}
 	if (!isnan(pack->HDOP)) {
-		nmea_INFO_set_present(pack, HDOP);
+		nmea_INFO_set_present(&pack->present, HDOP);
 	}
 	if (!isnan(pack->elv) && (pack->elv_units)) {
 		if (pack->elv_units != 'M') {
@@ -427,7 +427,7 @@ int nmea_parse_GPGGA(const char *s, const int len, nmeaGPGGA *pack) {
 			return 0;
 		}
 
-		nmea_INFO_set_present(pack, ELV);
+		nmea_INFO_set_present(&pack->present, ELV);
 	}
 	/* ignore diff and diff_units */
 	/* ignore dgps_age and dgps_sid */
@@ -490,22 +490,22 @@ int nmea_parse_GPGSA(const char *s, const int len, nmeaGPGSA *pack) {
 			return 0;
 		}
 
-		nmea_INFO_set_present(pack, FIX);
+		nmea_INFO_set_present(&pack->present, FIX);
 	}
 	for (i = 0; i < NMEA_MAXSAT; i++) {
 		if (pack->sat_prn[i] != 0) {
-			nmea_INFO_set_present(pack, SATINUSE);
+			nmea_INFO_set_present(&pack->present, SATINUSE);
 			break;
 		}
 	}
 	if (!isnan(pack->PDOP)) {
-		nmea_INFO_set_present(pack, PDOP);
+		nmea_INFO_set_present(&pack->present, PDOP);
 	}
 	if (!isnan(pack->HDOP)) {
-		nmea_INFO_set_present(pack, HDOP);
+		nmea_INFO_set_present(&pack->present, HDOP);
 	}
 	if (!isnan(pack->VDOP)) {
-		nmea_INFO_set_present(pack, VDOP);
+		nmea_INFO_set_present(&pack->present, VDOP);
 	}
 
 	return 1;
@@ -587,7 +587,7 @@ int nmea_parse_GPGSV(const char *s, const int len, nmeaGPGSV *pack) {
 	/* determine which fields are present and validate them */
 
 	if (pack->sat_count > 0) {
-		nmea_INFO_set_present(pack, SATINVIEW);
+		nmea_INFO_set_present(&pack->present, SATINVIEW);
 	}
 
 	return 1;
@@ -657,7 +657,7 @@ int nmea_parse_GPRMC(const char *s, const int len, nmeaGPRMC *pack) {
 			return 0;
 		}
 
-		nmea_INFO_set_present(pack, UTCDATE);
+		nmea_INFO_set_present(&pack->present, UTCDATE);
 	}
 
 	time_buff_len = strlen(&time_buff[0]);
@@ -670,7 +670,7 @@ int nmea_parse_GPRMC(const char *s, const int len, nmeaGPRMC *pack) {
 			return 0;
 		}
 
-		nmea_INFO_set_present(pack, UTCTIME);
+		nmea_INFO_set_present(&pack->present, UTCTIME);
 	}
 
 	if (!pack->status) {
@@ -687,27 +687,27 @@ int nmea_parse_GPRMC(const char *s, const int len, nmeaGPRMC *pack) {
 			return 0;
 		}
 
-		nmea_INFO_set_present(pack, LAT);
+		nmea_INFO_set_present(&pack->present, LAT);
 	}
 	if (!isnan(pack->lon) && (pack->ew)) {
 		if (!validateNSEW(&pack->ew, false)) {
 			return 0;
 		}
 
-		nmea_INFO_set_present(pack, LON);
+		nmea_INFO_set_present(&pack->present, LON);
 	}
 	if (!isnan(pack->speed)) {
-		nmea_INFO_set_present(pack, SPEED);
+		nmea_INFO_set_present(&pack->present, SPEED);
 	}
 	if (!isnan(pack->track)) {
-		nmea_INFO_set_present(pack, TRACK);
+		nmea_INFO_set_present(&pack->present, TRACK);
 	}
 	if (!isnan(pack->magvar) && (pack->magvar_ew)) {
 		if (!validateNSEW(&pack->magvar_ew, false)) {
 			return 0;
 		}
 
-		nmea_INFO_set_present(pack, MAGVAR);
+		nmea_INFO_set_present(&pack->present, MAGVAR);
 	}
 	if (token_count == 13) {
 		pack->mode = 'A';
@@ -772,7 +772,7 @@ int nmea_parse_GPVTG(const char *s, const int len, nmeaGPVTG *pack) {
 			return 0;
 		}
 
-		nmea_INFO_set_present(pack, TRACK);
+		nmea_INFO_set_present(&pack->present, TRACK);
 	}
 	if (!isnan(pack->mtrack) && (pack->mtrack_m)) {
 		pack->mtrack_m = toupper(pack->mtrack_m);
@@ -781,7 +781,7 @@ int nmea_parse_GPVTG(const char *s, const int len, nmeaGPVTG *pack) {
 			return 0;
 		}
 
-		nmea_INFO_set_present(pack, MTRACK);
+		nmea_INFO_set_present(&pack->present, MTRACK);
 	}
 	if (!isnan(pack->spn) && (pack->spn_n)) {
 		pack->spn_n = toupper(pack->spn_n);
@@ -790,7 +790,7 @@ int nmea_parse_GPVTG(const char *s, const int len, nmeaGPVTG *pack) {
 			return 0;
 		}
 
-		nmea_INFO_set_present(pack, SPEED);
+		nmea_INFO_set_present(&pack->present, SPEED);
 
 		if (isnan(pack->spk)) {
 			pack->spk = pack->spn * NMEA_TUD_KNOTS;
@@ -804,7 +804,7 @@ int nmea_parse_GPVTG(const char *s, const int len, nmeaGPVTG *pack) {
 			return 0;
 		}
 
-		nmea_INFO_set_present(pack, SPEED);
+		nmea_INFO_set_present(&pack->present, SPEED);
 
 		if (isnan(pack->spn)) {
 			pack->spn = pack->spk / NMEA_TUD_KNOTS;
