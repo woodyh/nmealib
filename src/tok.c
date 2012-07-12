@@ -18,8 +18,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*! \file tok.h */
-
 #include <nmea/tok.h>
 
 #include <ctype.h>
@@ -28,53 +26,68 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define NMEA_TOKS_COMPARE   (1)
-#define NMEA_TOKS_PERCENT   (2)
-#define NMEA_TOKS_WIDTH     (3)
-#define NMEA_TOKS_TYPE      (4)
+#define NMEA_TOKS_COMPARE   1
+#define NMEA_TOKS_PERCENT   2
+#define NMEA_TOKS_WIDTH     3
+#define NMEA_TOKS_TYPE      4
 
-#define NMEA_CONVSTR_BUF    (256)
+/** number conversion buffer size */
+#define NMEA_CONVSTR_BUF    64
 
 /**
- * \brief Calculate control sum of binary buffer
+ * Calculate crc control sum of a string
+ *
+ * @param s the string
+ * @param len the length of the string
+ * @return the crc
  */
-int nmea_calc_crc(const char *buff, int buff_sz) {
-	int chsum = 0, it;
+int nmea_calc_crc(const char *s, const int len) {
+	int chksum = 0;
+	int it;
 
-	for (it = 0; it < buff_sz; it++)
-		chsum ^= (int) buff[it];
+	for (it = 0; it < len; it++)
+		chksum ^= (int) s[it];
 
-	return chsum;
+	return chksum;
 }
 
 /**
- * \brief Convert string to number
+ * Convert string to an integer
+ *
+ * @param s the string
+ * @param len the length of the string
+ * @param radix the radix of the numbers in the string
+ * @return the converted number, or 0 on failure
  */
-int nmea_atoi(const char *str, int str_sz, int radix) {
+int nmea_atoi(const char *s, int len, int radix) {
 	char *tmp_ptr;
 	char buff[NMEA_CONVSTR_BUF];
-	int res = 0;
+	long res = 0;
 
-	if (str_sz < NMEA_CONVSTR_BUF) {
-		memcpy(&buff[0], str, str_sz);
-		buff[str_sz] = '\0';
+	if (len < NMEA_CONVSTR_BUF) {
+		memcpy(&buff[0], s, len);
+		buff[len] = '\0';
 		res = strtol(&buff[0], &tmp_ptr, radix);
 	}
 
-	return res;
+	return (int) res;
 }
 
 /**
- * \brief Convert string to fraction number
+ * Convert string to a floating point number
+ *
+ * @param s the string
+ * @param len the length of the string
+ * @return the converted number, or 0 on failure
  */
-double nmea_atof(const char *str, int str_sz) {
+double nmea_atof(const char *s, const int len) {
 	char *tmp_ptr;
 	char buff[NMEA_CONVSTR_BUF];
 	double res = 0;
 
-	if (str_sz < NMEA_CONVSTR_BUF) {
-		memcpy(&buff[0], str, str_sz);
-		buff[str_sz] = '\0';
+	if (len < NMEA_CONVSTR_BUF) {
+		memcpy(&buff[0], s, len);
+		buff[len] = '\0';
 		res = strtod(&buff[0], &tmp_ptr);
 	}
 
@@ -82,28 +95,34 @@ double nmea_atof(const char *str, int str_sz) {
 }
 
 /**
- * \brief Formating string (like standart printf) with CRC tail (*CRC)
+ * Formating string (like standart printf) with CRC tail (*CRC)
+ *
+ * @param s the string buffer to printf into
+ * @param len the size of the string buffer
+ * @param format the string format to use
+ * @return the number of printed characters
  */
-int nmea_printf(char *buff, int buff_sz, const char *format, ...) {
-	int retval, add = 0;
+int nmea_printf(char *s, int len, const char *format, ...) {
+	int retval;
+	int add = 0;
 	va_list arg_ptr;
 
-	if (buff_sz <= 0)
+	if (len <= 0)
 		return 0;
 
 	va_start(arg_ptr, format);
 
-	retval = vsnprintf(buff, buff_sz, format, arg_ptr);
+	retval = vsnprintf(s, len, format, arg_ptr);
 
 	if (retval > 0) {
-		add = snprintf(buff + retval, buff_sz - retval, "*%02x\r\n", nmea_calc_crc(buff + 1, retval - 1));
+		add = snprintf(s + retval, len - retval, "*%02x\r\n", nmea_calc_crc(s + 1, retval - 1));
 	}
 
 	retval += add;
 
-	if (retval < 0 || retval > buff_sz) {
-		memset(buff, ' ', buff_sz);
-		retval = buff_sz;
+	if (retval < 0 || retval > len) {
+		memset(s, ' ', len);
+		retval = len;
 	}
 
 	va_end(arg_ptr);
@@ -112,11 +131,16 @@ int nmea_printf(char *buff, int buff_sz, const char *format, ...) {
 }
 
 /**
- * \brief Analyse string (specificate for NMEA sentences)
+ * Analyse a string (specific for NMEA sentences)
+ *
+ * @param s the string
+ * @param len the length of the string
+ * @param format the string format to use
+ * @return the number of scanned characters
  */
-int nmea_scanf(const char *buff, int buff_sz, const char *format, ...) {
+int nmea_scanf(const char *s, int len, const char *format, ...) {
 	const char *beg_tok;
-	const char *end_buf = buff + buff_sz;
+	const char *end_buf = s + len;
 
 	va_list arg_ptr;
 	int tok_type = NMEA_TOKS_COMPARE;
@@ -129,12 +153,12 @@ int nmea_scanf(const char *buff, int buff_sz, const char *format, ...) {
 
 	va_start(arg_ptr, format);
 
-	for (; *format && buff < end_buf; format++) {
+	for (; *format && s < end_buf; format++) {
 		switch (tok_type) {
 		case NMEA_TOKS_COMPARE:
 			if ('%' == *format)
 				tok_type = NMEA_TOKS_PERCENT;
-			else if (*buff++ != *format)
+			else if (*s++ != *format)
 				goto fail;
 			break;
 		case NMEA_TOKS_PERCENT:
@@ -152,29 +176,29 @@ int nmea_scanf(const char *buff, int buff_sz, const char *format, ...) {
 			}
 			/* no break */
 		case NMEA_TOKS_TYPE:
-			beg_tok = buff;
+			beg_tok = s;
 
-			if (!width && ('c' == *format || 'C' == *format) && *buff != format[1])
+			if (!width && ('c' == *format || 'C' == *format) && *s != format[1])
 				width = 1;
 
 			if (width) {
-				if (buff + width <= end_buf)
-					buff += width;
+				if (s + width <= end_buf)
+					s += width;
 				else
 					goto fail;
 			} else {
-				if (!format[1] || (0 == (buff = (char *) memchr(buff, format[1], end_buf - buff))))
-					buff = end_buf;
+				if (!format[1] || (0 == (s = (char *) memchr(s, format[1], end_buf - s))))
+					s = end_buf;
 			}
 
-			if (buff > end_buf)
+			if (s > end_buf)
 				goto fail;
 
 			tok_type = NMEA_TOKS_COMPARE;
 			tok_count++;
 
 			parg_target = 0;
-			width = (int) (buff - beg_tok);
+			width = (int) (s - beg_tok);
 
 			switch (*format) {
 			case 'c':
@@ -207,7 +231,7 @@ int nmea_scanf(const char *buff, int buff_sz, const char *format, ...) {
 
 			if (parg_target)
 				break;
-			if (0 == (parg_target = (void *) va_arg(arg_ptr, int *) ))
+			if (0 == (parg_target = (void *) va_arg(arg_ptr, int *)))
 				break;
 			if (!width)
 				break;
