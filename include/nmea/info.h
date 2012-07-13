@@ -18,31 +18,39 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*! \file */
-
 #ifndef __NMEA_INFO_H__
 #define __NMEA_INFO_H__
 
 #include <stdint.h>
 #include <stdbool.h>
 
-/*
+/**
+ * @file
+ * The table below describes which fields are present in the sentences that are
+ * supported by the library.
  <pre>
- field/sentence GPGGA   GPGSA   GPGSV   GPRMC   GPVTG
- smask:         x       x       x       x       x
- utc:           x                       x
- sig:           x                       x
- fix:                   x               x
- PDOP:                  x
- HDOP:          x       x
- VDOP:                  x
- lat:           x                       x
- lon:           x                       x
- elv:           x
- speed:                                 x       x
- track:                                 x       x
+ field/sentence       GPGGA   GPGSA   GPGSV   GPRMC   GPVTG
+ present:               x       x       x       x       x
+ smask:                 x       x       x       x       x
+ utc (date):                                    x
+ utc (time):            x                       x
+ sig:                   x                       x1
+ fix:                           x               x1
+ PDOP:                          x
+ HDOP:                  x       x
+ VDOP:                          x
+ lat:                   x                       x
+ lon:                   x                       x
+ elv:                   x
+ speed:                                         x       x
+ track:                                         x       x
+ mtrack:                                                x
  magvar:                                        x
- satinfo:               x       x
+ satinfo (inuse count): x       x1
+ satinfo (inuse):               x
+ satinfo (inview):                      x
+
+ x1 = not present in the sentence but the library sets it up.
  </pre>
  */
 
