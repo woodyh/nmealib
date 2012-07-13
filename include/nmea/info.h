@@ -198,6 +198,7 @@ typedef enum _nmeaINFO_FIELD {
 void nmea_time_now(nmeaTIME *utc, uint32_t * present);
 void nmea_zero_INFO(nmeaINFO *info);
 
+bool nmea_INFO_is_present_smask(int smask, nmeaINFO_FIELD fieldName);
 bool nmea_INFO_is_present(uint32_t present, nmeaINFO_FIELD fieldName);
 void nmea_INFO_set_present(uint32_t * present, nmeaINFO_FIELD fieldName);
 void nmea_INFO_unset_present(uint32_t * present, nmeaINFO_FIELD fieldName);
