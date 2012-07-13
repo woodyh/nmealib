@@ -180,12 +180,13 @@ void nmea_INFO_unset_present(uint32_t * present, nmeaINFO_FIELD fieldName) {
  * - track is in the range [0, 360>.
  * - mtrack is in the range [0, 360>.
  * - magvar is in the range [0, 360>.
- * - satinfo: inuse and in_use are consistent (w.r.t. count)
- *            inview and sat are consistent (w.r.t. count/id)
- *            in_use and sat are consistent (w.r.t. count/id)
- *            elv is in the range [0, 90]
- *            azimuth is in the range [0, 359]
- *            sig is in the range [0, 99]
+ * - satinfo:
+ *   - inuse and in_use are consistent (w.r.t. count)
+ *   - inview and sat are consistent (w.r.t. count/id)
+ *   - in_use and sat are consistent (w.r.t. count/id)
+ *   - elv is in the range [0, 90]
+ *   - azimuth is in the range [0, 359]
+ *   - sig is in the range [0, 99]
  *
  * Time is set to the current time when not present.
  * Fields are reset to their defaults (0) when not signaled as being present.
