@@ -421,8 +421,8 @@ int nmea_parse_GPGGA(const char *s, const int len, nmeaGPGGA *pack) {
 		nmea_INFO_set_present(&pack->present, LON);
 	}
 	if (pack->sig != -1) {
-		if (!((pack->sig >= 0) && (pack->sig <= 8))) {
-			nmea_error("GPGGA parse error: invalid signal %d, expected [0, 8]", pack->sig);
+		if (!((pack->sig >= NMEA_SIG_FIRST) && (pack->sig <= NMEA_SIG_LAST))) {
+			nmea_error("GPGGA parse error: invalid signal %d, expected [%d, %d]", pack->sig, NMEA_SIG_FIRST, NMEA_SIG_LAST);
 			return 0;
 		}
 
@@ -498,8 +498,8 @@ int nmea_parse_GPGSA(const char *s, const int len, nmeaGPGSA *pack) {
 		return 0;
 	}
 	if (pack->fix_type != -1) {
-		if (!((pack->fix_type >= 1) && (pack->fix_type <= 3))) {
-			nmea_error("GPGSA parse error: invalid fix type %d, expected [1, 3]", pack->fix_type);
+		if (!((pack->fix_type >= NMEA_FIX_FIRST) && (pack->fix_type <= NMEA_FIX_LAST))) {
+			nmea_error("GPGSA parse error: invalid fix type %d, expected [%d, %d]", pack->fix_type, NMEA_FIX_FIRST, NMEA_FIX_LAST);
 			return 0;
 		}
 
