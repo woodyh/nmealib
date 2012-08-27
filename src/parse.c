@@ -162,10 +162,22 @@ static bool validateNSEW(char * c, const bool ns) {
 }
 
 /**
- * Validate mode and uppercase it.
+ * Uppercase mode and validate it.
  * Expects:
  * <pre>
- *   c in { a, A, d, D, e, E, n, N, s, S }
+ *   c in { A, D, E, F, M, N, P, R, S }
+ *
+ *   A = Autonomous. Satellite system used in non-differential mode in position fix
+ *   D = Differential. Satellite system used in differential mode in position fix
+ *   E = Estimated (dead reckoning) mode
+ *   F = Float RTK. Satellite system used in real time kinematic mode with floating integers
+ *   M = Manual input mode
+ *   N = No fix. Satellite system not used in position fix, or fix not valid
+ *   P = Precise. Satellite system used in precision mode. Precision mode is defined
+ *       as no deliberate degradation (such as Selective Availability) and higher
+ *       resolution code (P-code) is used to compute position fix.
+ *   R = Real Time Kinematic. Satellite system used in RTK mode with fixed integers
+ *   S = Simulator mode
  * </pre>
  *
  * @param c a pointer to the character. The character will be converted to uppercase.
@@ -178,7 +190,8 @@ static bool validateMode(char * c) {
 
 	*c = toupper(*c);
 
-	if (!((*c == 'A') || (*c == 'D') || (*c == 'E') || (*c == 'N') || (*c == 'S'))) {
+	if (!((*c == 'A') || (*c == 'D') || (*c == 'E') || (*c == 'F') || (*c == 'M') || (*c == 'N') || (*c == 'P')
+			|| (*c == 'R') || (*c == 'S'))) {
 		nmea_error("Parse error: invalid mode (%c)", *c);
 		return false;
 	}
