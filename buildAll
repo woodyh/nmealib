@@ -1,8 +1,12 @@
 #!/bin/bash
 
+
+declare -i VERBOSE=0
+
 for i in 0 1; do
+  echo "=== clean"
   git clean -fdx
-  make DEBUG=${i} all samples
+  make DEBUG=${i} VERBOSE=${VERBOSE} all samples
 done
 
-make doc
+make doc VERBOSE=${VERBOSE}
