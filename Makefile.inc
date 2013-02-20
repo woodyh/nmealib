@@ -76,3 +76,11 @@ endif
 endif
 endif
 
+ifeq ($(MYARCH),32)
+CFLAGS += -m32
+LDFLAGS += -m32
+endif
+ifeq ($(MYARCH),64)
+CFLAGS += -m64
+LDFLAGS += -m64
+endif
