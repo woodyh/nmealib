@@ -93,7 +93,6 @@ int main(int argc __attribute__((unused)), char *argv[] __attribute__((unused)))
 	 }
 	 */
 
-	nmea_parser_destroy(&parser);
 	fclose(file);
 
 	return 0;
