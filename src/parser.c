@@ -34,10 +34,12 @@
 #define first_eol_char  ('\r')
 #define second_eol_char ('\n')
 
-static void reset_sentence_parser(sentencePARSER * sentence_parser, sentence_parser_state new_state) {
-  assert(sentence_parser);
-  memset(sentence_parser, 0, sizeof(*sentence_parser));
-  sentence_parser->state = new_state;
+static void reset_sentence_parser(nmeaPARSER * parser, sentence_parser_state new_state) {
+  assert(parser);
+  memset(&parser->sentence_parser, 0, sizeof(parser->sentence_parser));
+  parser->buffer.buffer[0] = '\0';
+  parser->buffer.length = 0;
+  parser->sentence_parser.state = new_state;
 }
 
 static inline bool isHexChar(char c) {
@@ -77,41 +79,47 @@ static inline bool isHexChar(char c) {
 int nmea_parser_init(nmeaPARSER *parser) {
   assert(parser);
   memset(&parser->sentence, 0, sizeof(parser->sentence));
-  reset_sentence_parser(&parser->sentence_parser, SKIP_UNTIL_START);
+  reset_sentence_parser(parser, SKIP_UNTIL_START);
   return 0;
 }
 
-static bool nmea_parse_sentence_character(sentencePARSER *parser, const char * c) {
+static bool nmea_parse_sentence_character(nmeaPARSER *parser, const char * c) {
   assert(parser);
 
   /* always reset when we encounter a start-of-sentence character */
   if (*c == '$') {
     reset_sentence_parser(parser, READ_SENTENCE);
-    parser->sentence_start = c;
-    parser->sentence_length = 1;
+    parser->buffer.buffer[parser->buffer.length++] = *c;
     return false;
   }
 
   /* just return when we haven't encountered a start-of-sentence character yet */
-  if (parser->state == SKIP_UNTIL_START) {
+  if (parser->sentence_parser.state == SKIP_UNTIL_START) {
     return false;
   }
 
-  /* this character belongs to the sentence, so increment its length */
-  parser->sentence_length++;
+  /* this character belongs to the sentence */
 
-  switch (parser->state) {
+  /* check whether the sentence still fits in the buffer */
+  if (parser->buffer.length >= SENTENCE_SIZE) {
+    reset_sentence_parser(parser, SKIP_UNTIL_START);
+    return false;
+  }
+
+  parser->buffer.buffer[parser->buffer.length++] = *c;
+
+  switch (parser->sentence_parser.state) {
     case READ_SENTENCE:
       if (*c == '*') {
-        parser->state = READ_CHECKSUM;
-        parser->sentence_checksum_chars_count = 0;
+        parser->sentence_parser.state = READ_CHECKSUM;
+        parser->sentence_parser.sentence_checksum_chars_count = 0;
       } else if (*c == first_eol_char) {
-        parser->state = READ_EOL;
-        parser->sentence_eol_chars_count = 0;
+        parser->sentence_parser.state = READ_EOL;
+        parser->sentence_parser.sentence_eol_chars_count = 0;
       } else if (isInvalidNMEACharacter(c)) {
         reset_sentence_parser(parser, SKIP_UNTIL_START);
       } else {
-        parser->calculated_checksum ^= (int) *c;
+        parser->sentence_parser.calculated_checksum ^= (int) *c;
       }
       break;
 
@@ -119,18 +127,18 @@ static bool nmea_parse_sentence_character(sentencePARSER *parser, const char * c
       if (!isHexChar(*c)) {
         reset_sentence_parser(parser, SKIP_UNTIL_START);
       } else {
-        switch (parser->sentence_checksum_chars_count) {
+        switch (parser->sentence_parser.sentence_checksum_chars_count) {
           case 0:
-            parser->sentence_checksum_chars[0] = *c;
-            parser->sentence_checksum_chars[1] = 0;
-            parser->sentence_checksum_chars_count = 1;
+            parser->sentence_parser.sentence_checksum_chars[0] = *c;
+            parser->sentence_parser.sentence_checksum_chars[1] = 0;
+            parser->sentence_parser.sentence_checksum_chars_count = 1;
             break;
 
           case 1:
-            parser->sentence_checksum_chars[1] = *c;
-            parser->sentence_checksum_chars_count = 2;
-            parser->sentence_checksum = nmea_atoi(parser->sentence_checksum_chars, 2, 16);
-            parser->state = READ_EOL;
+            parser->sentence_parser.sentence_checksum_chars[1] = *c;
+            parser->sentence_parser.sentence_checksum_chars_count = 2;
+            parser->sentence_parser.sentence_checksum = nmea_atoi(parser->sentence_parser.sentence_checksum_chars, 2, 16);
+            parser->sentence_parser.state = READ_EOL;
             break;
 
           default:
@@ -142,12 +150,12 @@ static bool nmea_parse_sentence_character(sentencePARSER *parser, const char * c
 
 
     case READ_EOL:
-      switch (parser->sentence_eol_chars_count) {
+      switch (parser->sentence_parser.sentence_eol_chars_count) {
         case 0:
           if (*c != first_eol_char) {
             reset_sentence_parser(parser, SKIP_UNTIL_START);
           } else {
-            parser->sentence_eol_chars_count = 1;
+            parser->sentence_parser.sentence_eol_chars_count = 1;
           }
           break;
 
@@ -155,8 +163,10 @@ static bool nmea_parse_sentence_character(sentencePARSER *parser, const char * c
           if (*c != second_eol_char) {
             reset_sentence_parser(parser, SKIP_UNTIL_START);
           } else {
-            parser->state = SKIP_UNTIL_START;
-            return (!parser->sentence_checksum_chars_count || (parser->sentence_checksum_chars_count && (parser->sentence_checksum == parser->calculated_checksum)));
+            parser->sentence_parser.state = SKIP_UNTIL_START;
+            return (!parser->sentence_parser.sentence_checksum_chars_count
+                || (parser->sentence_parser.sentence_checksum_chars_count
+                    && (parser->sentence_parser.sentence_checksum == parser->sentence_parser.calculated_checksum)));
           }
           break;
 
@@ -186,7 +196,6 @@ static bool nmea_parse_sentence_character(sentencePARSER *parser, const char * c
  * @return the number of packets that were parsed
  */
 int nmea_parse(nmeaPARSER * parser, const char * s, int len, nmeaINFO * info) {
-  sentencePARSER * sp;
   int sentences_count = 0;
   int index = 0;
 
@@ -194,43 +203,41 @@ int nmea_parse(nmeaPARSER * parser, const char * s, int len, nmeaINFO * info) {
   assert(s);
   assert(info);
 
-  sp = &parser->sentence_parser;
-
   for (index = 0; index < len; index++) {
-    bool sentence_read_successfully = nmea_parse_sentence_character(sp, &s[index]);
+    bool sentence_read_successfully = nmea_parse_sentence_character(parser, &s[index]);
     if (sentence_read_successfully) {
-      enum nmeaPACKTYPE sentence_type = nmea_parse_get_sentence_type(&sp->sentence_start[1], sp->sentence_length - 1);
+      enum nmeaPACKTYPE sentence_type = nmea_parse_get_sentence_type(&parser->buffer.buffer[1], parser->buffer.length - 1);
       switch (sentence_type) {
         case GPGGA:
-          if (nmea_parse_GPGGA(sp->sentence_start, sp->sentence_length, &parser->sentence.gpgga)) {
+          if (nmea_parse_GPGGA(parser->buffer.buffer, parser->buffer.length, &parser->sentence.gpgga)) {
             sentences_count++;
             nmea_GPGGA2info(&parser->sentence.gpgga, info);
           }
           break;
 
         case GPGSA:
-          if (nmea_parse_GPGSA(sp->sentence_start, sp->sentence_length, &parser->sentence.gpgsa)) {
+          if (nmea_parse_GPGSA(parser->buffer.buffer, parser->buffer.length, &parser->sentence.gpgsa)) {
             sentences_count++;
             nmea_GPGSA2info(&parser->sentence.gpgsa, info);
           }
           break;
 
         case GPGSV:
-          if (nmea_parse_GPGSV(sp->sentence_start, sp->sentence_length, &parser->sentence.gpgsv)) {
+          if (nmea_parse_GPGSV(parser->buffer.buffer, parser->buffer.length, &parser->sentence.gpgsv)) {
             sentences_count++;
             nmea_GPGSV2info(&parser->sentence.gpgsv, info);
           }
           break;
 
         case GPRMC:
-          if (nmea_parse_GPRMC(sp->sentence_start, sp->sentence_length, &parser->sentence.gprmc)) {
+          if (nmea_parse_GPRMC(parser->buffer.buffer, parser->buffer.length, &parser->sentence.gprmc)) {
             sentences_count++;
             nmea_GPRMC2info(&parser->sentence.gprmc, info);
           }
           break;
 
         case GPVTG:
-          if (nmea_parse_GPVTG(sp->sentence_start, sp->sentence_length, &parser->sentence.gpvtg)) {
+          if (nmea_parse_GPVTG(parser->buffer.buffer, parser->buffer.length, &parser->sentence.gpvtg)) {
             sentences_count++;
             nmea_GPVTG2info(&parser->sentence.gpvtg, info);
           }

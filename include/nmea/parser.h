@@ -28,6 +28,9 @@
 extern "C" {
 #endif /* __cplusplus */
 
+/* we need to be able to parse much longer sentences than specified in the (original) specification */
+#define SENTENCE_SIZE (4096 * 1)
+
 typedef enum _sentence_parser_state {
   SKIP_UNTIL_START,
   READ_SENTENCE,
@@ -39,8 +42,6 @@ typedef enum _sentence_parser_state {
  * NMEA frame parser structure
  */
 typedef struct _sentencePARSER {
-    char * sentence_start;
-    unsigned int sentence_length;
     int sentence_checksum;
     int calculated_checksum;
 
@@ -56,6 +57,11 @@ typedef struct _sentencePARSER {
  * parsed NMEA data and frame parser state
  */
 typedef struct _nmeaPARSER {
+    struct {
+        unsigned int length;
+        char buffer[SENTENCE_SIZE];
+    } buffer;
+
     union {
         nmeaGPGGA gpgga;
         nmeaGPGSA gpgsa;
