@@ -49,7 +49,6 @@ int main(int argc __attribute__((unused)), char *argv[] __attribute__((unused)))
 		nmea_info2pos(&info, &pos[it]);
 	}
 
-	nmea_parser_destroy(&parser);
 
 	for (it = 0; it < NUM_POINTS; it++) {
 		dist[it][0] = nmea_distance(&pos[0], &pos[it]);

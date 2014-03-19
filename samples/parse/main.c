@@ -49,7 +49,5 @@ int main(int argc __attribute__((unused)), char *argv[] __attribute__((unused)))
 		printf("%03d, Lat: %f, Lon: %f, Sig: %d, Fix: %d\n", it, dpos.lat, dpos.lon, info.sig, info.fix);
 	}
 
-	nmea_parser_destroy(&parser);
-
 	return 0;
 }
