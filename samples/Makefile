@@ -4,7 +4,7 @@ include ../Makefile.inc
 # Settings
 #
 
-SAMPLES = generate generator math parse parse_file
+SAMPLES = generate generator math parse parse_file parse_test
 SMPLS = $(SAMPLES:%=../build/samples/%)
 SMPLOBJ = $(SAMPLES:%=%/main.o)
 
