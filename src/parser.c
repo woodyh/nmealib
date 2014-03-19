@@ -29,7 +29,6 @@
 #include <string.h>
 #include <assert.h>
 
-
 /**
  * Initialise the parser.
  * Allocates a buffer.
@@ -43,8 +42,7 @@ int nmea_parser_init(nmeaPARSER *parser) {
 	return 0;
 }
 
-
-static int nmea_parse_frame(frame_parser_t *parser, char c)
+static inline int nmea_parse_frame(frame_parser_t *parser, char c)
 {
 	int ret = 0;
 	assert(parser);
@@ -57,12 +55,12 @@ static int nmea_parse_frame(frame_parser_t *parser, char c)
 	}
 	else {
 		switch (parser->state) {
-
 			case READ_DATA_CRC_CR:
 				if (c == '*')
 					parser->state = READ_CS1;
 				else if (c != '\r')
 					parser->cksum ^= (int)c;
+					/* intentional missing break */
 
 			case READ_CR:
 				if (c == '\r')
@@ -95,12 +93,12 @@ static int nmea_parse_frame(frame_parser_t *parser, char c)
 
 	/* put character in frame buffer: */
 	parser->frame[parser->frame_len] = c;
-	parser->frame_len = (parser->frame_len + 1) % sizeof(parser->frame);
+	if (parser->frame_len < sizeof(parser->frame) - 1)
+		parser->frame_len++;
 	if (ret)
 		parser->frame[parser->frame_len] = '\0';
 	return ret;
 }
-
 
 /**
  * Parse a string and store the results in the nmeaINFO structure
@@ -121,7 +119,7 @@ int nmea_parse(nmeaPARSER *parser, const char *s, int len, nmeaINFO *info) {
 	for (i = 0; i < len; i++) {
 		frame_parser_t *fp = &parser->frame_parser;
 		if (nmea_parse_frame(fp, s[i])) {
-			switch (nmea_parse_get_sentence_type(fp->frame)) {
+			switch (nmea_parse_get_sentence_type(fp->frame + 1, fp->frame_len - 1)) {
 				case GPGGA:
 					if (nmea_parse_GPGGA(fp->frame, fp->frame_len, &parser->gpgga)) {
 						parsed++;
@@ -165,4 +163,3 @@ int nmea_parse(nmeaPARSER *parser, const char *s, int len, nmeaINFO *info) {
 
 	return parsed;
 }
-

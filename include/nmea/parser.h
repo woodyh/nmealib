@@ -24,22 +24,20 @@
 #include <nmea/info.h>
 #include <nmea/sentence.h>
 
-
 #ifdef  __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-
 
 /**
  * NMEA frame parser structure
  */
 typedef struct 
 {
-   int cksum;
+	int cksum;
 	char cs1;
 	int checksum;
-   char frame[1024];
-   int frame_len;
+	char frame[128];
+	unsigned int frame_len;
 
 	enum {
 		READ_START,
@@ -48,27 +46,25 @@ typedef struct
 		READ_CS1,
 		READ_CS2,
 		READ_LF,
-	}
+	} 
 	state;
 }
 frame_parser_t;
 
-
 /**
- * The parser data.
+ * parsed NMEA data and frame parser state
  */
 typedef struct _nmeaPARSER {
-   union
-   {
-      nmeaGPGGA gpgga;
-      nmeaGPGSA gpgsa;
-      nmeaGPGSV gpgsv;
-      nmeaGPRMC gprmc;
-      nmeaGPVTG gpvtg;
-   };
-   frame_parser_t frame_parser;
-} nmeaPARSER;
+	union {
+		nmeaGPGGA gpgga;
+		nmeaGPGSA gpgsa;
+		nmeaGPGSV gpgsv;
+		nmeaGPRMC gprmc;
+		nmeaGPVTG gpvtg;
+	};
 
+	frame_parser_t frame_parser;
+} nmeaPARSER;
 
 int nmea_parser_init(nmeaPARSER *parser);
 int nmea_parse(nmeaPARSER *parser, const char *buff, int buff_sz, nmeaINFO *info);
