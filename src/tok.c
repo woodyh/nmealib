@@ -44,16 +44,16 @@
  * @return the crc
  */
 int nmea_calc_crc(const char *s, const int len) {
-	int chksum = 0;
-	int it = 0;
+  int chksum = 0;
+  int it = 0;
 
-	if (s[it] == '$')
-		it++;
+  if (s[it] == '$')
+    it++;
 
-	for (; it < len; it++)
-		chksum ^= (int) s[it];
+  for (; it < len; it++)
+    chksum ^= (int) s[it];
 
-	return chksum;
+  return chksum;
 }
 
 /**
