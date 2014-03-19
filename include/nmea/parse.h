@@ -29,10 +29,11 @@
 #ifdef  __cplusplus
 extern "C" {
 #endif /* __cplusplus */
- 
-bool nmea_parse_sentence_has_invalid_chars(const char *str, const size_t str_len, const char *strName, char *report,
-		const size_t reportSize);
-int nmea_parse_get_sentence_type(const char *s, const int len);
+
+const char * isInvalidNMEACharacter(const char * c);
+const char * nmea_parse_sentence_has_invalid_chars(const char * s, const size_t len);
+
+enum nmeaPACKTYPE nmea_parse_get_sentence_type(const char *s, const int len);
 
 int nmea_parse_GPGGA(const char *s, const int len, nmeaGPGGA *pack);
 int nmea_parse_GPGSA(const char *s, const int len, nmeaGPGSA *pack);

@@ -49,7 +49,6 @@ int main(int argc __attribute__((unused)), char *argv[] __attribute__((unused)))
 		nmea_info2pos(&info, &pos[it]);
 	}
 
-
 	for (it = 0; it < NUM_POINTS; it++) {
 		dist[it][0] = nmea_distance(&pos[0], &pos[it]);
 		dist[it][1] = nmea_distance_ellipsoid(&pos[0], &pos[it], &azimuth[it][0], &azimuth[it][1]);

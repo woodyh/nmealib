@@ -230,63 +230,64 @@ static bool validateMode(char * c) {
 }
 
 /**
- * Determine whether the given string contains characters that are not allowed
- * for fields in an NMEA string.
+ * Determine whether the given character is not allowed in an NMEA string.
  *
- * @param str
- * The string to check
- * @param str_len
- * The length of the string to check
- * @param strName
- * The name of the string to report when invalid characters are encountered
- * @param report
- * A pointer to a buffer in which to place the report string when an invalid
- * nmea character is detected
- * @param reportSize
- * The size of the report buffer
+ * @param c
+ * The character to check
  *
  * @return
- * - true when the string has invalid characters
- * - false otherwise
+ * - a pointer to the invalid character name/description when the string has invalid characters
+ * - NULL otherwise
  */
-bool nmea_parse_sentence_has_invalid_chars(const char * str, const size_t str_len, const char * strName, char * report,
-		const size_t reportSize) {
-	static const char invalidChars[] = { '$', '*', ',', '!', '\\', '^', '~' };
+const char * isInvalidNMEACharacter(const char * c) {
+	static const char invalidChars[] = { '$', '*', '!', '\\', '^', '~' };
+	static const char * invalidNonAsciiCharsName = "non-ascii character";
 	static const char * invalidCharsNames[] = { "sentence delimiter ($)", "checksum field delimiter (*)", "comma (,)",
 			"exclamation mark (!)", "backslash (\\)", "power (^)", "tilde (~)" };
 
+	size_t index;
+
+  if (!((*c >= 32) && (*c <= 126))) {
+    return invalidNonAsciiCharsName;
+  }
+
+  for (index = 0; index < sizeof(invalidChars); index++) {
+    if (*c == invalidChars[index]) {
+      return invalidCharsNames[index];
+    }
+  }
+
+  return NULL;
+}
+
+/**
+ * Determine whether the given string contains characters that are not allowed
+ * in an NMEA string.
+ *
+ * @param s
+ * The string to check
+ * @param len
+ * The length of the string to check
+ *
+ * @return
+ * - a pointer to the invalid character name/description when the string has invalid characters
+ * - NULL otherwise
+ */
+const char * nmea_parse_sentence_has_invalid_chars(const char * s, const size_t len) {
 	size_t i;
-	size_t j;
 
-	if (!str || !str_len) {
-		return false;
+	if (!s || !len) {
+		return NULL;
 	}
 
-	for (i = 0; i < str_len; i++) {
-		char c = str[i];
-
-		if (!((c >= 32) && (c <= 126))) {
-			if (report && reportSize) {
-				snprintf(report, reportSize, "Configured %s (%s),"
-						" character %lu, can not contain non-printable"
-						" characters (codes outside the range [32, 126])", strName, str, (unsigned long) i + 1);
-			}
-			return true;
-		}
-
-		for (j = 0; j < sizeof(invalidChars); j++) {
-			if (c == invalidChars[j]) {
-				if (report && reportSize) {
-					snprintf(report, reportSize, "Configured %s (%s),"
-							" character %lu, can not contain %s characters", strName, str, (unsigned long) i + 1,
-							invalidCharsNames[j]);
-				}
-				return true;
-			}
+	for (i = 0; i < len; i++) {
+		const char * invalidCharName = isInvalidNMEACharacter(&s[i]);
+		if (invalidCharName) {
+		  return invalidCharName;
 		}
 	}
 
-	return false;
+	return NULL;
 }
 
 /**
@@ -297,17 +298,18 @@ bool nmea_parse_sentence_has_invalid_chars(const char * str, const size_t str_le
  * @param len the length of the string
  * @return The packet type (or GPNON when it could not be determined)
  */
-int nmea_parse_get_sentence_type(const char *s, const int len) {
+enum nmeaPACKTYPE nmea_parse_get_sentence_type(const char *s, const int len) {
 	static const char *pheads[] = { "GPGGA", "GPGSA", "GPGSV", "GPRMC", "GPVTG" };
-	static const int types[] = { GPGGA, GPGSA, GPGSV, GPRMC, GPVTG };
+	static const enum nmeaPACKTYPE types[] = { GPGGA, GPGSA, GPGSV, GPRMC, GPVTG };
 	unsigned int i;
 
 	assert(s);
 
-	if (len < 5)
+	if (len < 5) {
 		return GPNON;
+	}
 
-	for (i = 0; i < (sizeof(types) / sizeof(int)); i++) {
+	for (i = 0; i < (sizeof(types) / sizeof(types[0])); i++) {
 		if (!memcmp(s, pheads[i], 5)) {
 			return types[i];
 		}

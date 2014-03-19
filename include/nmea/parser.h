@@ -28,46 +28,47 @@
 extern "C" {
 #endif /* __cplusplus */
 
+typedef enum _sentence_parser_state {
+  SKIP_UNTIL_START,
+  READ_SENTENCE,
+  READ_CHECKSUM,
+  READ_EOL
+} sentence_parser_state;
+
 /**
  * NMEA frame parser structure
  */
-typedef struct 
-{
-	int cksum;
-	char cs1;
-	int checksum;
-	char frame[128];
-	unsigned int frame_len;
+typedef struct _sentencePARSER {
+    char * sentence_start;
+    unsigned int sentence_length;
+    int sentence_checksum;
+    int calculated_checksum;
 
-	enum {
-		READ_START,
-		READ_DATA_CRC_CR,
-		READ_CR,
-		READ_CS1,
-		READ_CS2,
-		READ_LF,
-	} 
-	state;
-}
-frame_parser_t;
+    char sentence_checksum_chars[2];
+    char sentence_checksum_chars_count;
+
+    char sentence_eol_chars_count;
+
+    sentence_parser_state state;
+} sentencePARSER;
 
 /**
  * parsed NMEA data and frame parser state
  */
 typedef struct _nmeaPARSER {
-	union {
-		nmeaGPGGA gpgga;
-		nmeaGPGSA gpgsa;
-		nmeaGPGSV gpgsv;
-		nmeaGPRMC gprmc;
-		nmeaGPVTG gpvtg;
-	};
+    union {
+        nmeaGPGGA gpgga;
+        nmeaGPGSA gpgsa;
+        nmeaGPGSV gpgsv;
+        nmeaGPRMC gprmc;
+        nmeaGPVTG gpvtg;
+    } sentence;
 
-	frame_parser_t frame_parser;
+    sentencePARSER sentence_parser;
 } nmeaPARSER;
 
 int nmea_parser_init(nmeaPARSER *parser);
-int nmea_parse(nmeaPARSER *parser, const char *buff, int buff_sz, nmeaINFO *info);
+int nmea_parse(nmeaPARSER * parser, const char * s, int len, nmeaINFO * info);
 
 #ifdef  __cplusplus
 }
