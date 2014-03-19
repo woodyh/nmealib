@@ -8,7 +8,11 @@ SAMPLES = generate generator math parse parse_file
 SMPLS = $(SAMPLES:%=../build/samples/%)
 SMPLOBJ = $(SAMPLES:%=%/main.o)
 
-LIBRARIES = ../lib/libnmea.a -lm
+ifdef SAMPLESDYNAMICLINK
+  LIBRARIES = -lnmea -lm
+else
+  LIBRARIES = ../lib/libnmea.a -lm
+endif
 INCLUDES = -I ../include
 
 
