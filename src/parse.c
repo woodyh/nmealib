@@ -242,15 +242,15 @@ const char * isInvalidNMEACharacter(const char * c) {
 	static const char * invalidCharsNames[] = { "sentence delimiter ($)", "checksum field delimiter (*)", "comma (,)",
 			"exclamation mark (!)", "backslash (\\)", "power (^)", "tilde (~)" };
 
-	size_t index;
+	size_t charIndex;
 
   if (!((*c >= 32) && (*c <= 126))) {
     return invalidNonAsciiCharsName;
   }
 
-  for (index = 0; index < sizeof(invalidChars); index++) {
-    if (*c == invalidChars[index]) {
-      return invalidCharsNames[index];
+  for (charIndex = 0; charIndex < sizeof(invalidChars); charIndex++) {
+    if (*c == invalidChars[charIndex]) {
+      return invalidCharsNames[charIndex];
     }
   }
 
