@@ -112,7 +112,7 @@ static bool nmea_parse_sentence_character(nmeaPARSER *parser, const char * c) {
         parser->sentence_parser.sentence_checksum_chars_count = 0;
       } else if (*c == first_eol_char) {
         parser->sentence_parser.state = READ_EOL;
-        parser->sentence_parser.sentence_eol_chars_count = 0;
+        parser->sentence_parser.sentence_eol_chars_count = 1;
       } else if (isInvalidNMEACharacter(c)) {
         reset_sentence_parser(parser, SKIP_UNTIL_START);
       } else {
