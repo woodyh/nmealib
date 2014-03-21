@@ -237,10 +237,23 @@ static bool validateMode(char * c) {
  * - NULL otherwise
  */
 const char * isInvalidNMEACharacter(const char * c) {
-	static const char invalidChars[] = { '$', '*', '!', '\\', '^', '~' };
 	static const char * invalidNonAsciiCharsName = "non-ascii character";
-	static const char * invalidCharsNames[] = { "sentence delimiter ($)", "checksum field delimiter (*)", "comma (,)",
-			"exclamation mark (!)", "backslash (\\)", "power (^)", "tilde (~)" };
+	static const char invalidChars[] = {
+	    '$',
+	    '*',
+	    '!',
+	    '\\',
+	    '^',
+	    '~'
+	};
+	static const char * invalidCharsNames[] = {
+	    "sentence delimiter ($)",
+	    "checksum field delimiter (*)",
+			"exclamation mark (!)",
+			"backslash (\\)",
+			"power (^)",
+			"tilde (~)"
+	};
 
 	size_t charIndex;
 
