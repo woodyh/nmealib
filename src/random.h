@@ -11,12 +11,14 @@
 
 static inline long int nmea_random(const double min, const double max) {
   int32_t value;
+  int randomFile;
   double range = abs(max - min);
 
 #ifdef _WIN32
   value = random();
 #else
-  int randomFile = open("/dev/urandom", O_RDONLY);
+
+  randomFile = open("/dev/urandom", O_RDONLY);
   if (randomFile == -1) {
     randomFile = open("/dev/random", O_RDONLY);
   }
