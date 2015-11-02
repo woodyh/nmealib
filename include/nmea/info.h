@@ -18,6 +18,8 @@
 #ifndef __NMEA_INFO_H__
 #define __NMEA_INFO_H__
 
+#include <nmea/conf.h>
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -69,7 +71,7 @@
 #define NMEA_FIX_3D    (3)
 #define NMEA_FIX_LAST  (NMEA_FIX_3D)
 
-#define NMEA_MAXSAT    (64)
+#define NMEA_MAXSAT    (12)
 #define NMEA_SATINPACK (4)
 #define NMEA_NSATPACKS (NMEA_MAXSAT / NMEA_SATINPACK)
 

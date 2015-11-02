@@ -18,11 +18,7 @@
 #ifndef __NMEA_CONTEXT_H__
 #define __NMEA_CONTEXT_H__
 
-/** the default size for the temporary buffers */
-#define NMEA_DEF_PARSEBUFF  1024
-
-/** the minimum size for the temporary buffers */
-#define NMEA_MIN_PARSEBUFF  256
+#include <nmea/conf.h>
 
 #ifdef  __cplusplus
 extern "C" {
@@ -46,8 +42,6 @@ typedef void (*nmeaErrorFunc)(const char *str, int str_size);
 
 void nmea_context_set_trace_func(nmeaTraceFunc func);
 void nmea_context_set_error_func(nmeaErrorFunc func);
-void nmea_context_set_buffer_size(int buff_size);
-int nmea_context_get_buffer_size(void);
 
 void nmea_trace(const char *str, ...) __attribute__ ((format(printf, 1, 2)));
 void nmea_trace_buff(const char *buff, int buff_size);

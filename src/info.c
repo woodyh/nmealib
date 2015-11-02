@@ -23,9 +23,9 @@
 #include <stdbool.h>
 #include <string.h>
 #include <math.h>
-#include <time.h>
-#include <sys/time.h>
-#include <assert.h>
+#include <stdlib.h>
+#include "ch.h"
+#include "hal.h"
 
 /**
  * Reset the time to now
@@ -35,13 +35,13 @@
  * and UTCTIME flags are set in it.
  */
 void nmea_time_now(nmeaTIME *utc, uint32_t * present) {
-	struct timeval tp;
 	struct tm tt;
+	RTCDateTime timespec;
 
-	assert(utc);
+	NMEA_ASSERT(utc);
 
-	gettimeofday(&tp, NULL );
-	gmtime_r(&tp.tv_sec, &tt);
+    rtcGetTime(&RTCD1, &timespec);
+    rtcConvertDateTimeToStructTm(&timespec, &tt, NULL);
 
 	utc->year = tt.tm_year;
 	utc->mon = tt.tm_mon;
@@ -49,7 +49,7 @@ void nmea_time_now(nmeaTIME *utc, uint32_t * present) {
 	utc->hour = tt.tm_hour;
 	utc->min = tt.tm_min;
 	utc->sec = tt.tm_sec;
-	utc->hsec = (tp.tv_usec / 10000);
+	utc->hsec = (timespec.millisecond / 10);
 	if (present) {
 	  nmea_INFO_set_present(present, UTCDATE | UTCTIME);
 	}
@@ -151,7 +151,7 @@ bool nmea_INFO_is_present(uint32_t present, nmeaINFO_FIELD fieldName) {
  * @param fieldName use a name from nmeaINFO_FIELD
  */
 void nmea_INFO_set_present(uint32_t * present, nmeaINFO_FIELD fieldName) {
-	assert(present);
+	NMEA_ASSERT(present);
 	*present |= fieldName;
 }
 
@@ -162,7 +162,7 @@ void nmea_INFO_set_present(uint32_t * present, nmeaINFO_FIELD fieldName) {
  * @param fieldName use a name from nmeaINFO_FIELD
  */
 void nmea_INFO_unset_present(uint32_t * present, nmeaINFO_FIELD fieldName) {
-	assert(present);
+	NMEA_ASSERT(present);
 	*present &= ~fieldName;
 }
 

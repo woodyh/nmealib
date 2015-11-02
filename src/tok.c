@@ -28,31 +28,6 @@
 #define NMEA_TOKS_WIDTH     3
 #define NMEA_TOKS_TYPE      4
 
-/** number conversion buffer size */
-#define NMEA_CONVSTR_BUF    64
-
-/**
- * Calculate crc control sum of a string.
- * If the string starts with a '$' then that character is skipped as per
- * the NMEA spec.
- *
- * @param s the string
- * @param len the length of the string
- * @return the crc
- */
-int nmea_calc_crc(const char *s, const int len) {
-  int chksum = 0;
-  int it = 0;
-
-  if (s[it] == '$')
-    it++;
-
-  for (; it < len; it++)
-    chksum ^= (int) s[it];
-
-  return chksum;
-}
-
 /**
  * Convert string to an integer
  *
@@ -97,42 +72,6 @@ double nmea_atof(const char *s, const int len) {
 }
 
 /**
- * Formating string (like standart printf) with CRC tail (*CRC)
- *
- * @param s the string buffer to printf into
- * @param len the size of the string buffer
- * @param format the string format to use
- * @return the number of printed characters
- */
-int nmea_printf(char *s, int len, const char *format, ...) {
-	int retval;
-	int add = 0;
-	va_list arg_ptr;
-
-	if (len <= 0)
-		return 0;
-
-	va_start(arg_ptr, format);
-
-	retval = vsnprintf(s, len, format, arg_ptr);
-
-	if (retval > 0) {
-		add = snprintf(s + retval, len - retval, "*%02x\r\n", nmea_calc_crc(s + 1, retval - 1));
-	}
-
-	retval += add;
-
-	if (retval < 0 || retval > len) {
-		memset(s, ' ', len);
-		retval = len;
-	}
-
-	va_end(arg_ptr);
-
-	return retval;
-}
-
-/**
  * Analyse a string (specific for NMEA sentences)
  *
  * @param s the string
@@ -169,7 +108,7 @@ int nmea_scanf(const char *s, int len, const char *format, ...) {
 			tok_type = NMEA_TOKS_WIDTH;
 			/* no break */
 		case NMEA_TOKS_WIDTH:
-			if (isdigit(*format))
+			if (isdigit((unsigned char)*format))
 				break;
 			{
 				/* No need to do 'tok_type = NMEA_TOKS_TYPE' since we'll do a fall-through */

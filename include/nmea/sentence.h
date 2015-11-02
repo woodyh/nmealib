@@ -276,11 +276,6 @@ typedef struct _nmeaGPVTG {
 	char spk_k;					/**< Fixed text 'K' indicates that speed over ground is in kilometers/hour */
 } nmeaGPVTG;
 
-void nmea_zero_GPGGA(nmeaGPGGA *pack);
-void nmea_zero_GPGSA(nmeaGPGSA *pack);
-void nmea_zero_GPGSV(nmeaGPGSV *pack);
-void nmea_zero_GPRMC(nmeaGPRMC *pack);
-void nmea_zero_GPVTG(nmeaGPVTG *pack);
 
 #ifdef  __cplusplus
 }

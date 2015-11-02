@@ -19,6 +19,7 @@
 #define __NMEA_PARSE_H__
 
 #include <nmea/sentence.h>
+#include <nmea/conf.h>
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -27,8 +28,8 @@
 extern "C" {
 #endif /* __cplusplus */
 
-const char * isInvalidNMEACharacter(const char * c);
-const char * nmea_parse_sentence_has_invalid_chars(const char * s, const size_t len);
+char isInvalidNMEACharacter(const char * c);
+char nmea_parse_sentence_has_invalid_chars(const char * s, const size_t len);
 
 enum nmeaPACKTYPE nmea_parse_get_sentence_type(const char *s, const int len);
 

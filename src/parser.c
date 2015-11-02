@@ -25,14 +25,13 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include <assert.h>
 #include <ctype.h>
 
 #define first_eol_char  ('\r')
 #define second_eol_char ('\n')
 
 static void reset_sentence_parser(nmeaPARSER * parser, sentence_parser_state new_state) {
-  assert(parser);
+  NMEA_ASSERT(parser);
   memset(&parser->sentence_parser, 0, sizeof(parser->sentence_parser));
   parser->buffer.buffer[0] = '\0';
   parser->buffer.length = 0;
@@ -41,7 +40,7 @@ static void reset_sentence_parser(nmeaPARSER * parser, sentence_parser_state new
 }
 
 static inline bool isHexChar(char c) {
-  switch (tolower(c)) {
+  switch (tolower((unsigned char)c)) {
     case '0':
     case '1':
     case '2':
@@ -75,14 +74,14 @@ static inline bool isHexChar(char c) {
  * @return true (1) - success or false (0) - fail
  */
 int nmea_parser_init(nmeaPARSER *parser) {
-  assert(parser);
+  NMEA_ASSERT(parser);
   memset(&parser->sentence, 0, sizeof(parser->sentence));
   reset_sentence_parser(parser, SKIP_UNTIL_START);
   return 1;
 }
 
 static bool nmea_parse_sentence_character(nmeaPARSER *parser, const char * c) {
-  assert(parser);
+  NMEA_ASSERT(parser);
 
   /* always reset when we encounter a start-of-sentence character */
   if (*c == '$') {
@@ -198,9 +197,9 @@ int nmea_parse(nmeaPARSER * parser, const char * s, int len, nmeaINFO * info) {
   int sentences_count = 0;
   int charIndex = 0;
 
-  assert(parser);
-  assert(s);
-  assert(info);
+  NMEA_ASSERT(parser);
+  NMEA_ASSERT(s);
+  NMEA_ASSERT(info);
 
   for (charIndex = 0; charIndex < len; charIndex++) {
     bool sentence_read_successfully = nmea_parse_sentence_character(parser, &s[charIndex]);

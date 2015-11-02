@@ -30,8 +30,11 @@ typedef struct _nmeaPROPERTY {
 } nmeaPROPERTY;
 
 /** the nmealib context */
+#if NMEA_TRACE || NMEA_ERROR
 static nmeaPROPERTY property = { .trace_func = NULL, .error_func = NULL, .parse_buff_size = NMEA_DEF_PARSEBUFF };
+#endif
 
+#if NMEA_TRACE
 /**
  * Set the trace function
  *
@@ -40,7 +43,9 @@ static nmeaPROPERTY property = { .trace_func = NULL, .error_func = NULL, .parse_
 void nmea_context_set_trace_func(nmeaTraceFunc func) {
 	property.trace_func = func;
 }
+#endif
 
+#if NMEA_ERROR
 /**
  * Set the error function
  *
@@ -49,28 +54,9 @@ void nmea_context_set_trace_func(nmeaTraceFunc func) {
 void nmea_context_set_error_func(nmeaErrorFunc func) {
 	property.error_func = func;
 }
+#endif
 
-/**
- * Set the buffer size for temporary buffers.
- * If the size is less than NMEA_MIN_PARSEBUFF, then the size that is
- * configured will be NMEA_MIN_PARSEBUFF.
- *
- * @param buff_size the buffer size for temporary buffers
- */
-void nmea_context_set_buffer_size(int buff_size) {
-	if (buff_size < NMEA_MIN_PARSEBUFF)
-		property.parse_buff_size = NMEA_MIN_PARSEBUFF;
-	else
-		property.parse_buff_size = buff_size;
-}
-
-/**
- * @return the buffer size for temporary buffers
- */
-int nmea_context_get_buffer_size(void) {
-	return property.parse_buff_size;
-}
-
+#if NMEA_TRACE
 /**
  * Trace a formatted string
  *
@@ -104,7 +90,9 @@ void nmea_trace_buff(const char *buff, int buff_size) {
 	if (func && buff_size)
 		(*func)(buff, buff_size);
 }
+#endif
 
+#if NMEA_ERROR
 /**
  * Log a formatted error string
  *
@@ -126,3 +114,4 @@ void nmea_error(const char *str, ...) {
 			(*func)(&buff[0], size);
 	}
 }
+#endif

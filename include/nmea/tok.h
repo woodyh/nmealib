@@ -18,14 +18,14 @@
 #ifndef __NMEA_TOK_H__
 #define __NMEA_TOK_H__
 
+#include <nmea/conf.h>
+
 #ifdef  __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-int nmea_calc_crc(const char *s, const int len);
 int nmea_atoi(const char *s, const int len, const int radix);
 double nmea_atof(const char *s, const int len);
-int nmea_printf(char *s, int len, const char *format, ...) __attribute__ ((format(printf, 3, 4)));
 int nmea_scanf(const char *s, int len, const char *format, ...);
 
 #ifdef  __cplusplus
