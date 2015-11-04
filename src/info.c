@@ -37,7 +37,23 @@ bool nmea_INFO_has_fix(nmeaINFO *info) {
     return (info->fix > NMEA_FIX_BAD);
 }
 
-#define NMEA_MILLIS_IN_DAY 24*60*60*1000
+
+/**
+ * Determine the day of the week for any Gregorian date
+ * by Tomohiko Sakamoto (via Wikipedia)
+ *
+ * @param y year
+ * @param m month [1,12]
+ * @param d day [1,31]
+ * @return an int reflecting the day of the week  (0 = Sunday)
+ */
+static int dayofweek(int y, int m, int d) {
+    static int t[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
+    y -= m < 3;
+    return (y + y/4 - y/100 + y/400 + t[m-1] + d) % 7;
+}
+
+#define NMEA_MILLIS_IN_DAY  24*60*60*1000
 /**
  * Convert the date and time data of the nmeaINFO structure
  * to a RTCDateTime structure for use in ChibiOS
@@ -49,7 +65,10 @@ void nmea_INFO2time(nmeaINFO *info, RTCDateTime *timespec, long int timezone) {
   timespec->year      = (uint32_t)info->utc.year - (1980U - 1900U);
   timespec->month     = (uint32_t)info->utc.mon + 1U;
   timespec->day       = (uint32_t)info->utc.day;
-  timespec->dayofweek = (uint32_t)RTC_DAY_CATURDAY; /* TODO: fix this */
+  timespec->dayofweek = (uint32_t)dayofweek((int)timespec->year + 1980, (int)timespec->month, (int)timespec->day);
+  if (timespec->dayofweek == 0)
+    timespec->dayofweek = RTC_DAY_SUNDAY;
+
   timespec->dstflag = 0U;  /* set zero if dst is unknown */
 
   timespec->millisecond = (uint32_t)(info->utc.hsec * 10) +
