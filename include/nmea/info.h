@@ -18,6 +18,8 @@
 #ifndef __NMEA_INFO_H__
 #define __NMEA_INFO_H__
 
+#include "ch.h"
+#include "hal.h"
 #include <nmea/conf.h>
 
 #include <stdint.h>
@@ -198,6 +200,9 @@ typedef enum _nmeaINFO_FIELD {
 
 #define NMEA_INFO_PRESENT_MASK ((_nmeaINFO_FIELD_LAST << 1) - 1)
 
+bool nmea_INFO_has_fix(nmeaINFO *info);
+
+void nmea_INFO2time(nmeaINFO *info, RTCDateTime *timespec, long int timezone);
 void nmea_time_now(nmeaTIME *utc, uint32_t * present);
 void nmea_zero_INFO(nmeaINFO *info);
 

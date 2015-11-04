@@ -28,6 +28,43 @@
 #include "hal.h"
 
 /**
+ * Determine if a nmeaINFO structure has a fix
+ *
+ * @param info a pointer to the structure
+ * @return a boolean, true when the structure has a fix
+ */
+bool nmea_INFO_has_fix(nmeaINFO *info) {
+    return (info->fix > NMEA_FIX_BAD);
+}
+
+#define NMEA_MILLIS_IN_DAY 24*60*60*1000
+/**
+ * Convert the date and time data of the nmeaINFO structure
+ * to a RTCDateTime structure for use in ChibiOS
+ *
+ * @param info a pointer to the structure
+ * @param timespec a pointer to the RTCDateTime structure
+ */
+void nmea_INFO2time(nmeaINFO *info, RTCDateTime *timespec, long int timezone) {
+  timespec->year      = (uint32_t)info->utc.year - (1980U - 1900U);
+  timespec->month     = (uint32_t)info->utc.mon + 1U;
+  timespec->day       = (uint32_t)info->utc.day;
+  timespec->dayofweek = (uint32_t)RTC_DAY_CATURDAY; /* TODO: fix this */
+  timespec->dstflag = 0U;  /* set zero if dst is unknown */
+
+  timespec->millisecond = (uint32_t)(info->utc.hsec * 10) +
+      (uint32_t)( ( (info->utc.hour * 3600) + (info->utc.min * 60) + (info->utc.sec) ) * 1000);
+  timespec->millisecond += (timezone * 1000);
+  if (timespec->millisecond > NMEA_MILLIS_IN_DAY) {
+    timespec->day++;
+    timespec->millisecond -= - NMEA_MILLIS_IN_DAY;
+  } else if ((timespec->millisecond + (timezone * 1000)) < 0) {
+    timespec->day--;
+    timespec->millisecond += NMEA_MILLIS_IN_DAY;
+  }
+}
+
+/**
  * Reset the time to now
  *
  * @param utc a pointer to the time structure
@@ -37,11 +74,12 @@
 void nmea_time_now(nmeaTIME *utc, uint32_t * present) {
 	struct tm tt;
 	RTCDateTime timespec;
+	uint32_t tv_msec;
 
 	NMEA_ASSERT(utc);
 
     rtcGetTime(&RTCD1, &timespec);
-    rtcConvertDateTimeToStructTm(&timespec, &tt, NULL);
+    rtcConvertDateTimeToStructTm(&timespec, &tt, &tv_msec);
 
 	utc->year = tt.tm_year;
 	utc->mon = tt.tm_mon;
@@ -49,7 +87,7 @@ void nmea_time_now(nmeaTIME *utc, uint32_t * present) {
 	utc->hour = tt.tm_hour;
 	utc->min = tt.tm_min;
 	utc->sec = tt.tm_sec;
-	utc->hsec = (timespec.millisecond / 10);
+	utc->hsec = (tv_msec / 10);
 	if (present) {
 	  nmea_INFO_set_present(present, UTCDATE | UTCTIME);
 	}

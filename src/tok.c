@@ -41,7 +41,7 @@ int nmea_atoi(const char *s, int len, int radix) {
 	char buff[NMEA_CONVSTR_BUF];
 	long res = 0;
 
-	if (len < NMEA_CONVSTR_BUF) {
+	if (len < NMEA_CONVSTR_BUF-1) {
 		memcpy(&buff[0], s, len);
 		buff[len] = '\0';
 		res = strtol(&buff[0], &tmp_ptr, radix);
@@ -62,7 +62,7 @@ double nmea_atof(const char *s, const int len) {
 	char buff[NMEA_CONVSTR_BUF];
 	double res = 0;
 
-	if (len < NMEA_CONVSTR_BUF) {
+	if (len < NMEA_CONVSTR_BUF-1) {
 		memcpy(&buff[0], s, len);
 		buff[len] = '\0';
 		res = strtod(&buff[0], &tmp_ptr);
@@ -108,9 +108,9 @@ int nmea_scanf(const char *s, int len, const char *format, ...) {
 			tok_type = NMEA_TOKS_WIDTH;
 			/* no break */
 		case NMEA_TOKS_WIDTH:
-			if (isdigit((unsigned char)*format))
+			if (isdigit((unsigned char)*format)) {
 				break;
-			{
+			} else {
 				/* No need to do 'tok_type = NMEA_TOKS_TYPE' since we'll do a fall-through */
 				if (format > beg_fmt)
 					width = nmea_atoi(beg_fmt, (int) (format - beg_fmt), 10);

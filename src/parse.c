@@ -40,11 +40,12 @@ static bool _nmea_parse_time(const char *s, const int len, nmeaTIME *t) {
   NMEA_ASSERT(s);
   NMEA_ASSERT(t);
 
+#if NMEA_TIME_FORMAT == 1
   if (len == (sizeof("hhmmss") - 1)) {
     t->hsec = 0;
     return (3 == nmea_scanf(s, len, "%2d%2d%2d", &t->hour, &t->min, &t->sec));
   }
-
+#elif NMEA_TIME_FORMAT == 2
   if (len == (sizeof("hhmmss.s") - 1)) {
     if (4 == nmea_scanf(s, len, "%2d%2d%2d.%d", &t->hour, &t->min, &t->sec, &t->hsec)) {
       t->hsec *= 10;
@@ -52,11 +53,11 @@ static bool _nmea_parse_time(const char *s, const int len, nmeaTIME *t) {
     }
     return false;
   }
-
+#elif NMEA_TIME_FORMAT == 3
   if (len == (sizeof("hhmmss.ss") - 1)) {
     return (4 == nmea_scanf(s, len, "%2d%2d%2d.%d", &t->hour, &t->min, &t->sec, &t->hsec));
   }
-
+#elif NMEA_TIME_FORMAT == 4
   if (len == (sizeof("hhmmss.sss") - 1)) {
     if ((4 == nmea_scanf(s, len, "%2d%2d%2d.%d", &t->hour, &t->min, &t->sec, &t->hsec))) {
       t->hsec = (t->hsec + 9) / 10;
@@ -64,7 +65,7 @@ static bool _nmea_parse_time(const char *s, const int len, nmeaTIME *t) {
     }
     return false;
   }
-
+#endif
 #if NMEA_ERROR
   nmea_error("Parse error: invalid time format in %s", s);
 #endif

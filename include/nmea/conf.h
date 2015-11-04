@@ -8,11 +8,13 @@
 #ifndef NMEALIB_INCLUDE_NMEA_CONF_H_
 #define NMEALIB_INCLUDE_NMEA_CONF_H_
 
-#define NMEA_DEBUG 0
+#define NMEA_DEBUG 1
 
 #define NMEA_VALIDATE       1
 #define NMEA_TRACE          0
 #define NMEA_ERROR          0
+
+#define NMEA_TIME_FORMAT    4
 
 /** the default size for the temporary buffers */
 #define NMEA_DEF_PARSEBUFF  128
