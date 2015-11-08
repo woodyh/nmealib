@@ -11,7 +11,14 @@
 #define NMEA_DEBUG 1
 
 #define NMEA_VALIDATE       1
-#define NMEA_ERROR          0
+#define NMEA_ERROR          1
+
+#include "ch.h"
+#include "hal.h"
+#include "chprintf.h"
+extern SerialUSBDriver SDU1;
+#define NMEASD SDU1
+#define nmea_error(format, ...) chprintf((BaseSequentialStream *)&NMEASD, format, __VA_ARGS__)
 
 #define NMEA_TIME_FORMAT    4
 
