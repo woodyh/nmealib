@@ -18,10 +18,9 @@
 #ifndef __NMEA_INFO_H__
 #define __NMEA_INFO_H__
 
+#include <nmea/nmeaconf.h>
 #include "ch.h"
 #include "hal.h"
-#include <nmea/conf.h>
-
 #include <stdint.h>
 #include <stdbool.h>
 

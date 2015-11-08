@@ -18,9 +18,8 @@
 #ifndef __NMEA_PARSE_H__
 #define __NMEA_PARSE_H__
 
+#include <nmea/nmeaconf.h>
 #include <nmea/sentence.h>
-#include <nmea/conf.h>
-
 #include <stdbool.h>
 #include <stddef.h>
 

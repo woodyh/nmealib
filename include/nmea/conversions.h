@@ -20,7 +20,7 @@
 
 #include <nmea/sentence.h>
 #include <nmea/info.h>
-#include <nmea/conf.h>
+#include <nmea/nmeaconf.h>
 
 #ifdef  __cplusplus
 extern "C" {

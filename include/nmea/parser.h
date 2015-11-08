@@ -19,8 +19,8 @@
 #define __NMEA_PARSER_H__
 
 #include <nmea/info.h>
+#include <nmea/nmeaconf.h>
 #include <nmea/sentence.h>
-#include <nmea/conf.h>
 
 #ifdef  __cplusplus
 extern "C" {

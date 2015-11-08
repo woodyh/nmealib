@@ -18,7 +18,7 @@
 #ifndef __NMEA_CONTEXT_H__
 #define __NMEA_CONTEXT_H__
 
-#include <nmea/conf.h>
+#include <nmea/nmeaconf.h>
 
 #ifdef  __cplusplus
 extern "C" {

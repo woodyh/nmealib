@@ -5,8 +5,8 @@
  *      Author: woody
  */
 
-#ifndef NMEALIB_INCLUDE_NMEA_CONF_H_
-#define NMEALIB_INCLUDE_NMEA_CONF_H_
+#ifndef NMEALIB_INCLUDE_NMEA_NMEACONF_H_
+#define NMEALIB_INCLUDE_NMEA_NMEACONF_H_
 
 #define NMEA_DEBUG 1
 
@@ -37,4 +37,4 @@
   #define NMEA_ASSERT(x)
 #endif
 
-#endif /* NMEALIB_INCLUDE_NMEA_CONF_H_ */
+#endif /* NMEALIB_INCLUDE_NMEA_NMEACONF_H_ */
