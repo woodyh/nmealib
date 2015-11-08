@@ -359,10 +359,6 @@ int nmea_parse_GPGGA(const char *s, const int len, bool has_checksum, nmeaGPGGA 
   NMEA_ASSERT(s);
   NMEA_ASSERT(pack);
 
-#if NMEA_TRACE
-  nmea_trace_buff(s, len);
-#endif
-
   /*
    * Clear before parsing, to be able to detect absent fields
    */
@@ -488,10 +484,6 @@ int nmea_parse_GPGSA(const char *s, const int len, bool has_checksum, nmeaGPGSA 
   NMEA_ASSERT(s);
   NMEA_ASSERT(pack);
 
-#if NMEA_TRACE
-  nmea_trace_buff(s, len);
-#endif
-
   /*
    * Clear before parsing, to be able to detect absent fields
    */
@@ -585,10 +577,6 @@ int nmea_parse_GPGSV(const char *s, const int len, bool has_checksum, nmeaGPGSV 
 
   NMEA_ASSERT(s);
   NMEA_ASSERT(pack);
-
-#if NMEA_TRACE
-  nmea_trace_buff(s, len);
-#endif
 
   /*
    * Clear before parsing, to be able to detect absent fields
@@ -689,10 +677,6 @@ int nmea_parse_GPRMC(const char *s, const int len, bool has_checksum, nmeaGPRMC 
 
   NMEA_ASSERT(s);
   NMEA_ASSERT(pack);
-
-#if NMEA_TRACE
-  nmea_trace_buff(s, len);
-#endif
 
   /*
    * Clear before parsing, to be able to detect absent fields
@@ -840,10 +824,6 @@ int nmea_parse_GPVTG(const char *s, const int len, bool has_checksum, nmeaGPVTG 
 
   NMEA_ASSERT(s);
   NMEA_ASSERT(pack);
-
-#if NMEA_TRACE
-  nmea_trace_buff(s, len);
-#endif
 
   /*
    * Clear before parsing, to be able to detect absent fields

@@ -11,7 +11,6 @@
 #define NMEA_DEBUG 1
 
 #define NMEA_VALIDATE       1
-#define NMEA_TRACE          0
 #define NMEA_ERROR          0
 
 #define NMEA_TIME_FORMAT    4

@@ -25,14 +25,6 @@ extern "C" {
 #endif /* __cplusplus */
 
 /**
- * Function type definition for tracing
- *
- * @param str the string to trace
- * @param str_size the length of the string
- */
-typedef void (*nmeaTraceFunc)(const char *str, int str_size);
-
-/**
  * Function type definition for error logging
  *
  * @param str the string to log
@@ -40,11 +32,8 @@ typedef void (*nmeaTraceFunc)(const char *str, int str_size);
  */
 typedef void (*nmeaErrorFunc)(const char *str, int str_size);
 
-void nmea_context_set_trace_func(nmeaTraceFunc func);
 void nmea_context_set_error_func(nmeaErrorFunc func);
 
-void nmea_trace(const char *str, ...) __attribute__ ((format(printf, 1, 2)));
-void nmea_trace_buff(const char *buff, int buff_size);
 void nmea_error(const char *str, ...) __attribute__ ((format(printf, 1, 2)));
 
 #ifdef  __cplusplus
