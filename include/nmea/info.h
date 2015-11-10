@@ -79,6 +79,9 @@
 #define NMEA_DEF_LAT   (0.0)
 #define NMEA_DEF_LON   (0.0)
 
+#define NMEA_CONNECTION     (1)
+#define NMEA_NO_CONNECTION  (0)
+
 #ifdef  __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -169,6 +172,8 @@ typedef struct _nmeaINFO {
 	double magvar;					/**< Magnetic variation degrees */
 
 	nmeaSATINFO satinfo;			/**< Satellites information */
+
+	int connection;                 /**< Flag specifying whether a connection is present */
 } nmeaINFO;
 
 /**
@@ -199,6 +204,8 @@ typedef enum _nmeaINFO_FIELD {
 
 #define NMEA_INFO_PRESENT_MASK ((_nmeaINFO_FIELD_LAST << 1) - 1)
 
+void nmea_INFO_set_connection(nmeaINFO *info, int connection);
+bool nmea_INFO_has_connection(nmeaINFO *info);
 bool nmea_INFO_has_fix(nmeaINFO *info);
 
 void nmea_INFO2time(nmeaINFO *info, RTCDateTime *timespec, long int timezone);

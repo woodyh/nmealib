@@ -19,7 +19,6 @@
 
 #include <nmea/gmath.h>
 #include <nmea/tok.h>
-#include <nmea/context.h>
 
 #include <string.h>
 #include <math.h>

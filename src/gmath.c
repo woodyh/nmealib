@@ -25,7 +25,7 @@
  * @param val degrees
  * @return radians
  */
-double nmea_degree2radian(const double val) {
+inline double nmea_degree2radian(const double val) {
 	return (val * NMEA_PI180);
 }
 
@@ -35,7 +35,7 @@ double nmea_degree2radian(const double val) {
  * @param val radians
  * @return degrees
  */
-double nmea_radian2degree(const double val) {
+inline double nmea_radian2degree(const double val) {
 	return (val / NMEA_PI180);
 }
 
@@ -45,7 +45,7 @@ double nmea_radian2degree(const double val) {
  * @param val NDEG (NMEA degrees)
  * @return decimal (fractional) degrees
  */
-double nmea_ndeg2degree(const double val) {
+inline double nmea_ndeg2degree(const double val) {
 	double deg;
 	double fra_part = modf(val / 100.0, &deg);
 	return (deg + ((fra_part * 100.0) / 60.0));
@@ -57,7 +57,7 @@ double nmea_ndeg2degree(const double val) {
  * @param val decimal (fractional) degrees
  * @return NDEG (NMEA degrees)
  */
-double nmea_degree2ndeg(const double val) {
+inline double nmea_degree2ndeg(const double val) {
 	double deg;
 	double fra_part = modf(val, &deg);
 	return ((deg * 100.0) + (fra_part * 60.0));
@@ -69,7 +69,7 @@ double nmea_degree2ndeg(const double val) {
  * @param val NDEG (NMEA degrees)
  * @return radians
  */
-double nmea_ndeg2radian(const double val) {
+inline double nmea_ndeg2radian(const double val) {
 	return nmea_degree2radian(nmea_ndeg2degree(val));
 }
 
@@ -79,7 +79,7 @@ double nmea_ndeg2radian(const double val) {
  * @param val radians
  * @return NDEG (NMEA degrees)
  */
-double nmea_radian2ndeg(const double val) {
+inline double nmea_radian2ndeg(const double val) {
 	return nmea_degree2ndeg(nmea_radian2degree(val));
 }
 
@@ -90,7 +90,7 @@ double nmea_radian2ndeg(const double val) {
  * @param vdop VDOP
  * @return PDOP
  */
-double nmea_calc_pdop(const double hdop, const double vdop) {
+inline double nmea_calc_pdop(const double hdop, const double vdop) {
 	return sqrt(pow(hdop, 2) + pow(vdop, 2));
 }
 
@@ -100,7 +100,7 @@ double nmea_calc_pdop(const double hdop, const double vdop) {
  * @param dop the DOP
  * @return the DOP in meters
  */
-double nmea_dop2meters(const double dop) {
+inline double nmea_dop2meters(const double dop) {
 	return (dop * NMEA_DOP_FACTOR);
 }
 
@@ -110,7 +110,7 @@ double nmea_dop2meters(const double dop) {
  * @param meters the DOP in meters
  * @return the plain DOP
  */
-double nmea_meters2dop(const double meters) {
+inline double nmea_meters2dop(const double meters) {
 	return (meters / NMEA_DOP_FACTOR);
 }
 

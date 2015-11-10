@@ -20,12 +20,19 @@
 #include <nmea/sentence.h>
 #include <nmea/gmath.h>
 
-#include <stdbool.h>
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
 #include "ch.h"
 #include "hal.h"
+
+void nmea_INFO_set_connection(nmeaINFO *info, int connection) {
+    info->connection = connection;
+}
+
+bool nmea_INFO_has_connection(nmeaINFO *info) {
+    return (info->connection == NMEA_CONNECTION);
+}
 
 /**
  * Determine if a nmeaINFO structure has a fix
@@ -36,7 +43,6 @@
 bool nmea_INFO_has_fix(nmeaINFO *info) {
     return (info->fix > NMEA_FIX_BAD);
 }
-
 
 /**
  * Determine the day of the week for any Gregorian date
