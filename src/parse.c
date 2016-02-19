@@ -613,8 +613,12 @@ int nmea_parse_GPGSV(const char *s, const int len, bool has_checksum, nmeaGPGSV 
 #endif
         return 0;
       }
+<<<<<<< HEAD
       if ((pack->sat_data[sat_count].elv < -90) || (pack->sat_data[sat_count].elv > 90)) {
 #if NMEA_ERROR
+=======
+      if ((pack->sat_data[sat_count].elv < -180) || (pack->sat_data[sat_count].elv > 180)) {
+>>>>>>> 3628f7e... parse: be less strict about satellite elevation
         nmea_error("GPGSV parse error: invalid sat %d elevation (%d)", sat_count + 1, pack->sat_data[sat_count].elv);
 #endif
         return 0;
